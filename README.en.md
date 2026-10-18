@@ -37,6 +37,16 @@ Windows 10/11 (.NET Framework 4.8 is built in, nothing else to install)
 
 When you start the app, the toolbar appears in the top-left corner of the active monitor. Drag the top row (HighPen) to move it; the position is remembered. Use the `<` button to collapse and expand it.
 
+### Changing the language
+
+The default language is **English**. On first launch, buttons and tooltips are shown in English. You can switch while the app is running:
+
+1. Click **Settings** on the toolbar or press `Ctrl+Alt+D` to open the settings panel.
+2. Under **Language** near the bottom of the panel, click **日本語** or **한국어**.
+3. The change applies immediately without restarting, and the current state (pen, zoom, etc.) is kept.
+
+The chosen language is saved automatically and used on the next launch.
+
 Shortcuts are global, so they work while you are using other programs. A combination already used by another program may fail to register. Hovering over a button shows its name and shortcut as a tooltip.
 
 | Button | Shortcut | Function |
@@ -62,7 +72,7 @@ Shortcuts are global, so they work while you are using other programs. A combina
 | Pen width | | 1–30 |
 | Pressure | Ctrl+Alt+R | The harder you press the pen, the thicker the line. A mouse always draws at the set width. |
 | Spot color / size | | 8 colors and sizes 20–200. |
-| Language | | Choose 한국어, 日本語 or English; the change applies immediately. On first launch the app follows the Windows display language, and uses English if it is neither Korean nor Japanese. |
+| Language | | Choose 한국어, 日本語 or English; the change applies immediately. The default is English (see [Changing the language](#changing-the-language)). |
 | Version | | The current version (`HighPen v1.2.0`) is shown at the bottom of the panel. |
 
 Settings are saved automatically to `%APPDATA%\HighPen\settings.txt`.

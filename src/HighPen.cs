@@ -291,10 +291,9 @@ namespace HighPen
 
         public static string T(string key) { return Text[key][Cur]; }
 
-        // Saved code, or the Windows display language when nothing is saved (English if unsupported).
+        // Saved code, or English when nothing (or an unsupported code) is saved.
         public static int FromCode(string code)
         {
-            if (string.IsNullOrEmpty(code)) code = System.Globalization.CultureInfo.CurrentUICulture.TwoLetterISOLanguageName;
             int i = Array.IndexOf(Codes, code);
             return i < 0 ? 2 : i;
         }
@@ -311,7 +310,7 @@ namespace HighPen
         public bool Pressure = true;
         public double ZoomFactor = 2;
         public int BarX = 20, BarY = 20; // offset from the monitor work area, in pixels
-        public string Language = ""; // "" = follow the Windows display language
+        public string Language = ""; // "" = English (the default)
 
         static string FilePath
         {
