@@ -61,11 +61,45 @@ namespace HighPen
 
         [StructLayout(LayoutKind.Sequential)]
         public struct MAGTRANSFORM { [MarshalAs(UnmanagedType.ByValArray, SizeConst = 9)] public float[] v; }
+        [DllImport("user32.dll")] public static extern bool ClipCursor(ref RECT r);
+        [DllImport("user32.dll")] public static extern bool ClipCursor(IntPtr r);
         [DllImport("Magnification.dll")] public static extern bool MagInitialize();
         [DllImport("Magnification.dll")] public static extern bool MagUninitialize();
         [DllImport("Magnification.dll")] public static extern bool MagSetWindowSource(IntPtr h, RECT r);
         [DllImport("Magnification.dll")] public static extern bool MagSetWindowTransform(IntPtr h, ref MAGTRANSFORM t);
         [DllImport("Magnification.dll")] public static extern bool MagSetWindowFilterList(IntPtr h, uint mode, int count, IntPtr[] list);
+
+        [DllImport("user32.dll")] public static extern IntPtr GetForegroundWindow();
+        [DllImport("user32.dll")] public static extern uint GetWindowThreadProcessId(IntPtr h, out uint pid);
+
+        static IntPtr lastFg = IntPtr.Zero;
+        static bool lastFgIsSnip;
+
+        // True while the Windows snipping overlay (Win+Shift+S) is the foreground, full-screen window.
+        public static bool IsSnippingOverlayActive()
+        {
+            IntPtr h = GetForegroundWindow();
+            if (h == IntPtr.Zero) { lastFg = IntPtr.Zero; return false; }
+            if (h != lastFg)
+            {
+                lastFg = h;
+                lastFgIsSnip = false;
+                try
+                {
+                    uint pid;
+                    GetWindowThreadProcessId(h, out pid);
+                    string n = System.Diagnostics.Process.GetProcessById((int)pid).ProcessName;
+                    lastFgIsSnip = n.Equals("SnippingTool", StringComparison.OrdinalIgnoreCase) || n.Equals("ScreenClippingHost", StringComparison.OrdinalIgnoreCase);
+                }
+                catch { }
+            }
+            if (!lastFgIsSnip) return false;
+            RECT r;
+            if (!GetWindowRect(h, out r)) return false;
+            System.Drawing.Rectangle b = System.Windows.Forms.Screen.FromHandle(h).Bounds;
+            // the overlay spans the whole screen; the editor window of Snipping Tool does not
+            return (r.Right - r.Left) >= b.Width * 0.9 && (r.Bottom - r.Top) >= b.Height * 0.9;
+        }
 
         public static System.Windows.Forms.Screen GetScreen(int idx)
         {
@@ -100,7 +134,7 @@ namespace HighPen
         public bool Frozen;
         // Reports the zoomed monitor bounds and the source rect being shown (empty bounds = zoom off).
         public Action<System.Drawing.Rectangle, Native.RECT> ViewChanged;
-        System.Drawing.Rectangle current;
+        System.Drawing.Rectangle current, locked;
         DispatcherTimer timer = new DispatcherTimer();
         public bool Active { get { return host != IntPtr.Zero; } }
 
@@ -141,6 +175,8 @@ namespace HighPen
             timer.Stop();
             if (host != IntPtr.Zero)
             {
+                Native.ClipCursor(IntPtr.Zero);
+                locked = System.Drawing.Rectangle.Empty;
                 Native.DestroyWindow(host); host = IntPtr.Zero; mag = IntPtr.Zero; Native.MagUninitialize();
                 if (ViewChanged != null) ViewChanged(System.Drawing.Rectangle.Empty, new Native.RECT());
             }
@@ -157,7 +193,17 @@ namespace HighPen
             if (Frozen && current != System.Drawing.Rectangle.Empty) return;
             Native.POINT p;
             if (!Native.GetCursorPos(out p)) return;
-            System.Drawing.Rectangle b = System.Windows.Forms.Screen.FromPoint(new System.Drawing.Point(p.X, p.Y)).Bounds;
+            // the zoomed monitor is fixed when zoom starts; the pointer is confined to it
+            if (locked.IsEmpty)
+            {
+                locked = System.Windows.Forms.Screen.FromPoint(new System.Drawing.Point(p.X, p.Y)).Bounds;
+                Native.RECT clip;
+                clip.Left = locked.Left; clip.Top = locked.Top; clip.Right = locked.Right; clip.Bottom = locked.Bottom;
+                Native.ClipCursor(ref clip);
+            }
+            System.Drawing.Rectangle b = locked;
+            p.X = Math.Max(b.Left, Math.Min(b.Right - 1, p.X));
+            p.Y = Math.Max(b.Top, Math.Min(b.Bottom - 1, p.Y));
             if (b != current)
             {
                 current = b;
@@ -402,7 +448,11 @@ namespace HighPen
             SourceInitialized += delegate { Native.AddExStyle(this, Native.WS_EX_NOACTIVATE); RegisterHotkeys(); };
             overlay.Canvas.PreviewMouseLeftButtonDown += delegate (object sender, MouseButtonEventArgs e)
             {
-                if (!textMode || e.OriginalSource != overlay.Canvas) return;
+                if (!textMode) return;
+                DependencyObject src = e.OriginalSource as DependencyObject;
+                while (src != null && !(src is TextBox) && src != overlay.Canvas)
+                    src = (src is Visual || src is System.Windows.Media.Media3D.Visual3D) ? VisualTreeHelper.GetParent(src) : LogicalTreeHelper.GetParent(src);
+                if (src is TextBox) return;
                 e.Handled = true;
                 BeginBubble(e.GetPosition(overlay.Canvas));
             };
@@ -417,6 +467,9 @@ namespace HighPen
 
             // Slideshow / other topmost windows can cover us; re-assert periodically.
             zoomer.ViewChanged = OnZoomView;
+            snipTimer.Interval = TimeSpan.FromMilliseconds(100);
+            snipTimer.Tick += delegate { CheckSnipping(); };
+            snipTimer.Start();
             topTimer.Interval = TimeSpan.FromSeconds(1.5);
             topTimer.Tick += delegate { ReassertTop(); };
             topTimer.Start();
@@ -515,8 +568,31 @@ namespace HighPen
 
         List<Border> monitorBtns = new List<Border>();
 
+        // While the snipping overlay is up, get out of its way: no input capture, no spot,
+        // no z-order fighting. Normal state is restored when it closes.
+        bool suspended;
+        DispatcherTimer snipTimer = new DispatcherTimer();
+
+        void CheckSnipping()
+        {
+            bool snip = Native.IsSnippingOverlayActive();
+            if (snip == suspended) return;
+            suspended = snip;
+            if (suspended)
+            {
+                Native.SetClickThrough(overlay, true);
+                spotWin.SetSpotVisible(false);
+            }
+            else
+            {
+                ApplyMode();
+                ApplySpot();
+            }
+        }
+
         void ReassertTop()
         {
+            if (suspended) return;
             zoomer.BringTopmost();
             Native.BringTopmost(overlay);
             Native.BringTopmost(spotWin);
@@ -711,10 +787,10 @@ namespace HighPen
             SetPen(true);
         }
         void ToggleEraser() { eraser = !eraser; textMode = false; if (eraser) penMode = true; ApplyMode(); }
-        // First press enters eraser mode; pressing again while erasing wipes all pen strokes on this page.
+        // First press enters eraser mode; pressing again while erasing wipes all strokes and speech bubbles on this page.
         void EraserHotkey()
         {
-            if (eraser) overlay.Canvas.Strokes.Clear();
+            if (eraser) ClearPage();
             else ToggleEraser();
         }
         void ToggleText() { textMode = !textMode; if (textMode) { penMode = true; eraser = false; } ApplyMode(); }
@@ -839,15 +915,20 @@ namespace HighPen
                 textMode = false;
                 ApplyMode();
             };
-            tb.KeyDown += delegate (object o, KeyEventArgs e)
+            tb.PreviewKeyDown += delegate (object o, KeyEventArgs e)
             {
                 if (e.Key == Key.Escape) finish(false);
                 else if (e.Key == Key.Enter && (Keyboard.Modifiers & ModifierKeys.Shift) == 0) { finish(true); e.Handled = true; }
             };
-            tb.LostKeyboardFocus += delegate { finish(true); };
-            overlay.Activate();
-            tb.Focus();
-            Keyboard.Focus(tb);
+            // Focus only after the overlay has actually been activated, and only treat focus loss
+            // as "done" once the box has really had focus.
+            Dispatcher.BeginInvoke(DispatcherPriority.Input, new Action(delegate
+            {
+                overlay.Activate();
+                tb.Focus();
+                Keyboard.Focus(tb);
+                tb.LostKeyboardFocus += delegate { finish(true); };
+            }));
         }
 
         void AddBubble(string text, Point pos)
@@ -901,7 +982,9 @@ namespace HighPen
                 ic.Children.Clear();
                 foreach (UIElement el in overlay.Bubbles[board]) ic.Children.Add(el);
             }
-            ic.Cursor = textMode ? Cursors.IBeam : null;
+            // InkCanvas' built-in ink cursor is a barely visible dot, so use a real pointer
+            ic.UseCustomCursor = true;
+            ic.Cursor = textMode ? Cursors.IBeam : (eraser ? Cursors.Cross : Cursors.Pen);
             ApplyPen();
 
             if (board == 1) overlay.Background = Brushes.White;
@@ -910,7 +993,7 @@ namespace HighPen
 
             zoomer.Frozen = penMode;
             ApplyZoomTransform();
-            Native.SetClickThrough(overlay, !penMode);
+            Native.SetClickThrough(overlay, !penMode || suspended);
             ic.IsHitTestVisible = penMode;
 
             Highlight(penBtn, penMode && !eraser && !textMode);
