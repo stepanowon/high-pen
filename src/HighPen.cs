@@ -687,7 +687,7 @@ namespace HighPen
 
         void BuildContent()
         {
-            buttons.Children.Clear();
+            buttons = new StackPanel(); // a fresh panel: the old one is still parented to the previous toolbar
             monitorBtns.Clear();
             StackPanel row = new StackPanel();
             row.Orientation = Orientation.Horizontal;
