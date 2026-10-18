@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Runtime.InteropServices;
+using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Ink;
@@ -1020,6 +1021,13 @@ namespace HighPen
             return IntPtr.Zero;
         }
 
+        // Called when HighPen is launched again while already running.
+        public void Summon()
+        {
+            if (collapsed) ToggleCollapse();
+            ReassertTop();
+        }
+
         void ToggleCollapse()
         {
             collapsed = !collapsed;
@@ -1226,6 +1234,12 @@ namespace HighPen
         [STAThread]
         static void Main()
         {
+            // One instance per user session: a second launch asks the running one to show its toolbar and exits.
+            bool first;
+            Mutex single = new Mutex(true, @"Local\HighPen.SingleInstance", out first);
+            EventWaitHandle summon = new EventWaitHandle(false, EventResetMode.AutoReset, @"Local\HighPen.Summon");
+            if (!first) { summon.Set(); return; }
+
             App app = new App();
             app.ShutdownMode = ShutdownMode.OnExplicitShutdown;
             Settings cfg = Settings.Load();
@@ -1236,7 +1250,12 @@ namespace HighPen
             overlay.Show();
             spot.Show();
             bar.Show();
+            ThreadPool.RegisterWaitForSingleObject(summon, delegate
+            {
+                bar.Dispatcher.BeginInvoke(new Action(bar.Summon));
+            }, null, Timeout.Infinite, false);
             app.Run();
+            GC.KeepAlive(single);
         }
     }
 }
