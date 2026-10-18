@@ -482,7 +482,7 @@ namespace HighPen
 
     class ToolbarWindow : Window
     {
-        const string AppVersion = "1.1.0"; // keep in sync with Version in Setup.cs
+        const string AppVersion = "1.2.0"; // keep in sync with Version in Setup.cs
         static readonly string[] Palette = { "#FF3B30", "#FF9500", "#FFD60A", "#34C759", "#0A84FF", "#BF5AF2", "#000000", "#FFFFFF" };
         static readonly string[] ColorNames = { "Red", "Orange", "Yellow", "Green", "Blue", "Purple", "Black", "White" }; // Lang keys
         static readonly Key[] ColorKeys = { Key.R, Key.O, Key.Y, Key.G, Key.B, Key.P, Key.K, Key.W };
