@@ -396,6 +396,7 @@ namespace HighPen
 
     class ToolbarWindow : Window
     {
+        const string AppVersion = "1.0.0"; // keep in sync with Version in Setup.cs
         static readonly string[] Palette = { "#FF3B30", "#FF9500", "#FFD60A", "#34C759", "#0A84FF", "#BF5AF2", "#000000", "#FFFFFF" };
         static readonly string[] ColorNames = { "빨강", "주황", "노랑", "초록", "파랑", "보라", "검정", "흰색" };
         static readonly Key[] ColorKeys = { Key.R, Key.O, Key.Y, Key.G, Key.B, Key.P, Key.K, Key.W };
@@ -733,6 +734,9 @@ namespace HighPen
             p.Children.Add(Swatches(cfg.SpotColor, delegate (string c) { cfg.SpotColor = c; ApplySpot(); cfg.Save(); }, false));
             p.Children.Add(SecTitle("스팟 크기"));
             p.Children.Add(MakeSlider(20, 200, cfg.SpotSize, delegate (double v) { cfg.SpotSize = v; ApplySpot(); cfg.Save(); }));
+
+            p.Children.Add(new Separator { Margin = new Thickness(0, 8, 0, 4) });
+            p.Children.Add(new TextBlock { Text = "HighPen v" + AppVersion, Foreground = Brushes.Gray, FontSize = 11, HorizontalAlignment = HorizontalAlignment.Center });
 
             return new Border { Background = PanelBg, BorderBrush = Line, BorderThickness = new Thickness(0, 1, 1, 1), Child = p, VerticalAlignment = VerticalAlignment.Top };
         }
