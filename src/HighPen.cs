@@ -122,12 +122,13 @@ namespace HighPen
         }
     }
 
-    // Live 2x zoom of the monitor under the mouse pointer, using the Windows Magnification API.
+    // Live zoom (1.5x / 2x / 2.5x) of the monitor under the mouse pointer, using the Windows Magnification API.
     // The view is positioned so the content under the pointer stays under the pointer,
     // so clicks (the host window is click-through) land exactly where they appear.
     class Zoomer
     {
-        const float Factor = 2f;
+        public static readonly double[] Factors = { 1.5, 2, 2.5 };
+        float factor = 2f;
         IntPtr host, mag;
         IntPtr[] exclude;
         // While frozen the view stays put so the user can draw on it.
@@ -137,6 +138,27 @@ namespace HighPen
         System.Drawing.Rectangle current, locked;
         DispatcherTimer timer = new DispatcherTimer();
         public bool Active { get { return host != IntPtr.Zero; } }
+
+        // Can be changed while zoomed; the view updates on the spot.
+        public double Factor
+        {
+            get { return factor; }
+            set
+            {
+                factor = (float)value;
+                if (!Active) return;
+                ApplyTransform();
+                current = System.Drawing.Rectangle.Empty;
+                bool f = Frozen; Frozen = false; Update(); Frozen = f;
+            }
+        }
+
+        void ApplyTransform()
+        {
+            Native.MAGTRANSFORM t = new Native.MAGTRANSFORM();
+            t.v = new float[] { factor, 0, 0, 0, factor, 0, 0, 0, 1 };
+            Native.MagSetWindowTransform(mag, ref t);
+        }
 
         public Zoomer()
         {
@@ -156,9 +178,7 @@ namespace HighPen
             Native.SetLayeredWindowAttributes(host, 0, 255, 2);
             mag = Native.CreateWindowEx(0, "Magnifier", "HighPenMag", Native.WS_CHILD | Native.WS_VISIBLE, 0, 0, 100, 100, host, IntPtr.Zero, inst, IntPtr.Zero);
             if (mag == IntPtr.Zero) { Stop(); return; }
-            Native.MAGTRANSFORM t = new Native.MAGTRANSFORM();
-            t.v = new float[] { Factor, 0, 0, 0, Factor, 0, 0, 0, 1 };
-            Native.MagSetWindowTransform(mag, ref t);
+            ApplyTransform();
             // keep the zoom window itself, the toolbar, the ink overlay and the spot out of the magnified image
             IntPtr[] list = new IntPtr[exclude.Length + 1];
             list[0] = host;
@@ -210,12 +230,12 @@ namespace HighPen
                 Native.SetWindowPos(host, Native.HWND_TOPMOST, b.X, b.Y, b.Width, b.Height, Native.SWP_NOACTIVATE | 0x40);
                 Native.MoveWindow(mag, 0, 0, b.Width, b.Height, true);
             }
-            float k = 1f - 1f / Factor;
+            float k = 1f - 1f / factor;
             Native.RECT r;
             r.Left = b.X + (int)Math.Round((p.X - b.X) * k);
             r.Top = b.Y + (int)Math.Round((p.Y - b.Y) * k);
-            r.Right = r.Left + (int)(b.Width / Factor);
-            r.Bottom = r.Top + (int)(b.Height / Factor);
+            r.Right = r.Left + (int)(b.Width / factor);
+            r.Bottom = r.Top + (int)(b.Height / factor);
             Native.MagSetWindowSource(mag, r);
             if (ViewChanged != null) ViewChanged(b, r);
         }
@@ -243,7 +263,8 @@ namespace HighPen
             { "Clear",         new[] { "지우기", "全消去", "Clear" } },
             { "ClearTip",      new[] { "전체 지우기", "すべて消去", "Clear all" } },
             { "Zoom",          new[] { "확대", "拡大", "Zoom" } },
-            { "ZoomTip",       new[] { "2배 확대", "2倍拡大", "2x zoom" } },
+            { "ZoomTip",       new[] { "{0}배 확대", "{0}倍拡大", "{0}x zoom" } },
+            { "ZoomFactor",    new[] { "확대 배율", "拡大倍率", "Zoom level" } },
             { "Bubble",        new[] { "말풍선", "吹き出し", "Note" } },
             { "Settings",      new[] { "설정", "設定", "Settings" } },
             { "Collapse",      new[] { "접기/펴기", "折りたたみ/展開", "Collapse/expand" } },
@@ -288,6 +309,7 @@ namespace HighPen
         public bool SpotOn = true;
         public int Monitor = 0;
         public bool Pressure = true;
+        public double ZoomFactor = 2;
         public int BarX = 20, BarY = 20; // offset from the monitor work area, in pixels
         public string Language = ""; // "" = follow the Windows display language
 
@@ -317,6 +339,7 @@ namespace HighPen
                     else if (k == "SpotSize") s.SpotSize = double.Parse(v, System.Globalization.CultureInfo.InvariantCulture);
                     else if (k == "SpotOn") s.SpotOn = v == "1";
                     else if (k == "Pressure") s.Pressure = v == "1";
+                    else if (k == "ZoomFactor") s.ZoomFactor = double.Parse(v, System.Globalization.CultureInfo.InvariantCulture);
                     else if (k == "Monitor") s.Monitor = int.Parse(v);
                     else if (k == "BarX") s.BarX = int.Parse(v);
                     else if (k == "BarY") s.BarY = int.Parse(v);
@@ -324,6 +347,7 @@ namespace HighPen
                 }
             }
             catch { }
+            if (Array.IndexOf(Zoomer.Factors, s.ZoomFactor) < 0) s.ZoomFactor = 2;
             return s;
         }
 
@@ -340,6 +364,7 @@ namespace HighPen
                     "SpotOn=" + (SpotOn ? "1" : "0"),
                     "Monitor=" + Monitor,
                     "Pressure=" + (Pressure ? "1" : "0"),
+                    "ZoomFactor=" + ZoomFactor.ToString(ic),
                     "BarX=" + BarX,
                     "BarY=" + BarY,
                     "Language=" + Language });
@@ -523,6 +548,7 @@ namespace HighPen
 
             // Slideshow / other topmost windows can cover us; re-assert periodically.
             zoomer.ViewChanged = OnZoomView;
+            zoomer.Factor = cfg.ZoomFactor;
             snipTimer.Interval = TimeSpan.FromMilliseconds(100);
             snipTimer.Tick += delegate { CheckSnipping(); };
             snipTimer.Start();
@@ -555,7 +581,8 @@ namespace HighPen
             DpiScale d = VisualTreeHelper.GetDpi(overlay);
             double sx = (zoomSource.Left - zoomBounds.X) / d.DpiScaleX;
             double sy = (zoomSource.Top - zoomBounds.Y) / d.DpiScaleY;
-            ic.RenderTransform = new MatrixTransform(2, 0, 0, 2, -2 * sx, -2 * sy);
+            double f = zoomer.Factor;
+            ic.RenderTransform = new MatrixTransform(f, 0, 0, f, -f * sx, -f * sy);
         }
 
         void ApplyMonitor()
@@ -623,6 +650,7 @@ namespace HighPen
         }
 
         List<Border> monitorBtns = new List<Border>();
+        List<Border> zoomFactorBtns = new List<Border>();
 
         // While the snipping overlay is up, get out of its way: no input capture, no spot,
         // no z-order fighting. Normal state is restored when it closes.
@@ -730,7 +758,7 @@ namespace HighPen
             Tip(boardBtn, Lang.T("BoardTip"), "B");
             Tip(undo, Lang.T("Undo"), "Z");
             Tip(clear, Lang.T("ClearTip"), "C");
-            Tip(zoomBtn, Lang.T("ZoomTip"), "X");
+            Tip(zoomBtn, ZoomTipText(), "X");
             Tip(bubbleBtn, Lang.T("Bubble"), "T");
             Tip(setBtn, Lang.T("Settings"), "D");
             Tip(ab, Lang.T("Collapse"), "H");
@@ -819,6 +847,21 @@ namespace HighPen
             p.Children.Add(MakeSlider(20, 200, cfg.SpotSize, delegate (double v) { cfg.SpotSize = v; ApplySpot(); cfg.Save(); }));
 
             p.Children.Add(new Separator { Margin = new Thickness(0, 8, 0, 4) });
+            p.Children.Add(SecTitle(Lang.T("ZoomFactor")));
+            WrapPanel zp = new WrapPanel();
+            zoomFactorBtns.Clear();
+            foreach (double f in Zoomer.Factors)
+            {
+                double fv = f;
+                Border zb = new Border { Width = 58, Height = 26, Margin = new Thickness(2), Cursor = Cursors.Hand, Background = f == cfg.ZoomFactor ? Active : Idle };
+                zb.Child = new TextBlock { Text = FactorText(f) + "x", Foreground = Brushes.White, HorizontalAlignment = HorizontalAlignment.Center, VerticalAlignment = VerticalAlignment.Center };
+                zb.MouseLeftButtonUp += delegate { SetZoomFactor(fv); };
+                zoomFactorBtns.Add(zb);
+                zp.Children.Add(zb);
+            }
+            p.Children.Add(zp);
+
+            p.Children.Add(new Separator { Margin = new Thickness(0, 8, 0, 4) });
             p.Children.Add(SecTitle(Lang.T("Language")));
             WrapPanel lp = new WrapPanel();
             for (int i = 0; i < Lang.Codes.Length; i++)
@@ -905,6 +948,19 @@ namespace HighPen
             Highlight(zoomBtn, zoomer.Active);
             ReassertTop();
         }
+        static string FactorText(double f) { return f.ToString(System.Globalization.CultureInfo.InvariantCulture); }
+        string ZoomTipText() { return string.Format(Lang.T("ZoomTip"), FactorText(cfg.ZoomFactor)); }
+
+        void SetZoomFactor(double f)
+        {
+            cfg.ZoomFactor = f;
+            cfg.Save();
+            zoomer.Factor = f;
+            for (int i = 0; i < zoomFactorBtns.Count; i++)
+                zoomFactorBtns[i].Background = Zoomer.Factors[i] == f ? Active : Idle;
+            Tip(zoomBtn, ZoomTipText(), "X");
+        }
+
         void Quit() { zoomer.Stop(); cfg.Save(); Application.Current.Shutdown(); }
 
         // ---------- global hotkeys (Ctrl+Alt+key) ----------

@@ -48,7 +48,7 @@ Shortcuts are global, so they work while you are using other programs. A combina
 | Undo | Ctrl+Alt+Z | Cancels the last stroke. |
 | Clear | Ctrl+Alt+C | Clears all ink and notes on the current page. |
 | Note | Ctrl+Alt+T | Places a text note where you click. Enter confirms, Shift+Enter adds a line break, Esc cancels. |
-| Zoom | Ctrl+Alt+X | Zooms the monitor under the mouse pointer to 2x. |
+| Zoom | Ctrl+Alt+X | Zooms the monitor under the mouse pointer (1.5x, 2x or 2.5x, chosen in Settings). |
 | Settings | Ctrl+Alt+D | Opens and closes the settings panel. |
 | `<` | Ctrl+Alt+H | Collapses and expands the toolbar. |
 | Red X | Ctrl+Alt+Q | Quit |
@@ -132,11 +132,11 @@ Attaches a text note to the screen. Use it to leave terms or explanations in cle
 
 ![Ink and notes](screen/펜2.png)
 
-### 2x zoom
+### Zoom
 
-Zooms the monitor under the mouse pointer to 2x in real time.
+Zooms the monitor under the mouse pointer in real time. Pick 1.5x, 2x or 2.5x in the settings panel; changing it while zoomed applies immediately.
 
-![2x zoom](screen/화면%20확대.png)
+![Zoom](screen/화면%20확대.png)
 
 - The view moves so that the content under the pointer stays under the pointer after zooming. Just click where you see things.
 - The toolbar is not zoomed and keeps its normal size.
