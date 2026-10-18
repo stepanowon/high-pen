@@ -1,6 +1,8 @@
 # HighPen
 
-**한국어** | [English](README.en.md) | [日本語](README.ja.md)
+- **한국어:** 지금 보고 있는 문서입니다.
+- **English:** [Read this document in English.](README.en.md)
+- **日本語:** [日本語版のドキュメントはこちらです。](README.ja.md)
 
 비대면 강의용 Windows 펜 앱입니다. 화면 위에 바로 필기하고, 마우스 포인터를 스팟으로 강조하고, 화면을 확대하고, 칠판을 띄울 수 있습니다. 와콤 같은 펜 태블릿(Windows Ink)과 마우스를 모두 지원합니다.
 

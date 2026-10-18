@@ -1,6 +1,8 @@
 # HighPen
 
-[한국어](README.md) | [English](README.en.md) | **日本語**
+- **한국어:** [한국어로 된 문서는 여기를 보세요.](README.md)
+- **English:** [Read this document in English.](README.en.md)
+- **日本語:** 現在ご覧のドキュメントです。
 
 オンライン授業向けの Windows 用ペンアプリです。画面に直接書き込んだり、マウスポインターをスポットで強調したり、画面を拡大したり、ボードを表示したりできます。ワコムなどのペンタブレット (Windows Ink) とマウスの両方に対応しています。
 

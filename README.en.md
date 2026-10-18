@@ -1,6 +1,8 @@
 # HighPen
 
-[한국어](README.md) | **English** | [日本語](README.ja.md)
+- **한국어:** [한국어로 된 문서는 여기를 보세요.](README.md)
+- **English:** You are reading this document.
+- **日本語:** [日本語版のドキュメントはこちらです。](README.ja.md)
 
 HighPen is a Windows pen app for online lectures. You can write directly on the screen, highlight the mouse pointer with a spotlight, zoom in on the screen, and bring up a whiteboard. It works with pen tablets such as Wacom (Windows Ink) as well as with a mouse.
 
