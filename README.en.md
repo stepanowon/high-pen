@@ -45,7 +45,7 @@ Shortcuts are global, so they work while you are using other programs. A combina
 | Pen | Ctrl+Alt+P | Writes on the screen. When the pen is turned off, the ink stays on screen and the mouse passes through to the screen below. Switches back to the pen from eraser or note mode. |
 | Eraser | Ctrl+Alt+E | Erases whole strokes. Pressing it again while erasing deletes all pen ink and notes on the current page. |
 | Board | Ctrl+Alt+B | Cycles white board → black board → off. Ink on the screen and on the two boards is kept separately. |
-| Undo | Ctrl+Alt+Z | Cancels the last stroke. |
+| Undo | Ctrl+Alt+Z | Cancels the last pen stroke or eraser action. |
 | Clear | Ctrl+Alt+C | Clears all ink and notes on the current page. |
 | Note | Ctrl+Alt+T | Places a text note where you click. Enter confirms, Shift+Enter adds a line break, Esc cancels. |
 | Zoom | Ctrl+Alt+X | Zooms the monitor under the mouse pointer (1.5x, 2x or 2.5x, chosen in Settings). |
@@ -114,7 +114,7 @@ Covers the whole screen with a white or black board to write on. Each press of t
 
 ### Undo / Clear
 
-- **Undo:** cancels the last stroke drawn on the current page. Notes cannot be undone.
+- **Undo:** cancels the last action on the current page: one pen stroke, or all strokes removed by one eraser drag. Clear all cannot be undone. Notes cannot be undone.
 - **Clear:** removes all ink and notes on the current page. Other pages (screen, white board, black board) are not affected.
 
 ### Notes

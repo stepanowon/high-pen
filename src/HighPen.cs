@@ -527,6 +527,15 @@ namespace HighPen
             BuildContent();
 
             SourceInitialized += delegate { Native.AddExStyle(this, Native.WS_EX_NOACTIVATE); RegisterHotkeys(); };
+            for (int i = 0; i < overlay.Pages.Length; i++)
+            {
+                int page = i;
+                overlay.Pages[i].StrokesChanged += delegate (object sender, StrokeCollectionChangedEventArgs e) { RecordInkEdit(page, e); };
+            }
+            overlay.Canvas.PreviewStylusDown += delegate { BeginPress(); };
+            overlay.Canvas.PreviewMouseLeftButtonDown += delegate { BeginPress(); };
+            overlay.Canvas.PreviewStylusUp += delegate { pressed = false; };
+            overlay.Canvas.PreviewMouseLeftButtonUp += delegate { pressed = false; };
             overlay.Canvas.PreviewMouseLeftButtonDown += delegate (object sender, MouseButtonEventArgs e)
             {
                 if (!textMode) return;
@@ -1041,7 +1050,10 @@ namespace HighPen
 
         void ClearPage()
         {
+            history[board].Clear();
+            undoing = true;
             overlay.Canvas.Strokes.Clear();
+            undoing = false;
             overlay.Canvas.Children.Clear();
             overlay.Bubbles[board].Clear();
         }
@@ -1103,10 +1115,51 @@ namespace HighPen
             overlay.Canvas.Children.Add(b);
         }
 
+        // ---------- undo ----------
+
+        // One undo step: a pen stroke, or every stroke removed by one eraser drag.
+        class InkEdit
+        {
+            public StrokeCollection Added = new StrokeCollection();
+            public StrokeCollection Removed = new StrokeCollection();
+        }
+
+        List<InkEdit>[] history = { new List<InkEdit>(), new List<InkEdit>(), new List<InkEdit>() };
+        bool undoing, pressed, newEdit;
+
+        // Stylus input is promoted to mouse events too, so only the first down of a press starts a new step.
+        void BeginPress()
+        {
+            if (pressed) return;
+            pressed = true;
+            newEdit = true;
+        }
+
+        void RecordInkEdit(int page, StrokeCollectionChangedEventArgs e)
+        {
+            if (undoing) return;
+            List<InkEdit> h = history[page];
+            if (newEdit || !pressed || h.Count == 0) { h.Add(new InkEdit()); newEdit = false; }
+            InkEdit top = h[h.Count - 1];
+            foreach (Stroke st in e.Added) top.Added.Add(st);
+            foreach (Stroke st in e.Removed)
+            {
+                if (top.Added.Contains(st)) top.Added.Remove(st);
+                else top.Removed.Add(st);
+            }
+        }
+
         void UndoStroke()
         {
-            StrokeCollection s = overlay.Canvas.Strokes;
-            if (s.Count > 0) s.RemoveAt(s.Count - 1);
+            List<InkEdit> h = history[board];
+            if (h.Count == 0) return;
+            InkEdit last = h[h.Count - 1];
+            h.RemoveAt(h.Count - 1);
+            StrokeCollection s = overlay.Pages[board];
+            undoing = true;
+            foreach (Stroke st in last.Added) if (s.Contains(st)) s.Remove(st);
+            foreach (Stroke st in last.Removed) if (!s.Contains(st)) s.Add(st);
+            undoing = false;
         }
 
         void ApplyPen()
