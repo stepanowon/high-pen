@@ -17,6 +17,10 @@ namespace HighPenSetup
 
         static bool silent;
 
+        // Installer text follows the Windows display language (Korean / Japanese / otherwise English).
+        static readonly string Ui = System.Globalization.CultureInfo.CurrentUICulture.TwoLetterISOLanguageName;
+        static string L(string ko, string ja, string en) { return Ui == "ko" ? ko : (Ui == "ja" ? ja : en); }
+
         static string InstallDir
         {
             get { return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Programs", AppName); }
@@ -45,7 +49,10 @@ namespace HighPenSetup
             }
             catch (Exception ex)
             {
-                Show((uninstall ? "제거" : "설치") + " 중 오류가 발생했습니다.\n\n" + ex.Message, MessageBoxIcon.Error);
+                Show((uninstall
+                    ? L("제거 중 오류가 발생했습니다.", "アンインストール中にエラーが発生しました。", "An error occurred while uninstalling.")
+                    : L("설치 중 오류가 발생했습니다.", "インストール中にエラーが発生しました。", "An error occurred while installing."))
+                    + "\n\n" + ex.Message, MessageBoxIcon.Error);
                 return 1;
             }
         }
@@ -76,13 +83,13 @@ namespace HighPenSetup
             Type lt = link.GetType();
             lt.InvokeMember("TargetPath", BindingFlags.SetProperty, null, link, new object[] { target });
             lt.InvokeMember("WorkingDirectory", BindingFlags.SetProperty, null, link, new object[] { workDir });
-            lt.InvokeMember("Description", BindingFlags.SetProperty, null, link, new object[] { "비대면 강의용 펜 앱" });
+            lt.InvokeMember("Description", BindingFlags.SetProperty, null, link, new object[] { L("비대면 강의용 펜 앱", "オンライン授業用ペンアプリ", "Pen app for online lectures") });
             lt.InvokeMember("Save", BindingFlags.InvokeMethod, null, link, null);
         }
 
         static int Install()
         {
-            if (!Ask(AppName + " " + Version + " 을(를) 설치할까요?\n\n설치 위치: " + InstallDir)) return 0;
+            if (!Ask(string.Format(L("{0} 을(를) 설치할까요?\n\n설치 위치: {1}", "{0} をインストールしますか？\n\nインストール先: {1}", "Install {0}?\n\nLocation: {1}"), AppName + " " + Version, InstallDir))) return 0;
 
             KillApp();
             Directory.CreateDirectory(InstallDir);
@@ -96,7 +103,7 @@ namespace HighPenSetup
             File.Copy(Assembly.GetExecutingAssembly().Location, uninstaller, true);
 
             CreateLink(StartMenuLink, exe, InstallDir);
-            bool desktop = !silent && MessageBox.Show("바탕화면에 바로가기를 만들까요?", AppName, MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes;
+            bool desktop = !silent && MessageBox.Show(L("바탕화면에 바로가기를 만들까요?", "デスクトップにショートカットを作成しますか？", "Create a desktop shortcut?"), AppName, MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes;
             if (desktop) CreateLink(DesktopLink, exe, InstallDir);
 
             using (RegistryKey k = Registry.CurrentUser.CreateSubKey(UninstallKey))
@@ -111,14 +118,17 @@ namespace HighPenSetup
                 k.SetValue("NoRepair", 1, RegistryValueKind.DWord);
             }
 
-            if (!silent && MessageBox.Show("설치가 완료되었습니다.\n\n작업표시줄에 고정하려면 앱을 실행한 뒤 작업표시줄의 HighPen 아이콘을 우클릭하고 '작업 표시줄에 고정'을 선택하세요.\n\n지금 실행할까요?", AppName, MessageBoxButtons.YesNo, MessageBoxIcon.Information) == DialogResult.Yes)
+            if (!silent && MessageBox.Show(L(
+                "설치가 완료되었습니다.\n\n작업표시줄에 고정하려면 앱을 실행한 뒤 작업표시줄의 HighPen 아이콘을 우클릭하고 '작업 표시줄에 고정'을 선택하세요.\n\n지금 실행할까요?",
+                "インストールが完了しました。\n\nタスクバーにピン留めするには、アプリを起動してタスクバーの HighPen アイコンを右クリックし、「タスクバーにピン留めする」を選んでください。\n\n今すぐ起動しますか？",
+                "Installation complete.\n\nTo pin it to the taskbar, start the app, right-click the HighPen icon on the taskbar and choose 'Pin to taskbar'.\n\nStart it now?"), AppName, MessageBoxButtons.YesNo, MessageBoxIcon.Information) == DialogResult.Yes)
                 Process.Start(exe);
             return 0;
         }
 
         static int Uninstall()
         {
-            if (!Ask(AppName + " 을(를) 제거할까요?\n\n저장된 설정(%APPDATA%\\HighPen)은 남겨 둡니다.")) return 0;
+            if (!Ask(string.Format(L("{0} 을(를) 제거할까요?\n\n저장된 설정(%APPDATA%\\HighPen)은 남겨 둡니다.", "{0} をアンインストールしますか？\n\n保存された設定 (%APPDATA%\\HighPen) は残ります。", "Uninstall {0}?\n\nSaved settings (%APPDATA%\\HighPen) are kept."), AppName))) return 0;
 
             KillApp();
             try { File.Delete(StartMenuLink); } catch { }
@@ -133,7 +143,7 @@ namespace HighPenSetup
             psi.UseShellExecute = false;
             Process.Start(psi);
 
-            Show("제거가 완료되었습니다.", MessageBoxIcon.Information);
+            Show(L("제거가 완료되었습니다.", "アンインストールが完了しました。", "Uninstall complete."), MessageBoxIcon.Information);
             return 0;
         }
     }

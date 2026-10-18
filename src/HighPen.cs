@@ -221,6 +221,64 @@ namespace HighPen
         }
     }
 
+    // UI strings in Korean / Japanese / English. Cur is an index into Codes.
+    static class Lang
+    {
+        public static readonly string[] Codes = { "ko", "ja", "en" };
+        public static readonly string[] Names = { "한국어", "日本語", "English" };
+        public static int Cur;
+
+        static readonly Dictionary<string, string[]> Text = new Dictionary<string, string[]>
+        {
+            { "Spot",          new[] { "스팟", "スポット", "Spot" } },
+            { "MouseSpot",     new[] { "마우스 스팟", "マウススポット", "Mouse spot" } },
+            { "Pen",           new[] { "펜", "ペン", "Pen" } },
+            { "Eraser",        new[] { "지우개", "消しゴム", "Eraser" } },
+            { "EraserTip",     new[] { "지우개  (Ctrl+Alt+E, 지우개 상태에서 한 번 더 누르면 전체 삭제)", "消しゴム  (Ctrl+Alt+E、消しゴム中にもう一度押すと全消去)", "Eraser  (Ctrl+Alt+E, press again while erasing to clear all)" } },
+            { "Board",         new[] { "칠판", "ボード", "Board" } },
+            { "BoardTip",      new[] { "칠판 (흰색/검정/끄기)", "ボード (白/黒/オフ)", "Board (white/black/off)" } },
+            { "WhiteBoard",    new[] { "흰 칠판", "白ボード", "White" } },
+            { "BlackBoard",    new[] { "검은 칠판", "黒ボード", "Black" } },
+            { "Undo",          new[] { "되돌리기", "元に戻す", "Undo" } },
+            { "Clear",         new[] { "지우기", "全消去", "Clear" } },
+            { "ClearTip",      new[] { "전체 지우기", "すべて消去", "Clear all" } },
+            { "Zoom",          new[] { "확대", "拡大", "Zoom" } },
+            { "ZoomTip",       new[] { "2배 확대", "2倍拡大", "2x zoom" } },
+            { "Bubble",        new[] { "말풍선", "吹き出し", "Note" } },
+            { "Settings",      new[] { "설정", "設定", "Settings" } },
+            { "Collapse",      new[] { "접기/펴기", "折りたたみ/展開", "Collapse/expand" } },
+            { "Quit",          new[] { "종료", "終了", "Quit" } },
+            { "Monitor",       new[] { "작동 모니터", "使用モニター", "Monitor" } },
+            { "MonitorTip",    new[] { "모니터 {0}  (순환: Ctrl+Alt+M)", "モニター {0}  (切替: Ctrl+Alt+M)", "Monitor {0}  (cycle: Ctrl+Alt+M)" } },
+            { "PenColor",      new[] { "펜 색상", "ペンの色", "Pen color" } },
+            { "PenSize",       new[] { "펜 두께", "ペンの太さ", "Pen width" } },
+            { "Pressure",      new[] { "필압 반영", "筆圧", "Pressure" } },
+            { "On",            new[] { "켜짐", "オン", "on" } },
+            { "Off",           new[] { "꺼짐", "オフ", "off" } },
+            { "SpotColor",     new[] { "스팟 색상", "スポットの色", "Spot color" } },
+            { "SpotSize",      new[] { "스팟 크기", "スポットの大きさ", "Spot size" } },
+            { "Language",      new[] { "언어", "言語", "Language" } },
+            { "Red",           new[] { "빨강", "赤", "Red" } },
+            { "Orange",        new[] { "주황", "オレンジ", "Orange" } },
+            { "Yellow",        new[] { "노랑", "黄", "Yellow" } },
+            { "Green",         new[] { "초록", "緑", "Green" } },
+            { "Blue",          new[] { "파랑", "青", "Blue" } },
+            { "Purple",        new[] { "보라", "紫", "Purple" } },
+            { "Black",         new[] { "검정", "黒", "Black" } },
+            { "White",         new[] { "흰색", "白", "White" } },
+        };
+
+        public static string T(string key) { return Text[key][Cur]; }
+
+        // Saved code, or the Windows display language when nothing is saved (English if unsupported).
+        public static int FromCode(string code)
+        {
+            if (string.IsNullOrEmpty(code)) code = System.Globalization.CultureInfo.CurrentUICulture.TwoLetterISOLanguageName;
+            int i = Array.IndexOf(Codes, code);
+            return i < 0 ? 2 : i;
+        }
+    }
+
     class Settings
     {
         public string PenColor = "#FF3B30";
@@ -231,6 +289,7 @@ namespace HighPen
         public int Monitor = 0;
         public bool Pressure = true;
         public int BarX = 20, BarY = 20; // offset from the monitor work area, in pixels
+        public string Language = ""; // "" = follow the Windows display language
 
         static string FilePath
         {
@@ -261,6 +320,7 @@ namespace HighPen
                     else if (k == "Monitor") s.Monitor = int.Parse(v);
                     else if (k == "BarX") s.BarX = int.Parse(v);
                     else if (k == "BarY") s.BarY = int.Parse(v);
+                    else if (k == "Language") s.Language = v;
                 }
             }
             catch { }
@@ -281,7 +341,8 @@ namespace HighPen
                     "Monitor=" + Monitor,
                     "Pressure=" + (Pressure ? "1" : "0"),
                     "BarX=" + BarX,
-                    "BarY=" + BarY });
+                    "BarY=" + BarY,
+                    "Language=" + Language });
             }
             catch { }
         }
@@ -398,7 +459,7 @@ namespace HighPen
     {
         const string AppVersion = "1.0.0"; // keep in sync with Version in Setup.cs
         static readonly string[] Palette = { "#FF3B30", "#FF9500", "#FFD60A", "#34C759", "#0A84FF", "#BF5AF2", "#000000", "#FFFFFF" };
-        static readonly string[] ColorNames = { "빨강", "주황", "노랑", "초록", "파랑", "보라", "검정", "흰색" };
+        static readonly string[] ColorNames = { "Red", "Orange", "Yellow", "Green", "Blue", "Purple", "Black", "White" }; // Lang keys
         static readonly Key[] ColorKeys = { Key.R, Key.O, Key.Y, Key.G, Key.B, Key.P, Key.K, Key.W };
         static readonly string[] ColorKeyText = { "R", "O", "Y", "G", "B", "P", "K", "W" };
         static readonly Brush PanelBg = new SolidColorBrush(Color.FromRgb(0x2B, 0x2E, 0x33));
@@ -438,13 +499,7 @@ namespace HighPen
             Left = SystemParameters.WorkArea.Right - 80;
             Top = SystemParameters.WorkArea.Top + 140;
 
-            StackPanel row = new StackPanel();
-            row.Orientation = Orientation.Horizontal;
-            row.Children.Add(BuildMain());
-            settingsPanel = BuildSettings();
-            settingsPanel.Visibility = Visibility.Collapsed;
-            row.Children.Add(settingsPanel);
-            Content = row;
+            BuildContent();
 
             SourceInitialized += delegate { Native.AddExStyle(this, Native.WS_EX_NOACTIVATE); RegisterHotkeys(); };
             overlay.Canvas.PreviewMouseLeftButtonDown += delegate (object sender, MouseButtonEventArgs e)
@@ -555,7 +610,7 @@ namespace HighPen
 
         void UpdatePressureButton()
         {
-            pressureText.Text = "필압 반영: " + (cfg.Pressure ? "켜짐" : "꺼짐");
+            pressureText.Text = Lang.T("Pressure") + ": " + Lang.T(cfg.Pressure ? "On" : "Off");
             pressureBtn.Background = cfg.Pressure ? Active : Idle;
         }
 
@@ -602,6 +657,34 @@ namespace HighPen
 
         // ---------- UI building ----------
 
+        void BuildContent()
+        {
+            buttons.Children.Clear();
+            monitorBtns.Clear();
+            StackPanel row = new StackPanel();
+            row.Orientation = Orientation.Horizontal;
+            row.Children.Add(BuildMain());
+            settingsPanel = BuildSettings();
+            settingsPanel.Visibility = Visibility.Collapsed;
+            row.Children.Add(settingsPanel);
+            Content = row;
+        }
+
+        // Rebuilds the toolbar in the new language, keeping the current mode.
+        void SetLanguage(int i)
+        {
+            Lang.Cur = i;
+            cfg.Language = Lang.Codes[i];
+            cfg.Save();
+            BuildContent();
+            buttons.Visibility = collapsed ? Visibility.Collapsed : Visibility.Visible;
+            arrow.Text = collapsed ? "" : "";
+            Highlight(zoomBtn, zoomer.Active);
+            ApplySpot();
+            ApplyMonitor();
+            ApplyMode();
+        }
+
         Border BuildMain()
         {
             StackPanel col = new StackPanel();
@@ -630,27 +713,27 @@ namespace HighPen
             header.Children.Add(ab);
             col.Children.Add(header);
 
-            spotBtn = MakeButton("◎", "스팟", false, delegate { ToggleSpot(); });
-            penBtn = MakeButton("", "펜", true, delegate { TogglePen(); });
-            eraserBtn = MakeButton("", "지우개", true, delegate { ToggleEraser(); });
-            boardBtn = MakeButton("▭", "칠판", false, delegate { CycleBoard(); });
-            Border undo = MakeButton("", "되돌리기", true, delegate { UndoStroke(); });
-            Border clear = MakeButton("", "지우기", true, delegate { ClearPage(); });
-            zoomBtn = MakeButton("", "확대", true, delegate { ToggleZoom(); });
-            bubbleBtn = MakeButton("", "말풍선", true, delegate { ToggleText(); });
-            setBtn = MakeButton("", "설정", true, delegate { ToggleSettings(); });
+            spotBtn = MakeButton("◎", Lang.T("Spot"), false, delegate { ToggleSpot(); });
+            penBtn = MakeButton("", Lang.T("Pen"), true, delegate { TogglePen(); });
+            eraserBtn = MakeButton("", Lang.T("Eraser"), true, delegate { ToggleEraser(); });
+            boardBtn = MakeButton("▭", Lang.T("Board"), false, delegate { CycleBoard(); });
+            Border undo = MakeButton("", Lang.T("Undo"), true, delegate { UndoStroke(); });
+            Border clear = MakeButton("", Lang.T("Clear"), true, delegate { ClearPage(); });
+            zoomBtn = MakeButton("", Lang.T("Zoom"), true, delegate { ToggleZoom(); });
+            bubbleBtn = MakeButton("", Lang.T("Bubble"), true, delegate { ToggleText(); });
+            setBtn = MakeButton("", Lang.T("Settings"), true, delegate { ToggleSettings(); });
             boardLabel = (TextBlock)((StackPanel)boardBtn.Child).Children[1];
 
-            Tip(spotBtn, "마우스 스팟", "S");
-            Tip(penBtn, "펜", "P");
-            eraserBtn.ToolTip = "지우개  (Ctrl+Alt+E, 지우개 상태에서 한 번 더 누르면 전체 삭제)";
-            Tip(boardBtn, "칠판 (흰색/검정/끄기)", "B");
-            Tip(undo, "되돌리기", "Z");
-            Tip(clear, "전체 지우기", "C");
-            Tip(zoomBtn, "2배 확대", "X");
-            Tip(bubbleBtn, "말풍선", "T");
-            Tip(setBtn, "설정", "D");
-            Tip(ab, "접기/펴기", "H");
+            Tip(spotBtn, Lang.T("MouseSpot"), "S");
+            Tip(penBtn, Lang.T("Pen"), "P");
+            eraserBtn.ToolTip = Lang.T("EraserTip");
+            Tip(boardBtn, Lang.T("BoardTip"), "B");
+            Tip(undo, Lang.T("Undo"), "Z");
+            Tip(clear, Lang.T("ClearTip"), "C");
+            Tip(zoomBtn, Lang.T("ZoomTip"), "X");
+            Tip(bubbleBtn, Lang.T("Bubble"), "T");
+            Tip(setBtn, Lang.T("Settings"), "D");
+            Tip(ab, Lang.T("Collapse"), "H");
 
             buttons.Children.Add(spotBtn);
             buttons.Children.Add(penBtn);
@@ -668,7 +751,7 @@ namespace HighPen
             cg.Children.Add(new Ellipse { Fill = new SolidColorBrush(Color.FromRgb(0xD9, 0x30, 0x25)), Stroke = Brushes.White, StrokeThickness = 2 });
             cg.Children.Add(new TextBlock { Text = "", FontFamily = new FontFamily("Segoe MDL2 Assets"), Foreground = Brushes.White, FontSize = 14, FontWeight = FontWeights.Bold, HorizontalAlignment = HorizontalAlignment.Center, VerticalAlignment = VerticalAlignment.Center });
             close.Child = cg;
-            Tip(close, "종료", "Q");
+            Tip(close, Lang.T("Quit"), "Q");
             close.MouseLeftButtonUp += delegate { Quit(); };
             buttons.Children.Add(close);
 
@@ -699,7 +782,7 @@ namespace HighPen
         {
             StackPanel p = new StackPanel { Margin = new Thickness(10), Width = 190 };
 
-            p.Children.Add(SecTitle("작동 모니터"));
+            p.Children.Add(SecTitle(Lang.T("Monitor")));
             WrapPanel mp = new WrapPanel();
             int n = System.Windows.Forms.Screen.AllScreens.Length;
             for (int i = 0; i < n; i++)
@@ -707,7 +790,7 @@ namespace HighPen
                 int idx = i;
                 Border mb = new Border { Width = 34, Height = 26, Margin = new Thickness(2), Cursor = Cursors.Hand, Background = Idle };
                 mb.Child = new TextBlock { Text = (i + 1).ToString(), Foreground = Brushes.White, HorizontalAlignment = HorizontalAlignment.Center, VerticalAlignment = VerticalAlignment.Center };
-                mb.ToolTip = "모니터 " + (i + 1) + "  (순환: Ctrl+Alt+M)";
+                mb.ToolTip = string.Format(Lang.T("MonitorTip"), i + 1);
                 mb.MouseLeftButtonUp += delegate { cfg.Monitor = idx; cfg.Save(); ApplyMonitor(); };
                 monitorBtns.Add(mb);
                 mp.Children.Add(mb);
@@ -715,13 +798,13 @@ namespace HighPen
             p.Children.Add(mp);
             p.Children.Add(new Separator { Margin = new Thickness(0, 8, 0, 4) });
 
-            p.Children.Add(SecTitle("펜 색상"));
+            p.Children.Add(SecTitle(Lang.T("PenColor")));
             penSwatches = Swatches(cfg.PenColor, delegate (string c) { cfg.PenColor = c; ApplyPen(); cfg.Save(); }, true);
             p.Children.Add(penSwatches);
-            p.Children.Add(SecTitle("펜 두께"));
+            p.Children.Add(SecTitle(Lang.T("PenSize")));
             p.Children.Add(MakeSlider(1, 30, cfg.PenSize, delegate (double v) { cfg.PenSize = v; ApplyPen(); cfg.Save(); }));
 
-            pressureBtn = new Border { Height = 26, Margin = new Thickness(0, 6, 0, 0), Cursor = Cursors.Hand, ToolTip = "필압 반영  (Ctrl+Alt+R)" };
+            pressureBtn = new Border { Height = 26, Margin = new Thickness(0, 6, 0, 0), Cursor = Cursors.Hand, ToolTip = Lang.T("Pressure") + "  (Ctrl+Alt+R)" };
             pressureText = new TextBlock { Foreground = Brushes.White, HorizontalAlignment = HorizontalAlignment.Center, VerticalAlignment = VerticalAlignment.Center };
             pressureBtn.Child = pressureText;
             pressureBtn.MouseLeftButtonUp += delegate { TogglePressure(); };
@@ -730,10 +813,23 @@ namespace HighPen
 
             p.Children.Add(new Separator { Margin = new Thickness(0, 8, 0, 4) });
 
-            p.Children.Add(SecTitle("스팟 색상"));
+            p.Children.Add(SecTitle(Lang.T("SpotColor")));
             p.Children.Add(Swatches(cfg.SpotColor, delegate (string c) { cfg.SpotColor = c; ApplySpot(); cfg.Save(); }, false));
-            p.Children.Add(SecTitle("스팟 크기"));
+            p.Children.Add(SecTitle(Lang.T("SpotSize")));
             p.Children.Add(MakeSlider(20, 200, cfg.SpotSize, delegate (double v) { cfg.SpotSize = v; ApplySpot(); cfg.Save(); }));
+
+            p.Children.Add(new Separator { Margin = new Thickness(0, 8, 0, 4) });
+            p.Children.Add(SecTitle(Lang.T("Language")));
+            WrapPanel lp = new WrapPanel();
+            for (int i = 0; i < Lang.Codes.Length; i++)
+            {
+                int idx = i;
+                Border lb = new Border { Width = 58, Height = 26, Margin = new Thickness(2), Cursor = Cursors.Hand, Background = i == Lang.Cur ? Active : Idle };
+                lb.Child = new TextBlock { Text = Lang.Names[i], Foreground = Brushes.White, FontSize = 11, HorizontalAlignment = HorizontalAlignment.Center, VerticalAlignment = VerticalAlignment.Center };
+                lb.MouseLeftButtonUp += delegate { if (idx != Lang.Cur) SetLanguage(idx); };
+                lp.Children.Add(lb);
+            }
+            p.Children.Add(lp);
 
             p.Children.Add(new Separator { Margin = new Thickness(0, 8, 0, 4) });
             p.Children.Add(new TextBlock { Text = "HighPen v" + AppVersion, Foreground = Brushes.Gray, FontSize = 11, HorizontalAlignment = HorizontalAlignment.Center });
@@ -759,7 +855,7 @@ namespace HighPen
             {
                 string h = Palette[pi];
                 Border b = new Border { Width = 24, Height = 24, CornerRadius = new CornerRadius(12), Margin = new Thickness(2), Cursor = Cursors.Hand, Background = new SolidColorBrush(ParseColor(h)), BorderBrush = Brushes.Gray, BorderThickness = new Thickness(1), Tag = h };
-                b.ToolTip = ColorNames[pi] + (pen ? "  (Ctrl+Shift+" + ColorKeyText[pi] + ")" : "");
+                b.ToolTip = Lang.T(ColorNames[pi]) + (pen ? "  (Ctrl+Shift+" + ColorKeyText[pi] + ")" : "");
                 if (string.Equals(h, current, StringComparison.OrdinalIgnoreCase)) { b.BorderBrush = Brushes.White; b.BorderThickness = new Thickness(3); }
                 b.MouseLeftButtonUp += delegate
                 {
@@ -1005,7 +1101,7 @@ namespace HighPen
             Highlight(bubbleBtn, textMode);
             Highlight(boardBtn, board != 0);
             Highlight(setBtn, settingsOpen);
-            boardLabel.Text = board == 0 ? "칠판" : (board == 1 ? "흰 칠판" : "검은 칠판");
+            boardLabel.Text = Lang.T(board == 0 ? "Board" : (board == 1 ? "WhiteBoard" : "BlackBoard"));
 
             settingsPanel.Visibility = (settingsOpen && !collapsed) ? Visibility.Visible : Visibility.Collapsed;
             ReassertTop();
@@ -1025,6 +1121,7 @@ namespace HighPen
             App app = new App();
             app.ShutdownMode = ShutdownMode.OnExplicitShutdown;
             Settings cfg = Settings.Load();
+            Lang.Cur = Lang.FromCode(cfg.Language);
             OverlayWindow overlay = new OverlayWindow();
             SpotWindow spot = new SpotWindow();
             ToolbarWindow bar = new ToolbarWindow(cfg, overlay, spot);
