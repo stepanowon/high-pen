@@ -8,6 +8,10 @@ HighPen is a Windows pen app for online lectures. You can write directly on the 
 
 ## Installation
 
+### Run without installing
+
+Download [HighPen.exe](https://github.com/stepanowon/high-pen/raw/main/dist/HighPen.exe) and run it directly. No installation needed.
+
 ### Install with the installer
 
 1. Download [HighPen-Setup.exe](https://github.com/stepanowon/high-pen/raw/main/dist/HighPen-Setup.exe) and run it.
@@ -24,10 +28,6 @@ HighPen is a Windows pen app for online lectures. You can write directly on the 
 ### Pin to the taskbar
 
 While the app is running, the HighPen icon appears on the taskbar. Right-click it and choose **Pin to taskbar** so you can start it from the icon next time, even when the app is closed.
-
-### Run without installing
-
-You can also download [HighPen.exe](https://github.com/stepanowon/high-pen/raw/main/dist/HighPen.exe) and run it directly.
 
 ### Requirements
 

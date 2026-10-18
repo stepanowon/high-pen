@@ -8,6 +8,10 @@
 
 ## インストール
 
+### インストールせずに実行
+
+[HighPen.exe](https://github.com/stepanowon/high-pen/raw/main/dist/HighPen.exe) をダウンロードしてそのまま実行します。インストールは不要です。
+
 ### インストーラーでインストール
 
 1. [HighPen-Setup.exe](https://github.com/stepanowon/high-pen/raw/main/dist/HighPen-Setup.exe) をダウンロードして実行します。
@@ -24,10 +28,6 @@
 ### タスクバーにピン留め
 
 アプリを起動するとタスクバーに HighPen のアイコンが表示されます。右クリックして **タスクバーにピン留めする** を選ぶと、次からはアプリを閉じていてもアイコンから起動できます。
-
-### インストールせずに実行
-
-[HighPen.exe](https://github.com/stepanowon/high-pen/raw/main/dist/HighPen.exe) をダウンロードしてそのまま実行することもできます。
 
 ### 動作環境
 

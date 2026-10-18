@@ -8,6 +8,10 @@
 
 ## 설치
 
+### 설치 없이 실행
+
+[HighPen.exe](https://github.com/stepanowon/high-pen/raw/main/dist/HighPen.exe)를 다운로드해서 바로 실행합니다. 설치 과정이 필요 없습니다.
+
 ### 설치 파일로 설치
 
 1. [HighPen-Setup.exe](https://github.com/stepanowon/high-pen/raw/main/dist/HighPen-Setup.exe)를 다운로드해서 실행합니다.
@@ -24,10 +28,6 @@
 ### 작업표시줄에 고정
 
 앱을 실행하면 작업표시줄에 HighPen 아이콘이 나타납니다. 우클릭 → **작업 표시줄에 고정**을 선택하면 다음부터 앱이 꺼져 있어도 아이콘으로 실행할 수 있습니다.
-
-### 설치 없이 실행
-
-[HighPen.exe](https://github.com/stepanowon/high-pen/raw/main/dist/HighPen.exe)를 다운로드해서 바로 실행해도 됩니다.
 
 ### 요구 사항
 
