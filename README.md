@@ -8,7 +8,7 @@
 
 ### 설치 파일로 설치
 
-1. `dist\HighPen-Setup.exe`를 실행합니다.
+1. [HighPen-Setup.exe](https://github.com/stepanowon/high-pen/raw/main/dist/HighPen-Setup.exe)를 다운로드해서 실행합니다.
 2. 설치 여부와 바탕화면 바로가기 생성 여부를 선택합니다.
 3. 설치가 끝나면 바로 실행할 수 있습니다.
 
@@ -24,7 +24,7 @@
 
 ### 설치 없이 실행
 
-`dist\HighPen.exe`를 바로 실행해도 됩니다.
+[HighPen.exe](https://github.com/stepanowon/high-pen/raw/main/dist/HighPen.exe)를 다운로드해서 바로 실행해도 됩니다.
 
 ### 요구 사항
 
