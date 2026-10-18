@@ -180,3 +180,7 @@ Pen color, width, pressure, spot color and size, whether the spot is on, the act
 - Monitors connected or disconnected after the app starts are not picked up; restart the app.
 - On setups where monitors use different display scaling, zoom or the toolbar position may be off.
 - To write while zoomed, the pen must be on so the zoomed view does not follow the pointer.
+
+## License
+
+Released under the [MIT License](LICENSE). You may use, modify and distribute it freely, including for commercial purposes, as long as the copyright and license notice are included.
