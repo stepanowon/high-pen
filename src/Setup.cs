@@ -12,7 +12,7 @@ namespace HighPenSetup
     static class Program
     {
         const string AppName = "HighPen";
-        const string Version = "1.0.0"; // keep in sync with AppVersion in HighPen.cs
+        const string Version = "1.1.0"; // keep in sync with AppVersion in HighPen.cs
         const string UninstallKey = @"Software\Microsoft\Windows\CurrentVersion\Uninstall\HighPen";
 
         static bool silent;
