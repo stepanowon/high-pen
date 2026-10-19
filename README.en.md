@@ -10,6 +10,17 @@ HighPen is a Windows pen app for online lectures. You can write directly on the 
 
 ## Installation
 
+### Install with winget (recommended)
+
+Run this in a terminal (PowerShell or Command Prompt). It installs without a SmartScreen warning.
+
+```
+winget install highpen
+```
+
+- Update: `winget upgrade highpen`
+- Uninstall: `winget uninstall highpen`
+
 ### Run without installing
 
 Download [HighPen.exe](https://github.com/stepanowon/high-pen/raw/main/dist/HighPen.exe) and run it directly. No installation needed.
@@ -180,19 +191,14 @@ Pen color, width, pressure, spot color and size, whether the spot is on, the act
 
 ## Notes / limitations
 
-- The installer is not code-signed, so Windows SmartScreen may show a warning on other PCs.
+- The executables are not code-signed, so Windows SmartScreen may show a warning when you download them from the web. Install with winget, or click **More info → Run anyway** in the warning.
 - Monitors connected or disconnected after the app starts are not picked up; restart the app.
 - On setups where monitors use different display scaling, zoom or the toolbar position may be off.
 - To write while zoomed, the pen must be on so the zoomed view does not follow the pointer.
 
-## Code signing policy
+## Privacy
 
-Free code signing provided by [SignPath.io](https://about.signpath.io/), certificate by [SignPath Foundation](https://signpath.org/).
-
-- Release executables are built from this repository's source on GitHub Actions and signed through SignPath.
-- Committers and reviewers: [stepanowon](https://github.com/stepanowon)
-- Approvers: [stepanowon](https://github.com/stepanowon)
-- Privacy policy: This program will not transfer any information to other networked systems unless specifically requested by the user or the person installing or operating it. A browser or mail app opens only when you click a link in the About window. See the [privacy policy](PRIVACY.md#english) for details.
+This program will not transfer any information to other networked systems unless specifically requested by the user or the person installing or operating it. A browser or mail app opens only when you click a link in the About window. See the [privacy policy](PRIVACY.md#english) for details.
 
 ## License
 

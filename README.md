@@ -10,6 +10,17 @@
 
 ## 설치
 
+### winget으로 설치 (권장)
+
+터미널(PowerShell 또는 명령 프롬프트)에서 실행합니다. SmartScreen 경고 없이 설치됩니다.
+
+```
+winget install highpen
+```
+
+- 업데이트: `winget upgrade highpen`
+- 제거: `winget uninstall highpen`
+
 ### 설치 없이 실행
 
 [HighPen.exe](https://github.com/stepanowon/high-pen/raw/main/dist/HighPen.exe)를 다운로드해서 바로 실행합니다. 설치 과정이 필요 없습니다.
@@ -180,19 +191,14 @@ Windows 10/11 (.NET Framework 4.8 포함, 별도 설치 불필요)
 
 ## 참고 / 제한 사항
 
-- 설치 파일에 코드 서명이 없어서 다른 PC에서 Windows SmartScreen 경고가 뜰 수 있습니다.
+- 실행 파일에 코드 서명이 없어서 웹에서 직접 받으면 Windows SmartScreen 경고가 뜰 수 있습니다. winget으로 설치하거나, 경고 창에서 **추가 정보 → 실행**을 누르세요.
 - 앱을 켠 뒤에 모니터를 연결하거나 빼면 모니터 목록이 갱신되지 않으므로 다시 실행해야 합니다.
 - 모니터마다 화면 배율이 다른 환경에서는 확대나 설정바 위치가 어긋날 수 있습니다.
 - 확대 중에 펜을 쓰려면 확대 화면이 포인터를 따라 움직이지 않도록 펜을 켜 둔 상태여야 합니다.
 
-## 코드 서명 정책
+## 개인정보
 
-Free code signing provided by [SignPath.io](https://about.signpath.io/), certificate by [SignPath Foundation](https://signpath.org/).
-
-- 배포용 실행 파일은 GitHub Actions에서 이 저장소의 소스로 빌드되고 SignPath를 통해 서명됩니다.
-- 커미터 및 리뷰어: [stepanowon](https://github.com/stepanowon)
-- 승인자: [stepanowon](https://github.com/stepanowon)
-- 개인정보 정책: 이 프로그램은 사용자나 설치·운영하는 사람이 명시적으로 요청하지 않는 한 어떤 정보도 다른 네트워크 시스템으로 전송하지 않습니다. 정보 창의 링크를 누를 때만 브라우저나 메일 앱이 열립니다. 자세한 내용은 [개인정보 처리방침](PRIVACY.md#한국어)을 참고하세요.
+이 프로그램은 사용자나 설치·운영하는 사람이 명시적으로 요청하지 않는 한 어떤 정보도 다른 네트워크 시스템으로 전송하지 않습니다. 정보 창의 링크를 누를 때만 브라우저나 메일 앱이 열립니다. 자세한 내용은 [개인정보 처리방침](PRIVACY.md#한국어)을 참고하세요.
 
 ## 라이선스
 
