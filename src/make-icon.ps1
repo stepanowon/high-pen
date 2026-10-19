@@ -85,3 +85,13 @@ foreach ($n in 16, 24, 32, 48, 256) {
     Save-Logo "Square44x44Logo.targetsize-${n}_altform-unplated" $n $n $n
 }
 Write-Host "Wrote MSIX logos to $assets"
+
+# Store listing app logos for Partner Center (packaging\StoreListing)
+$listing = Join-Path $PSScriptRoot '..\packaging\StoreListing'
+New-Item -ItemType Directory -Force $listing | Out-Null
+foreach ($n in 71, 150, 300) {
+    $b = New-IconBitmap $n
+    $b.Save((Join-Path $listing "HighPen-$n.png"), [Drawing.Imaging.ImageFormat]::Png)
+    $b.Dispose()
+}
+Write-Host "Wrote Store listing logos to $listing"
