@@ -526,7 +526,14 @@ namespace HighPen
 
             BuildContent();
 
-            SourceInitialized += delegate { Native.AddExStyle(this, Native.WS_EX_NOACTIVATE); RegisterHotkeys(); };
+            SourceInitialized += delegate
+            {
+                Native.AddExStyle(this, Native.WS_EX_NOACTIVATE);
+                RegisterHotkeys();
+                HwndSource.FromHwnd(new WindowInteropHelper(this).Handle).AddHook(MoveHook);
+            };
+            // SizeChanged comes before the window itself is resized, so check once the resize has happened
+            SizeChanged += delegate { Dispatcher.BeginInvoke(DispatcherPriority.Loaded, new Action(KeepOnMonitor)); };
             for (int i = 0; i < overlay.Pages.Length; i++)
             {
                 int page = i;
@@ -603,10 +610,48 @@ namespace HighPen
             DpiScale d = VisualTreeHelper.GetDpi(this);
             int bx = cfg.BarX, by = cfg.BarY;
             if (bx < 0 || by < 0 || bx > wa.Width - 40 || by > wa.Height - 40) { bx = 20; by = 20; }
+            ShowSettingsPanel(false);
             Native.PlaceRect(this, wa.Left + bx, wa.Top + by, 0, 0, false);
+            ShowSettingsPanel(settingsOpen && !collapsed);
+            KeepOnMonitor();
             for (int i = 0; i < monitorBtns.Count; i++)
                 monitorBtns[i].Background = i == cfg.Monitor ? Active : Idle;
             ReassertTop();
+        }
+
+        // ---------- keep the toolbar inside the working area of the selected monitor ----------
+
+        const int WM_MOVING = 0x0216;
+
+        void ClampToMonitor(ref Native.RECT r)
+        {
+            System.Drawing.Rectangle wa = Native.GetScreen(cfg.Monitor).WorkingArea;
+            int w = r.Right - r.Left, h = r.Bottom - r.Top;
+            int x = Math.Max(wa.Left, Math.Min(wa.Right - w, r.Left));
+            int y = Math.Max(wa.Top, Math.Min(wa.Bottom - h, r.Top));
+            r.Left = x; r.Top = y; r.Right = x + w; r.Bottom = y + h;
+        }
+
+        // While dragging: adjust the proposed rect before the window moves.
+        IntPtr MoveHook(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
+        {
+            if (msg != WM_MOVING) return IntPtr.Zero;
+            Native.RECT r = (Native.RECT)Marshal.PtrToStructure(lParam, typeof(Native.RECT));
+            ClampToMonitor(ref r);
+            Marshal.StructureToPtr(r, lParam, false);
+            handled = true;
+            return (IntPtr)1;
+        }
+
+        // After a size or monitor change (expanding, opening settings), pull the toolbar back inside.
+        void KeepOnMonitor()
+        {
+            Native.RECT r;
+            IntPtr h = new WindowInteropHelper(this).Handle;
+            if (h == IntPtr.Zero || !Native.GetWindowRect(h, out r)) return;
+            Native.RECT c = r;
+            ClampToMonitor(ref c);
+            if (c.Left != r.Left || c.Top != r.Top) Native.PlaceRect(this, c.Left, c.Top, 0, 0, false);
         }
 
         void SaveBarPosition()
@@ -614,7 +659,7 @@ namespace HighPen
             Native.RECT r;
             if (!Native.GetWindowRect(new WindowInteropHelper(this).Handle, out r)) return;
             System.Drawing.Rectangle wa = Native.GetScreen(cfg.Monitor).WorkingArea;
-            cfg.BarX = r.Left - wa.Left;
+            cfg.BarX = r.Left - wa.Left + (settingsLeft ? SettingsPanelPx() : 0); // position of the bar itself
             cfg.BarY = r.Top - wa.Top;
             cfg.Save();
         }
@@ -698,13 +743,57 @@ namespace HighPen
         {
             buttons = new StackPanel(); // a fresh panel: the old one is still parented to the previous toolbar
             monitorBtns.Clear();
-            StackPanel row = new StackPanel();
-            row.Orientation = Orientation.Horizontal;
-            row.Children.Add(BuildMain());
+            barRow = new StackPanel();
+            barRow.Orientation = Orientation.Horizontal;
+            mainPanel = BuildMain();
+            barRow.Children.Add(mainPanel);
             settingsPanel = BuildSettings();
             settingsPanel.Visibility = Visibility.Collapsed;
-            row.Children.Add(settingsPanel);
-            Content = row;
+            settingsLeft = false;
+            barRow.Children.Add(settingsPanel);
+            Content = barRow;
+        }
+
+        // The settings panel opens to the right of the bar, or to its left when it would run past
+        // the right edge of the monitor. The window moves so the bar itself stays where it is.
+        StackPanel barRow;
+        Border mainPanel;
+        bool settingsLeft;
+
+        int SettingsPanelPx() { return ToPx(settingsPanel.ActualWidth); }
+        int ToPx(double dip) { return (int)Math.Round(dip * VisualTreeHelper.GetDpi(this).DpiScaleX); }
+
+        void ShowSettingsPanel(bool show)
+        {
+            if (show == (settingsPanel.Visibility == Visibility.Visible)) return;
+            Native.RECT r;
+            bool placed = Native.GetWindowRect(new WindowInteropHelper(this).Handle, out r);
+            if (!show)
+            {
+                int w = SettingsPanelPx();
+                settingsPanel.Visibility = Visibility.Collapsed;
+                if (!settingsLeft) return;
+                SetSettingsSide(false);
+                UpdateLayout(); // shrink first, so the window never pokes past the monitor edge
+                if (placed) Native.PlaceRect(this, r.Left + w, r.Top, 0, 0, false);
+                return;
+            }
+            settingsPanel.Visibility = Visibility.Visible;
+            if (!placed || !IsLoaded) return;
+            UpdateLayout();
+            int pw = SettingsPanelPx();
+            // the window rect may not have caught up with the layout yet, so use the bar's own width
+            if (r.Left + ToPx(mainPanel.ActualWidth) + pw <= Native.GetScreen(cfg.Monitor).WorkingArea.Right) return;
+            SetSettingsSide(true);
+            Native.PlaceRect(this, r.Left - pw, r.Top, 0, 0, false);
+        }
+
+        void SetSettingsSide(bool left)
+        {
+            settingsLeft = left;
+            barRow.Children.Remove(settingsPanel);
+            barRow.Children.Insert(left ? 0 : barRow.Children.Count, settingsPanel);
+            settingsPanel.BorderThickness = left ? new Thickness(1, 1, 0, 1) : new Thickness(0, 1, 1, 1);
         }
 
         // Rebuilds the toolbar in the new language, keeping the current mode.
@@ -1219,7 +1308,7 @@ namespace HighPen
             Highlight(setBtn, settingsOpen);
             boardLabel.Text = Lang.T(board == 0 ? "Board" : (board == 1 ? "WhiteBoard" : "BlackBoard"));
 
-            settingsPanel.Visibility = (settingsOpen && !collapsed) ? Visibility.Visible : Visibility.Collapsed;
+            ShowSettingsPanel(settingsOpen && !collapsed);
             ReassertTop();
         }
 

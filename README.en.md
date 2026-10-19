@@ -162,10 +162,12 @@ Choose the monitor the app works on with **Monitor** in the settings panel (or C
 ### Toolbar
 
 - Drag the top row (HighPen) to move the toolbar; the position is saved and used on the next launch. If the saved position is off screen, it returns to the top-left corner.
+- The toolbar stays inside the selected monitor. Whether you drag it or it grows (expanding, opening the settings panel), it is kept within that monitor's work area (excluding the taskbar).
 - Use the `<` button to collapse and expand it. When collapsed, only the HighPen title row remains, as shown below.
 
   ![Collapsed toolbar](screen/전체화면2.png)
 
+- The settings panel opens to the right of the toolbar, or to its left when the toolbar is at the right edge of the screen.
 - Hovering over a button shows its name and shortcut as a tooltip.
 - Clicking it does not take focus away from the screen you are presenting.
 - While running, its icon appears on the taskbar and can be pinned.
