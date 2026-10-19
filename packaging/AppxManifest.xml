@@ -7,7 +7,7 @@
   xmlns:rescap="http://schemas.microsoft.com/appx/manifest/foundation/windows10/restrictedcapabilities"
   IgnorableNamespaces="uap rescap">
 
-  <Identity Name="StephenWon.HighPen" Publisher="CN=00000000-0000-0000-0000-000000000000" Version="$Version$" ProcessorArchitecture="neutral" />
+  <Identity Name="StephenWon.HighPen" Publisher="CN=58BB6EA5-E7A7-4A4F-9A0C-62261149B3A1" Version="$Version$" ProcessorArchitecture="neutral" />
 
   <Properties>
     <DisplayName>HighPen</DisplayName>
