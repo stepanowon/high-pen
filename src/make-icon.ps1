@@ -60,3 +60,28 @@ $w.Close()
 # preview for a quick look
 (New-IconBitmap 256).Save((Join-Path $PSScriptRoot 'HighPen-icon-preview.png'), [Drawing.Imaging.ImageFormat]::Png)
 Write-Host "Wrote $out"
+
+# MSIX logos (packaging\Assets): the icon on a transparent canvas, scale-100/200 and taskbar target sizes
+function Save-Logo([string]$name, [int]$w, [int]$h, [int]$icon) {
+    $bmp = New-Object Drawing.Bitmap $w, $h, ([Drawing.Imaging.PixelFormat]::Format32bppArgb)
+    $g = [Drawing.Graphics]::FromImage($bmp)
+    $g.Clear([Drawing.Color]::Transparent)
+    $i = New-IconBitmap $icon
+    $g.DrawImage($i, [int](($w - $icon) / 2), [int](($h - $icon) / 2), $icon, $icon)
+    $g.Dispose(); $i.Dispose()
+    $bmp.Save((Join-Path $assets "$name.png"), [Drawing.Imaging.ImageFormat]::Png)
+    $bmp.Dispose()
+}
+$assets = Join-Path $PSScriptRoot '..\packaging\Assets'
+New-Item -ItemType Directory -Force $assets | Out-Null
+foreach ($s in 1, 2) {
+    Save-Logo "Square44x44Logo.scale-$($s * 100)" (44 * $s) (44 * $s) (36 * $s)
+    Save-Logo "Square150x150Logo.scale-$($s * 100)" (150 * $s) (150 * $s) (100 * $s)
+    Save-Logo "Wide310x150Logo.scale-$($s * 100)" (310 * $s) (150 * $s) (100 * $s)
+    Save-Logo "StoreLogo.scale-$($s * 100)" (50 * $s) (50 * $s) (50 * $s)
+}
+foreach ($n in 16, 24, 32, 48, 256) {
+    Save-Logo "Square44x44Logo.targetsize-$n" $n $n $n
+    Save-Logo "Square44x44Logo.targetsize-${n}_altform-unplated" $n $n $n
+}
+Write-Host "Wrote MSIX logos to $assets"
