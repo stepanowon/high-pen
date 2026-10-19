@@ -10,7 +10,13 @@ HighPen is a Windows pen app for online lectures. You can write directly on the 
 
 ## Installation
 
-### Install with winget (recommended)
+### Install from the Microsoft Store (recommended)
+
+<a href="https://apps.microsoft.com/detail/9PDG1QN5QSL3?mode=direct"><img src="https://get.microsoft.com/images/en-us%20dark.svg" alt="Get it from Microsoft" width="200"/></a>
+
+One click to install, and the Store keeps it up to date automatically. No SmartScreen warning.
+
+### Install with winget
 
 Run this in a terminal (PowerShell or Command Prompt). It installs without a SmartScreen warning.
 
@@ -191,7 +197,7 @@ Pen color, width, pressure, spot color and size, whether the spot is on, the act
 
 ## Notes / limitations
 
-- The executables are not code-signed, so Windows SmartScreen may show a warning when you download them from the web. Install with winget, or click **More info → Run anyway** in the warning.
+- The executables are not code-signed, so Windows SmartScreen may show a warning when you download them from the web. Install from the Microsoft Store or with winget, or click **More info → Run anyway** in the warning.
 - Monitors connected or disconnected after the app starts are not picked up; restart the app.
 - On setups where monitors use different display scaling, zoom or the toolbar position may be off.
 - To write while zoomed, the pen must be on so the zoomed view does not follow the pointer.

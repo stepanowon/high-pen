@@ -10,7 +10,13 @@
 
 ## 설치
 
-### winget으로 설치 (권장)
+### Microsoft Store에서 설치 (권장)
+
+<a href="https://apps.microsoft.com/detail/9PDG1QN5QSL3?mode=direct"><img src="https://get.microsoft.com/images/ko%20dark.svg" alt="Microsoft Store에서 받기" width="200"/></a>
+
+클릭 한 번으로 설치되고, 새 버전은 Store가 자동으로 업데이트합니다. SmartScreen 경고가 뜨지 않습니다.
+
+### winget으로 설치
 
 터미널(PowerShell 또는 명령 프롬프트)에서 실행합니다. SmartScreen 경고 없이 설치됩니다.
 
@@ -191,7 +197,7 @@ Windows 10/11 (.NET Framework 4.8 포함, 별도 설치 불필요)
 
 ## 참고 / 제한 사항
 
-- 실행 파일에 코드 서명이 없어서 웹에서 직접 받으면 Windows SmartScreen 경고가 뜰 수 있습니다. winget으로 설치하거나, 경고 창에서 **추가 정보 → 실행**을 누르세요.
+- 실행 파일에 코드 서명이 없어서 웹에서 직접 받으면 Windows SmartScreen 경고가 뜰 수 있습니다. Microsoft Store나 winget으로 설치하거나, 경고 창에서 **추가 정보 → 실행**을 누르세요.
 - 앱을 켠 뒤에 모니터를 연결하거나 빼면 모니터 목록이 갱신되지 않으므로 다시 실행해야 합니다.
 - 모니터마다 화면 배율이 다른 환경에서는 확대나 설정바 위치가 어긋날 수 있습니다.
 - 확대 중에 펜을 쓰려면 확대 화면이 포인터를 따라 움직이지 않도록 펜을 켜 둔 상태여야 합니다.

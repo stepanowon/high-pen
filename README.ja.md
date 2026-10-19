@@ -10,7 +10,13 @@
 
 ## インストール
 
-### winget でインストール (推奨)
+### Microsoft Store からインストール (推奨)
+
+<a href="https://apps.microsoft.com/detail/9PDG1QN5QSL3?mode=direct"><img src="https://get.microsoft.com/images/ja%20dark.svg" alt="Microsoft から入手" width="200"/></a>
+
+ワンクリックでインストールでき、新しいバージョンは Store が自動で更新します。SmartScreen の警告は表示されません。
+
+### winget でインストール
 
 ターミナル (PowerShell またはコマンドプロンプト) で実行します。SmartScreen の警告なしでインストールされます。
 
@@ -191,7 +197,7 @@ Windows 10/11 (.NET Framework 4.8 は標準搭載のため追加インストー�
 
 ## 注意 / 制限事項
 
-- 実行ファイルにコード署名がないため、Web から直接ダウンロードすると Windows SmartScreen の警告が表示されることがあります。winget でインストールするか、警告画面で **詳細情報 → 実行** を押してください。
+- 実行ファイルにコード署名がないため、Web から直接ダウンロードすると Windows SmartScreen の警告が表示されることがあります。Microsoft Store か winget でインストールするか、警告画面で **詳細情報 → 実行** を押してください。
 - アプリ起動後にモニターを接続したり外したりすると、モニター一覧が更新されないため再起動が必要です。
 - モニターごとに表示スケールが異なる環境では、拡大やツールバーの位置がずれることがあります。
 - 拡大中にペンを使うには、拡大画面がポインターに追従しないようペンをオンにしておく必要があります。
