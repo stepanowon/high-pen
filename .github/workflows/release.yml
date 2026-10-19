@@ -1,5 +1,5 @@
 # Builds HighPen on GitHub Actions and, once SignPath is set up, code-signs it.
-# Pushing a tag like v1.2.1 also publishes a GitHub release with the two .exe files.
+# Pushing a tag like v1.3.0 also publishes a GitHub release with the two .exe files.
 #
 # Signing is skipped until the repository variable SIGNPATH_ORGANIZATION_ID and the
 # secret SIGNPATH_API_TOKEN exist (see .signpath/README.md).

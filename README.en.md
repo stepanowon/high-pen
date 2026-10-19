@@ -76,7 +76,7 @@ Shortcuts are global, so they work while you are using other programs. A combina
 | Pressure | Ctrl+Alt+R | The harder you press the pen, the thicker the line. A mouse always draws at the set width. |
 | Spot color / size | | 8 colors and sizes 20–200. |
 | Language | | Choose 한국어, 日本語 or English; the change applies immediately. The default is English (see [Changing the language](#changing-the-language)). |
-| Version | | The current version (`HighPen v1.2.1`) is shown at the bottom of the panel. |
+| Version | | The current version (`HighPen v1.3.0`) is shown at the bottom of the panel. |
 
 Settings are saved automatically to `%APPDATA%\HighPen\settings.txt`.
 

@@ -42,8 +42,8 @@ SignPath 웹 화면에서 다음을 설정합니다.
 1. `src/HighPen.cs`의 `AppVersion`과 `src/Setup.cs`의 `Version`을 올리고 커밋합니다.
 2. 같은 버전으로 태그를 푸시합니다.
    ```
-   git tag v1.2.1
-   git push origin v1.2.1
+   git tag v1.3.0
+   git push origin v1.3.0
    ```
 3. 워크플로가 빌드 → 앱 서명 → 설치 파일 빌드 → 설치 파일 서명 순서로 진행합니다. 서명 정책에 수동 승인이 있으면 SignPath에서 요청을 승인해야 다음 단계로 넘어갑니다(최대 1시간 대기).
 4. 끝나면 GitHub Releases에 `HighPen-Setup.exe`와 `HighPen.exe`가 올라갑니다.
