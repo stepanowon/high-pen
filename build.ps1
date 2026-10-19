@@ -2,7 +2,6 @@
 #   .\build.ps1              both
 #   .\build.ps1 -Target app    only HighPen.exe
 #   .\build.ps1 -Target setup  only the installer, embedding the existing dist\HighPen.exe
-#                              (CI signs HighPen.exe in between, so the installer carries the signed app)
 param([ValidateSet('all', 'app', 'setup')] [string]$Target = 'all')
 $ErrorActionPreference = 'Stop'
 $fw   = 'C:\Windows\Microsoft.NET\Framework64\v4.0.30319'
