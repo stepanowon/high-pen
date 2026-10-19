@@ -62,6 +62,7 @@ Shortcuts are global, so they work while you are using other programs. A combina
 | Note | Ctrl+Alt+T | Places a text note where you click. Enter confirms, Shift+Enter adds a line break, Esc cancels. |
 | Zoom | Ctrl+Alt+X | Zooms the monitor under the mouse pointer (1.5x, 2x or 2.5x, chosen in Settings). |
 | Settings | Ctrl+Alt+D | Opens and closes the settings panel. |
+| About | | Shows the author (name, email, GitHub repository) and license. Clicking a link opens your mail app or browser. |
 | `<` | Ctrl+Alt+H | Collapses and expands the toolbar. |
 | Red X | Ctrl+Alt+Q | Quit |
 
@@ -75,7 +76,7 @@ Shortcuts are global, so they work while you are using other programs. A combina
 | Pressure | Ctrl+Alt+R | The harder you press the pen, the thicker the line. A mouse always draws at the set width. |
 | Spot color / size | | 8 colors and sizes 20–200. |
 | Language | | Choose 한국어, 日本語 or English; the change applies immediately. The default is English (see [Changing the language](#changing-the-language)). |
-| Version | | The current version (`HighPen v1.2.0`) is shown at the bottom of the panel. |
+| Version | | The current version (`HighPen v1.2.1`) is shown at the bottom of the panel. |
 
 Settings are saved automatically to `%APPDATA%\HighPen\settings.txt`.
 
@@ -153,6 +154,7 @@ Zooms the monitor under the mouse pointer in real time. Pick 1.5x, 2x or 2.5x in
 - The view moves so that the content under the pointer stays under the pointer after zooming. Just click where you see things.
 - The toolbar is not zoomed and keeps its normal size.
 - The monitor the pointer was on when zoom was turned on is zoomed, and the pointer cannot leave that monitor while zoomed. To zoom another monitor, turn zoom off, move the pointer, and turn it on again.
+- Changing the active monitor while zoomed turns zoom off.
 - **Writing while zoomed:** turning on the pen freezes the zoomed view so you can write where you see things. Turning the pen off makes the zoomed view follow the pointer again. Ink is stored in original screen coordinates, so it stays on the same content at normal size when zoom is turned off. To move to another area while zoomed, turn the pen off, move the pointer, and turn the pen on again.
 
 ### Multiple monitors
@@ -182,6 +184,15 @@ Pen color, width, pressure, spot color and size, whether the spot is on, the act
 - Monitors connected or disconnected after the app starts are not picked up; restart the app.
 - On setups where monitors use different display scaling, zoom or the toolbar position may be off.
 - To write while zoomed, the pen must be on so the zoomed view does not follow the pointer.
+
+## Code signing policy
+
+Free code signing provided by [SignPath.io](https://about.signpath.io/), certificate by [SignPath Foundation](https://signpath.org/).
+
+- Release executables are built from this repository's source on GitHub Actions and signed through SignPath.
+- Committers and reviewers: [stepanowon](https://github.com/stepanowon)
+- Approvers: [stepanowon](https://github.com/stepanowon)
+- Privacy policy: This program will not transfer any information to other networked systems unless specifically requested by the user or the person installing or operating it. A browser or mail app opens only when you click a link in the About window. See the [privacy policy](PRIVACY.md#english) for details.
 
 ## License
 

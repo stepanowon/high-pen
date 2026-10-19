@@ -270,6 +270,14 @@ namespace HighPen
             { "Settings",      new[] { "설정", "設定", "Settings" } },
             { "Collapse",      new[] { "접기/펴기", "折りたたみ/展開", "Collapse/expand" } },
             { "Quit",          new[] { "종료", "終了", "Quit" } },
+            { "About",         new[] { "정보", "情報", "About" } },
+            { "AboutTip",      new[] { "저작자 및 라이선스 정보", "作者とライセンス情報", "Author and license" } },
+            { "Tagline",       new[] { "비대면 강의용 Windows 펜 앱", "オンライン授業向け Windows ペンアプリ", "A Windows pen app for online lectures" } },
+            { "Author",        new[] { "저작자", "作者", "Author" } },
+            { "Email",         new[] { "이메일", "メール", "Email" } },
+            { "Website",       new[] { "웹사이트", "Web サイト", "Website" } },
+            { "License",       new[] { "라이선스", "ライセンス", "License" } },
+            { "Close",         new[] { "닫기", "閉じる", "Close" } },
             { "Monitor",       new[] { "작동 모니터", "使用モニター", "Monitor" } },
             { "MonitorTip",    new[] { "모니터 {0}  (순환: Ctrl+Alt+M)", "モニター {0}  (切替: Ctrl+Alt+M)", "Monitor {0}  (cycle: Ctrl+Alt+M)" } },
             { "PenColor",      new[] { "펜 색상", "ペンの色", "Pen color" } },
@@ -482,7 +490,10 @@ namespace HighPen
 
     class ToolbarWindow : Window
     {
-        const string AppVersion = "1.2.0"; // keep in sync with Version in Setup.cs
+        const string AppVersion = "1.2.1"; // keep in sync with Version in Setup.cs
+        const string AuthorName = "StephenWon";
+        const string AuthorEmail = "stepanowon@gmail.com";
+        const string RepoUrl = "https://github.com/stepanowon/high-pen";
         static readonly string[] Palette = { "#FF3B30", "#FF9500", "#FFD60A", "#34C759", "#0A84FF", "#BF5AF2", "#000000", "#FFFFFF" };
         static readonly string[] ColorNames = { "Red", "Orange", "Yellow", "Green", "Blue", "Purple", "Black", "White" }; // Lang keys
         static readonly Key[] ColorKeys = { Key.R, Key.O, Key.Y, Key.G, Key.B, Key.P, Key.K, Key.W };
@@ -654,6 +665,67 @@ namespace HighPen
             if (c.Left != r.Left || c.Top != r.Top) Native.PlaceRect(this, c.Left, c.Top, 0, 0, false);
         }
 
+        // ---------- about ----------
+
+        Window aboutWin;
+
+        void ShowAbout()
+        {
+            if (aboutWin != null) { aboutWin.Close(); return; }
+            StackPanel p = new StackPanel { Margin = new Thickness(20, 16, 20, 16), Width = 300 };
+            p.Children.Add(new TextBlock { Text = "HighPen v" + AppVersion, Foreground = Brushes.White, FontSize = 18, FontWeight = FontWeights.SemiBold });
+            p.Children.Add(new TextBlock { Text = Lang.T("Tagline"), Foreground = Brushes.Gray, FontSize = 12, Margin = new Thickness(0, 2, 0, 12), TextWrapping = TextWrapping.Wrap });
+            p.Children.Add(AboutRow(Lang.T("Author"), AuthorName, null));
+            p.Children.Add(AboutRow(Lang.T("Email"), AuthorEmail, "mailto:" + AuthorEmail));
+            p.Children.Add(AboutRow(Lang.T("Website"), RepoUrl.Replace("https://", ""), RepoUrl));
+            p.Children.Add(AboutRow(Lang.T("License"), "MIT License", RepoUrl + "/blob/main/LICENSE"));
+            p.Children.Add(new TextBlock { Text = "Copyright (c) 2026 " + AuthorName, Foreground = Brushes.Gray, FontSize = 11, Margin = new Thickness(0, 10, 0, 0) });
+
+            Border close = new Border { Height = 28, Margin = new Thickness(0, 14, 0, 0), Background = Idle, Cursor = Cursors.Hand };
+            close.Child = new TextBlock { Text = Lang.T("Close"), Foreground = Brushes.White, HorizontalAlignment = HorizontalAlignment.Center, VerticalAlignment = VerticalAlignment.Center };
+            p.Children.Add(close);
+
+            Window w = new Window
+            {
+                WindowStyle = WindowStyle.None, ResizeMode = ResizeMode.NoResize, SizeToContent = SizeToContent.WidthAndHeight,
+                ShowInTaskbar = false, Topmost = true, Title = "HighPen", Background = Brushes.Transparent, AllowsTransparency = true,
+                Content = new Border { Background = PanelBg, BorderBrush = Active, BorderThickness = new Thickness(1), Child = p },
+            };
+            close.MouseLeftButtonUp += delegate { w.Close(); };
+            w.KeyDown += delegate (object o, KeyEventArgs e) { if (e.Key == Key.Escape || e.Key == Key.Enter) w.Close(); };
+            w.Closed += delegate { aboutWin = null; };
+            // centered on the selected monitor
+            w.Loaded += delegate
+            {
+                System.Drawing.Rectangle wa = Native.GetScreen(cfg.Monitor).WorkingArea;
+                DpiScale d = VisualTreeHelper.GetDpi(w);
+                int pw = (int)(w.ActualWidth * d.DpiScaleX), ph = (int)(w.ActualHeight * d.DpiScaleY);
+                Native.PlaceRect(w, wa.Left + (wa.Width - pw) / 2, wa.Top + (wa.Height - ph) / 2, 0, 0, false);
+            };
+            aboutWin = w;
+            w.Show();
+        }
+
+        static FrameworkElement AboutRow(string label, string value, string url)
+        {
+            Grid g = new Grid { Margin = new Thickness(0, 3, 0, 3) };
+            g.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(80) });
+            g.ColumnDefinitions.Add(new ColumnDefinition());
+            g.Children.Add(new TextBlock { Text = label, Foreground = Brushes.Gray, FontSize = 12 });
+            TextBlock v = new TextBlock { Foreground = Brushes.White, FontSize = 12, TextWrapping = TextWrapping.Wrap };
+            if (url == null) v.Text = value;
+            else
+            {
+                System.Windows.Documents.Hyperlink link = new System.Windows.Documents.Hyperlink(new System.Windows.Documents.Run(value));
+                link.Foreground = new SolidColorBrush(Color.FromRgb(0x7F, 0xB2, 0xFF));
+                link.Click += delegate { try { System.Diagnostics.Process.Start(url); } catch { } };
+                v.Inlines.Add(link);
+            }
+            Grid.SetColumn(v, 1);
+            g.Children.Add(v);
+            return g;
+        }
+
         void SaveBarPosition()
         {
             Native.RECT r;
@@ -666,7 +738,15 @@ namespace HighPen
 
         void CycleMonitor()
         {
-            cfg.Monitor = (cfg.Monitor + 1) % System.Windows.Forms.Screen.AllScreens.Length;
+            SetMonitor((cfg.Monitor + 1) % System.Windows.Forms.Screen.AllScreens.Length);
+        }
+
+        void SetMonitor(int i)
+        {
+            if (i == cfg.Monitor) return;
+            // zoom belongs to the previous monitor (and confines the pointer to it)
+            if (zoomer.Active) { zoomer.Stop(); Highlight(zoomBtn, false); }
+            cfg.Monitor = i;
             cfg.Save();
             ApplyMonitor();
         }
@@ -735,6 +815,7 @@ namespace HighPen
             Native.BringTopmost(overlay);
             Native.BringTopmost(spotWin);
             Native.BringTopmost(this);
+            if (aboutWin != null) Native.BringTopmost(aboutWin);
         }
 
         // ---------- UI building ----------
@@ -848,6 +929,8 @@ namespace HighPen
             zoomBtn = MakeButton("", Lang.T("Zoom"), true, delegate { ToggleZoom(); });
             bubbleBtn = MakeButton("", Lang.T("Bubble"), true, delegate { ToggleText(); });
             setBtn = MakeButton("", Lang.T("Settings"), true, delegate { ToggleSettings(); });
+            Border aboutBtn = MakeButton("\uE946", Lang.T("About"), true, delegate { ShowAbout(); });
+            aboutBtn.ToolTip = Lang.T("AboutTip");
             boardLabel = (TextBlock)((StackPanel)boardBtn.Child).Children[1];
 
             Tip(spotBtn, Lang.T("MouseSpot"), "S");
@@ -870,6 +953,7 @@ namespace HighPen
             buttons.Children.Add(bubbleBtn);
             buttons.Children.Add(zoomBtn);
             buttons.Children.Add(setBtn);
+            buttons.Children.Add(aboutBtn);
 
             // red close button
             Border close = new Border { Height = 52, Background = Idle, Cursor = Cursors.Hand, Margin = new Thickness(0, 1, 0, 0) };
@@ -917,7 +1001,7 @@ namespace HighPen
                 Border mb = new Border { Width = 34, Height = 26, Margin = new Thickness(2), Cursor = Cursors.Hand, Background = Idle };
                 mb.Child = new TextBlock { Text = (i + 1).ToString(), Foreground = Brushes.White, HorizontalAlignment = HorizontalAlignment.Center, VerticalAlignment = VerticalAlignment.Center };
                 mb.ToolTip = string.Format(Lang.T("MonitorTip"), i + 1);
-                mb.MouseLeftButtonUp += delegate { cfg.Monitor = idx; cfg.Save(); ApplyMonitor(); };
+                mb.MouseLeftButtonUp += delegate { SetMonitor(idx); };
                 monitorBtns.Add(mb);
                 mp.Children.Add(mb);
             }
