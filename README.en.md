@@ -10,7 +10,13 @@ HighPen is a Windows pen app for online lectures. You can write directly on the 
 
 ## Installation
 
-### Install with winget (recommended)
+### Install from the Microsoft Store (recommended)
+
+[<img src="https://get.microsoft.com/images/en-us%20dark.svg" width="200" alt="Get it from Microsoft"/>](https://apps.microsoft.com/detail/9PDG1QN5QSL3?mode=direct)
+
+It installs without a SmartScreen warning and updates automatically when a new version is released. To uninstall, use **Installed apps** in Windows Settings.
+
+### Install with winget
 
 Run this in a terminal (PowerShell or Command Prompt). It installs without a SmartScreen warning.
 

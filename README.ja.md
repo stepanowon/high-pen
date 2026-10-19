@@ -10,7 +10,13 @@
 
 ## インストール
 
-### winget でインストール (推奨)
+### Microsoft Store からインストール (推奨)
+
+[<img src="https://get.microsoft.com/images/ja%20dark.svg" width="200" alt="Microsoft から入手"/>](https://apps.microsoft.com/detail/9PDG1QN5QSL3?mode=direct)
+
+SmartScreen の警告なしでインストールされ、新しいバージョンが出ると自動で更新されます。アンインストールは Windows の設定の **インストールされているアプリ** から行います。
+
+### winget でインストール
 
 ターミナル (PowerShell またはコマンドプロンプト) で実行します。SmartScreen の警告なしでインストールされます。
 

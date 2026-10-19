@@ -10,7 +10,13 @@
 
 ## 설치
 
-### winget으로 설치 (권장)
+### Microsoft Store에서 설치 (권장)
+
+[<img src="https://get.microsoft.com/images/ko%20dark.svg" width="200" alt="Microsoft Store에서 받기"/>](https://apps.microsoft.com/detail/9PDG1QN5QSL3?mode=direct)
+
+SmartScreen 경고 없이 설치되고, 새 버전이 나오면 자동으로 업데이트됩니다. 제거는 Windows 설정의 **설치된 앱**에서 합니다.
+
+### winget으로 설치
 
 터미널(PowerShell 또는 명령 프롬프트)에서 실행합니다. SmartScreen 경고 없이 설치됩니다.
 
