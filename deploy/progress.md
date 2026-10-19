@@ -1,6 +1,6 @@
 # 배포 진행 상황
 
-마지막 업데이트: 2026-10-19
+마지막 업데이트: 2026-10-20
 
 ## 목표
 
@@ -40,14 +40,16 @@
 | MSIX 패키징 | 완료 | [#3](https://github.com/stepanowon/high-pen/pull/3) 병합. `packaging/build-msix.ps1` → `dist/HighPen.msix` (1.3.0.0) |
 | Store 목록 로고 | 완료 | [#4](https://github.com/stepanowon/high-pen/pull/4) 병합. `packaging/StoreListing/HighPen-{71,150,300}.png` |
 | 제출 (Submission 1) | 완료 | 가격 무료, 연령 등급 IARC 3+ / 전체 이용가, 한·영·일 Store 목록 |
-| 인증 | **진행 중** | 사전 처리 중 → 인증 → 게시. 인증을 통과하면 자동 게시 (최대 영업일 3일) |
+| 인증 | 완료 | 인증 통과 |
+| 게시 | 완료 | 2026-10-20 확인. Store에서 검색·설치 가능 |
+| README Store 안내 | 완료 | 한·영·일 README에 Store 배지 추가, Store 설치를 권장 방법으로 변경 |
 
 ## Store 정보
 
 | 항목 | 값 |
 | --- | --- |
 | Store ID | `9PDG1QN5QSL3` |
-| 웹 Store URL | https://apps.microsoft.com/detail/9PDG1QN5QSL3 (게시 후 사용 가능) |
+| 웹 Store URL | https://apps.microsoft.com/detail/9PDG1QN5QSL3 |
 | Package/Identity/Name | `StephenWon.HighPen` |
 | Package/Identity/Publisher | `CN=58BB6EA5-E7A7-4A4F-9A0C-62261149B3A1` |
 | PublisherDisplayName | `StephenWon` |
@@ -55,11 +57,9 @@
 
 ## 다음 할 일
 
-1. Store 인증 결과 확인 (메일 또는 Partner Center)
-   - 통과: 자동 게시 → Store 배지 README PR 병합, `https://apps.microsoft.com/detail/9PDG1QN5QSL3` 열리는지 확인
-   - 반려: 인증 보고서 확인 후 수정해 다시 제출
-2. winget PR #455634 moderator 승인 대기. 질문 댓글이 달리면 답변
-3. 병합 후 확인: `winget install highpen`, `winget install 9PDG1QN5QSL3` (Store 버전)
+1. winget PR #455634 moderator 승인 대기. 질문 댓글이 달리면 답변
+2. 병합 후 확인: `winget install highpen`
+3. Store 버전 설치 확인: Store 앱에서 설치, `winget install 9PDG1QN5QSL3`
 
 ## winget 매니페스트 요약
 
