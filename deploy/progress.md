@@ -41,7 +41,10 @@
 | Store 목록 로고 | 완료 | [#4](https://github.com/stepanowon/high-pen/pull/4) 병합. `packaging/StoreListing/HighPen-{71,150,300}.png` |
 | 제출 (Submission 1) | 완료 | 가격 무료, 연령 등급 IARC 3+ / 전체 이용가, 한·영·일 Store 목록 |
 | 인증 | 완료 | 인증 통과 |
-| 게시 | 완료 | 2026-10-20 확인. Store에서 검색·설치 가능 |
+| 게시 | 완료 | 첫 게시 2026-10-19 19:49 UTC (`FirstAvailableDate`). Store 페이지 열림 |
+| 다운로드 활성화 | **대기** | 2026-10-20 00:36 UTC 기준 Store API `IsDownloadable`/`IsPurchaseEnabled` 모두 `false`. Store 앱에서 "이 제품은 현재 사용할 수 없습니다". 배포망 반영 대기 (보통 최대 24시간) |
+| 게시자 연락처 | **재검증 대기** | Store 페이지 데이터에 판매자 연락처(주소·전화)가 공개되는 것을 확인. Partner Center 법률 정보에서 사무실 주소·전화로 변경, 계정 재검증 후 반영 |
+| Store 목록 검색어·짧은 설명 | **확인 필요** | 한·영·일 검색어 7개와 짧은 설명 작성. 영어 목록 저장 시 "목록을 저장할 수 없습니다" 오류 발생, 다시 저장 후 목록 업데이트 제출 필요 |
 | README Store 안내 | 완료 | 한·영·일 README에 Store 배지 추가, Store 설치를 권장 방법으로 변경 |
 
 ## Store 정보
@@ -57,9 +60,15 @@
 
 ## 다음 할 일
 
-1. winget PR #455634 moderator 승인 대기. 질문 댓글이 달리면 답변
-2. 병합 후 확인: `winget install highpen`
-3. Store 버전 설치 확인: Store 앱에서 설치, `winget install 9PDG1QN5QSL3`
+1. Store 다운로드 활성화 확인. 게시 후 48시간(2026-10-21 19:49 UTC)이 지나도 `false`면 Partner Center 고객 지원팀에 문의
+   ```powershell
+   (Invoke-RestMethod "https://storeedgefd.dsx.mp.microsoft.com/v9.0/products/9PDG1QN5QSL3?market=KR&locale=ko-KR&deviceFamily=Windows.Desktop").Payload | Select-Object IsDownloadable, IsPurchaseEnabled, PublisherAddress, PublisherPhoneNumber
+   ```
+2. 활성화 후 Store 버전 설치 확인: Store 앱에서 설치, `winget install 9PDG1QN5QSL3`
+3. 게시자 연락처 재검증 완료 후 위 명령으로 `PublisherAddress`, `PublisherPhoneNumber`가 사무실 정보로 바뀌었는지 확인
+4. Store 목록(검색어·짧은 설명) 저장·제출 마무리
+5. winget PR #455634 moderator 승인 대기 (2026-10-20 확인: `REVIEW_REQUIRED`, 새 댓글 없음). 질문 댓글이 달리면 답변
+6. 병합 후 확인: `winget install highpen`
 
 ## winget 매니페스트 요약
 
