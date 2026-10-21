@@ -18,14 +18,14 @@ It installs without a SmartScreen warning and updates automatically when a new v
 
 ### Install with winget
 
-Run this in a terminal (PowerShell or Command Prompt). It installs without a SmartScreen warning.
+Run this in a terminal (PowerShell or Command Prompt). It installs the Microsoft Store package, the same as installing from the Store.
 
 ```
-winget install highpen
+winget install 9PDG1QN5QSL3
 ```
 
-- Update: `winget upgrade highpen`
-- Uninstall: `winget uninstall highpen`
+- Update: the Store updates it automatically, or run `winget upgrade 9PDG1QN5QSL3`
+- Uninstall: `winget uninstall 9PDG1QN5QSL3`
 
 ### Run without installing
 
@@ -214,7 +214,7 @@ Pen color, width, pressure, spot color and size, whether the spot is on, show cl
 
 ## Notes / limitations
 
-- The executables are not code-signed, so Windows SmartScreen may show a warning when you download them from the web. Install with winget, or click **More info → Run anyway** in the warning.
+- The executables are not code-signed, so Windows SmartScreen may show a warning when you download them from the web. Install from the Microsoft Store or with winget, or click **More info → Run anyway** in the warning.
 - On setups where monitors use different display scaling, zoom or the toolbar position may be off.
 - To write while zoomed, the pen must be on so the zoomed view does not follow the pointer.
 

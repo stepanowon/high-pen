@@ -18,14 +18,14 @@ SmartScreen の警告なしでインストールされ、新しいバージョ�
 
 ### winget でインストール
 
-ターミナル (PowerShell またはコマンドプロンプト) で実行します。SmartScreen の警告なしでインストールされます。
+ターミナル (PowerShell またはコマンドプロンプト) で実行します。Microsoft Store のパッケージをインストールするので、Store からインストールした場合と同じです。
 
 ```
-winget install highpen
+winget install 9PDG1QN5QSL3
 ```
 
-- 更新: `winget upgrade highpen`
-- アンインストール: `winget uninstall highpen`
+- 更新: Store が自動で更新します。手動で行う場合は `winget upgrade 9PDG1QN5QSL3`
+- アンインストール: `winget uninstall 9PDG1QN5QSL3`
 
 ### インストールせずに実行
 
@@ -214,7 +214,7 @@ Windows 10/11 (.NET Framework 4.8 は標準搭載のため追加インストー�
 
 ## 注意 / 制限事項
 
-- 実行ファイルにコード署名がないため、Web から直接ダウンロードすると Windows SmartScreen の警告が表示されることがあります。winget でインストールするか、警告画面で **詳細情報 → 実行** を押してください。
+- 実行ファイルにコード署名がないため、Web から直接ダウンロードすると Windows SmartScreen の警告が表示されることがあります。Microsoft Store または winget でインストールするか、警告画面で **詳細情報 → 実行** を押してください。
 - モニターごとに表示スケールが異なる環境では、拡大やツールバーの位置がずれることがあります。
 - 拡大中にペンを使うには、拡大画面がポインターに追従しないようペンをオンにしておく必要があります。
 

@@ -7,7 +7,7 @@
 코드 서명 없이, 설치할 때 Windows SmartScreen 경고("Windows의 PC 보호")가 뜨지 않도록 배포한다.
 
 - **Microsoft Store**: MSIX 패키지를 Store가 서명한다. 클릭 한 번 설치, 자동 업데이트, 스마트 앱 컨트롤과도 호환된다.
-- **winget**: 터미널에서 `winget install highpen`으로 경고 없이 설치한다.
+- **winget**: Store 앱은 winget `msstore` 원본에 자동으로 들어가므로 `winget install 9PDG1QN5QSL3`로 설치한다. winget-pkgs 별도 등록은 취소했다(2026-10-21).
 - 설치 파일은 사용자별 설치(`%LOCALAPPDATA%\Programs\HighPen`, HKCU)라서 UAC 창은 뜨지 않는다.
 - 웹에서 직접 받은 exe는 앞으로도 SmartScreen 경고가 뜬다.
 
@@ -31,8 +31,7 @@
 | winget-pkgs PR 제출 | 완료 | [microsoft/winget-pkgs#455634](https://github.com/microsoft/winget-pkgs/pull/455634) (fork `stepanowon/winget-pkgs`, 브랜치 `StephenWon.HighPen-1.3.0`) |
 | CLA 서명 | 완료 | `license/cla` 통과 |
 | 자동 검증 | 완료 | 01~10 모두 통과 (설치 파일 스캔, 설치 테스트 포함). 라벨 `Azure-Pipeline-Passed`, `Validation-Completed` |
-| moderator 승인·병합 | **대기** | 1.3.0 PR 커뮤니티 moderator 검토 대기 (2026-10-21 07:31 UTC 확인: `REVIEW_REQUIRED`, 새 댓글·리뷰 없음) |
-| 1.4.0 매니페스트 PR | **대기** | 1.3.0 PR 병합 후 제출. `InstallerSha256` `04E9AEAE8EEF77D6920816C934C11871F4408960ED4D92DB253268BEC46C82DD` |
+| 등록 취소 | 완료 | Store 배포로 일원화하기로 해서 2026-10-21 09:54 UTC에 moderator 승인 전 PR을 닫음. fork 브랜치 `StephenWon.HighPen-1.3.0` 삭제. winget 설치는 `msstore` 원본(`winget install 9PDG1QN5QSL3`)으로 대신함 |
 
 ### Microsoft Store
 
@@ -46,11 +45,11 @@
 | 인증 | 완료 | 인증 통과 |
 | 게시 | 완료 | 첫 게시 2026-10-19 19:49 UTC (`FirstAvailableDate`). Store 페이지 열림. Partner Center "Store 현재 상태"(Submission 1)는 "currently available in the Microsoft Store" |
 | 다운로드 활성화 | **대기** | 2026-10-21 07:31 UTC(게시 후 약 36시간) 기준 Store API `IsDownloadable`/`IsPurchaseEnabled` 모두 `false`. KR·US·JP 시장 모두 같음. Store 앱에서 "이 제품은 현재 사용할 수 없습니다" |
-| 게시자 연락처 | **Store 반영 대기** | Store 페이지 데이터에 판매자 연락처(주소·전화)가 공개되는 것을 확인. Partner Center 법률 정보에서 사무실 주소·전화로 변경했고 승인되어 법률 정보 페이지에 표시됨. Store API에는 아직 이전 정보가 나옴(2026-10-21 07:31 UTC) |
+| 게시자 연락처 | 완료 | 1.4.0 게시와 함께 Store API의 `PublisherAddress`, `PublisherPhoneNumber`가 사무실 정보로 바뀜(2026-10-21 09:16 UTC 확인). 주소의 구 이름이 `Kangdon-gu`로 표시되어 Partner Center 법률 정보 철자 확인 필요 |
 | Store 목록 검색어·짧은 설명 | **확인 필요** | 한·영·일 검색어 7개와 짧은 설명 작성. 영어·한국어 목록 저장 시 "목록을 저장할 수 없습니다" 오류 발생, 다시 저장 후 제출 필요 |
 | README Store 안내 | 완료 | 한·영·일 README에 Store 배지 추가, Store 설치를 권장 방법으로 변경 |
 | 1.4.0 MSIX | 완료 | `dist/HighPen.msix` (1.4.0.0) 빌드. `makeappx.exe`는 Windows SDK 미설치로 이전에 받은 SDK BuildTools를 사용 |
-| 1.4.0 제출 (Submission 2) | **인증 중** | 2026-10-21 제출. 패키지 1.4.0.0, 검색어·짧은 설명 포함. `runFullTrust` 사유에 마우스 훅·화면 캡처 용도 명시. 2026-10-21 08:50 UTC 기준 "사전 처리 중", 인증 통과 즉시 자동 게시 |
+| 1.4.0 제출 (Submission 2) | 완료 | 2026-10-21 제출, 약 20분 만에 인증 통과 후 게시. 패키지 1.4.0.0, 검색어·짧은 설명·새 기능 설명(한·영·일) 포함. `runFullTrust` 사유에 마우스 훅·화면 캡처 용도 명시. Partner Center "Store 현재 상태"가 Submission 2로 바뀜 |
 
 ## Store 정보
 
@@ -69,28 +68,8 @@
    ```powershell
    (Invoke-RestMethod "https://storeedgefd.dsx.mp.microsoft.com/v9.0/products/9PDG1QN5QSL3?market=KR&locale=ko-KR&deviceFamily=Windows.Desktop").Payload | Select-Object IsDownloadable, IsPurchaseEnabled, PublisherAddress, PublisherPhoneNumber
    ```
-2. 1.4.0 제출(Submission 2) 인증·게시 확인. 진행 중에는 **인증 취소**를 누르지 않는다. 게시되면 다운로드 활성화와 게시자 연락처 갱신 여부를 위 명령으로 확인
-3. 활성화 후 Store 버전 설치 확인: Store 앱에서 설치, `winget install 9PDG1QN5QSL3`
-4. 게시 후 위 명령으로 `PublisherAddress`, `PublisherPhoneNumber`가 사무실 정보로 바뀌었는지 확인
-5. winget PR #455634 moderator 승인 대기. 질문 댓글이 달리면 답변
-6. 1.3.0 병합 후 `winget install highpen` 확인, 이어서 1.4.0 매니페스트 제출
-   ```
-   wingetcreate update StephenWon.HighPen -v 1.4.0 -u https://github.com/stepanowon/high-pen/releases/download/v1.4.0/HighPen-Setup.exe --submit
-   ```
-
-## winget 매니페스트 요약
-
-경로: `manifests/s/StephenWon/HighPen/1.3.0/` (파일 4개: version, installer, locale.en-US, locale.ko-KR)
-
-| 항목 | 값 |
-| --- | --- |
-| PackageIdentifier | `StephenWon.HighPen` |
-| Moniker | `highpen` |
-| InstallerType / Scope | `exe` / `user` |
-| 조용한 설치 | `/S` |
-| InstallerUrl | `https://github.com/stepanowon/high-pen/releases/download/v1.3.0/HighPen-Setup.exe` |
-| InstallerSha256 | `9C10F437B7F13F87377CB5202C4E166E4D4849BE7B2CDACD52BF8506C450A5A8` |
-| ARP 항목 | DisplayName `HighPen`, Publisher `HighPen`, DisplayVersion `1.3.0` |
+2. 활성화 후 Store 버전 설치 확인: Store 앱에서 설치, `winget install 9PDG1QN5QSL3`
+3. Partner Center 법률 정보의 주소 철자 확인 (Store에 `Kangdon-gu`로 표시됨)
 
 ## 다음 버전 배포 절차
 
@@ -100,11 +79,7 @@
    ```
    gh release create v1.x.x dist/HighPen-Setup.exe dist/HighPen.exe --title "HighPen v1.x.x" --generate-notes
    ```
-4. winget 매니페스트를 갱신해 제출한다 (`winget install wingetcreate`로 설치).
-   ```
-   wingetcreate update StephenWon.HighPen -v 1.x.x -u https://github.com/stepanowon/high-pen/releases/download/v1.x.x/HighPen-Setup.exe --submit
-   ```
-5. Store 패키지를 만들고 Partner Center에서 **새 제출**의 패키지만 바꿔 제출한다 (자세한 내용: `packaging/STORE.md`).
+4. Store 패키지를 만들고 Partner Center에서 **새 제출**의 패키지만 바꿔 제출한다 (자세한 내용: `packaging/STORE.md`).
    ```
    .\packaging\build-msix.ps1
    ```

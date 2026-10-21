@@ -18,14 +18,14 @@ SmartScreen 경고 없이 설치되고, 새 버전이 나오면 자동으로 업
 
 ### winget으로 설치
 
-터미널(PowerShell 또는 명령 프롬프트)에서 실행합니다. SmartScreen 경고 없이 설치됩니다.
+터미널(PowerShell 또는 명령 프롬프트)에서 실행합니다. Microsoft Store 패키지를 설치하므로 Store에서 설치한 것과 같습니다.
 
 ```
-winget install highpen
+winget install 9PDG1QN5QSL3
 ```
 
-- 업데이트: `winget upgrade highpen`
-- 제거: `winget uninstall highpen`
+- 업데이트: Store가 자동으로 업데이트합니다. 직접 하려면 `winget upgrade 9PDG1QN5QSL3`
+- 제거: `winget uninstall 9PDG1QN5QSL3`
 
 ### 설치 없이 실행
 
@@ -214,7 +214,7 @@ Windows 10/11 (.NET Framework 4.8 포함, 별도 설치 불필요)
 
 ## 참고 / 제한 사항
 
-- 실행 파일에 코드 서명이 없어서 웹에서 직접 받으면 Windows SmartScreen 경고가 뜰 수 있습니다. winget으로 설치하거나, 경고 창에서 **추가 정보 → 실행**을 누르세요.
+- 실행 파일에 코드 서명이 없어서 웹에서 직접 받으면 Windows SmartScreen 경고가 뜰 수 있습니다. Microsoft Store나 winget으로 설치하거나, 경고 창에서 **추가 정보 → 실행**을 누르세요.
 - 모니터마다 화면 배율이 다른 환경에서는 확대나 설정바 위치가 어긋날 수 있습니다.
 - 확대 중에 펜을 쓰려면 확대 화면이 포인터를 따라 움직이지 않도록 펜을 켜 둔 상태여야 합니다.
 
