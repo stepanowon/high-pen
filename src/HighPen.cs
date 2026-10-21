@@ -30,6 +30,7 @@ namespace HighPen
         [DllImport("user32.dll")] public static extern int GetWindowLong(IntPtr h, int i);
         [DllImport("user32.dll")] public static extern int SetWindowLong(IntPtr h, int i, int v);
         [DllImport("user32.dll")] public static extern bool RegisterHotKey(IntPtr h, int id, uint mod, uint vk);
+        [DllImport("user32.dll")] public static extern bool UnregisterHotKey(IntPtr h, int id);
         [DllImport("user32.dll")] public static extern bool GetCursorPos(out POINT p);
         [DllImport("user32.dll")] public static extern bool SetWindowPos(IntPtr h, IntPtr after, int x, int y, int cx, int cy, uint flags);
 
@@ -285,6 +286,37 @@ namespace HighPen
         }
     }
 
+    // Shortcut text such as "Ctrl+Alt+P" <-> RegisterHotKey modifier flags + WPF key.
+    static class HotkeyText
+    {
+        public const uint Alt = 1, Ctrl = 2, Shift = 4;
+
+        public static string Format(uint mods, Key key)
+        {
+            string k = key >= Key.D0 && key <= Key.D9 ? ((int)(key - Key.D0)).ToString() : key.ToString();
+            return ((mods & Ctrl) != 0 ? "Ctrl+" : "") + ((mods & Alt) != 0 ? "Alt+" : "") + ((mods & Shift) != 0 ? "Shift+" : "") + k;
+        }
+
+        // "" (no shortcut) or anything unreadable gives false.
+        public static bool TryParse(string s, out uint mods, out Key key)
+        {
+            mods = 0;
+            key = Key.None;
+            if (string.IsNullOrEmpty(s)) return false;
+            string[] parts = s.Split('+');
+            for (int i = 0; i < parts.Length - 1; i++)
+            {
+                if (parts[i] == "Ctrl") mods |= Ctrl;
+                else if (parts[i] == "Alt") mods |= Alt;
+                else if (parts[i] == "Shift") mods |= Shift;
+                else return false;
+            }
+            string last = parts[parts.Length - 1];
+            if (last.Length == 1 && last[0] >= '0' && last[0] <= '9') { key = Key.D0 + (last[0] - '0'); return true; }
+            return Enum.TryParse(last, out key) && key != Key.None;
+        }
+    }
+
     // UI strings in Korean / Japanese / English. Cur is an index into Codes.
     static class Lang
     {
@@ -298,7 +330,10 @@ namespace HighPen
             { "MouseSpot",     new[] { "마우스 스팟", "マウススポット", "Mouse spot" } },
             { "Pen",           new[] { "펜", "ペン", "Pen" } },
             { "Eraser",        new[] { "지우개", "消しゴム", "Eraser" } },
-            { "EraserTip",     new[] { "지우개  (Ctrl+Alt+E, 지우개 상태에서 한 번 더 누르면 전체 삭제)", "消しゴム  (Ctrl+Alt+E、消しゴム中にもう一度押すと全消去)", "Eraser  (Ctrl+Alt+E, press again while erasing to clear all)" } },
+            { "EraserTip",     new[] { "지우개 상태에서 단축키를 한 번 더 누르면 전체 삭제", "消しゴム中にもう一度ショートカットを押すと全消去", "Press the shortcut again while erasing to clear all" } },
+            { "Highlighter",   new[] { "형광펜", "蛍光ペン", "Highlighter" } },
+            { "HighlightColor", new[] { "형광펜 색상", "蛍光ペンの色", "Highlighter color" } },
+            { "HighlightSize", new[] { "형광펜 두께", "蛍光ペンの太さ", "Highlighter width" } },
             { "Board",         new[] { "칠판", "ボード", "Board" } },
             { "BoardTip",      new[] { "칠판 (흰색/검정/끄기)", "ボード (白/黒/オフ)", "Board (white/black/off)" } },
             { "WhiteBoard",    new[] { "흰 칠판", "白ボード", "White" } },
@@ -317,6 +352,16 @@ namespace HighPen
             { "CaptureFailed", new[] { "캡처하지 못했습니다", "キャプチャできませんでした", "Capture failed" } },
             { "ClickShow",     new[] { "클릭 표시", "クリック表示", "Show clicks" } },
             { "HotkeyFail",    new[] { "다른 프로그램이 사용 중이라 등록하지 못한 단축키:", "他のアプリが使用中のため登録できなかったショートカット:", "Shortcuts in use by another app (not registered):" } },
+            { "Hotkeys",       new[] { "단축키 설정", "ショートカット設定", "Shortcuts" } },
+            { "HotkeyHint",    new[] { "바꿀 항목을 누른 뒤 새 조합을 누르세요.\nEsc 취소, Delete 단축키 없애기", "変更する項目を押してから新しい組み合わせを押してください。\nEsc で取り消し、Delete でショートカットなし", "Click an item, then press the new combination.\nEsc cancels, Delete removes the shortcut." } },
+            { "PressKeys",     new[] { "키를 누르세요…", "キーを押してください…", "Press keys…" } },
+            { "NoKey",         new[] { "없음", "なし", "None" } },
+            { "HotkeyNeedMod", new[] { "Ctrl 또는 Alt와 함께 눌러야 합니다 (F1~F24는 단독 사용 가능)", "Ctrl か Alt と一緒に押してください (F1~F24 は単独で使えます)", "Hold Ctrl or Alt as well (F1–F24 can be used alone)" } },
+            { "HotkeyDup",     new[] { "이미 '{0}'에 쓰는 조합입니다", "すでに「{0}」で使っている組み合わせです", "Already used for \"{0}\"" } },
+            { "HotkeyWaitHint", new[] { "눌러도 반응이 없으면 다른 프로그램이 이미 쓰는 조합입니다.", "押しても反応がない場合は、ほかのアプリがすでに使っている組み合わせです。", "If nothing happens, another app already uses that combination." } },
+            { "HotkeyTaken",   new[] { "다른 프로그램이 사용 중인 조합입니다", "ほかのアプリが使用中の組み合わせです", "Another app is using this combination" } },
+            { "ResetDefaults", new[] { "기본값으로", "既定に戻す", "Reset all" } },
+            { "Cycle",         new[] { "순환", "切替", "cycle" } },
             { "Settings",      new[] { "설정", "設定", "Settings" } },
             { "Collapse",      new[] { "접기/펴기", "折りたたみ/展開", "Collapse/expand" } },
             { "Quit",          new[] { "종료", "終了", "Quit" } },
@@ -329,7 +374,7 @@ namespace HighPen
             { "License",       new[] { "라이선스", "ライセンス", "License" } },
             { "Close",         new[] { "닫기", "閉じる", "Close" } },
             { "Monitor",       new[] { "작동 모니터", "使用モニター", "Monitor" } },
-            { "MonitorTip",    new[] { "모니터 {0}  (순환: Ctrl+Alt+M)", "モニター {0}  (切替: Ctrl+Alt+M)", "Monitor {0}  (cycle: Ctrl+Alt+M)" } },
+            { "MonitorTip",    new[] { "모니터 {0}", "モニター {0}", "Monitor {0}" } },
             { "PenColor",      new[] { "펜 색상", "ペンの色", "Pen color" } },
             { "PenSize",       new[] { "펜 두께", "ペンの太さ", "Pen width" } },
             { "Pressure",      new[] { "필압 반영", "筆圧", "Pressure" } },
@@ -362,6 +407,8 @@ namespace HighPen
     {
         public string PenColor = "#FF3B30";
         public double PenSize = 4;
+        public string HighlightColor = "#FFD60A";
+        public double HighlightSize = 20;
         public string SpotColor = "#FFD60A";
         public double SpotSize = 70;
         public bool SpotOn = true;
@@ -371,6 +418,8 @@ namespace HighPen
         public double ZoomFactor = 2;
         public int BarX = 20, BarY = 20; // offset from the monitor work area, in pixels
         public string Language = ""; // "" = English (the default)
+        // Shortcuts changed from their defaults, by action id ("" = no shortcut).
+        public Dictionary<string, string> Hotkeys = new Dictionary<string, string>();
 
         static string FilePath
         {
@@ -394,6 +443,9 @@ namespace HighPen
                     string k = line.Substring(0, i), v = line.Substring(i + 1);
                     if (k == "PenColor") s.PenColor = v;
                     else if (k == "PenSize") s.PenSize = double.Parse(v, System.Globalization.CultureInfo.InvariantCulture);
+                    else if (k == "HighlightColor") s.HighlightColor = v;
+                    else if (k == "HighlightSize") s.HighlightSize = double.Parse(v, System.Globalization.CultureInfo.InvariantCulture);
+                    else if (k.StartsWith("Hotkey.")) s.Hotkeys[k.Substring(7)] = v;
                     else if (k == "SpotColor") s.SpotColor = v;
                     else if (k == "SpotSize") s.SpotSize = double.Parse(v, System.Globalization.CultureInfo.InvariantCulture);
                     else if (k == "SpotOn") s.SpotOn = v == "1";
@@ -408,6 +460,7 @@ namespace HighPen
             }
             catch { }
             if (Array.IndexOf(Zoomer.Factors, s.ZoomFactor) < 0) s.ZoomFactor = 2;
+            s.HighlightSize = Math.Max(5, Math.Min(60, s.HighlightSize));
             return s;
         }
 
@@ -416,9 +469,11 @@ namespace HighPen
             try
             {
                 var ic = System.Globalization.CultureInfo.InvariantCulture;
-                File.WriteAllLines(FilePath, new string[] {
+                List<string> lines = new List<string> {
                     "PenColor=" + PenColor,
                     "PenSize=" + PenSize.ToString(ic),
+                    "HighlightColor=" + HighlightColor,
+                    "HighlightSize=" + HighlightSize.ToString(ic),
                     "SpotColor=" + SpotColor,
                     "SpotSize=" + SpotSize.ToString(ic),
                     "SpotOn=" + (SpotOn ? "1" : "0"),
@@ -428,7 +483,9 @@ namespace HighPen
                     "ZoomFactor=" + ZoomFactor.ToString(ic),
                     "BarX=" + BarX,
                     "BarY=" + BarY,
-                    "Language=" + Language });
+                    "Language=" + Language };
+                foreach (KeyValuePair<string, string> h in Hotkeys) lines.Add("Hotkey." + h.Key + "=" + h.Value);
+                File.WriteAllLines(FilePath, lines);
             }
             catch { }
         }
@@ -574,7 +631,6 @@ namespace HighPen
         static readonly string[] Palette = { "#FF3B30", "#FF9500", "#FFD60A", "#34C759", "#0A84FF", "#BF5AF2", "#000000", "#FFFFFF" };
         static readonly string[] ColorNames = { "Red", "Orange", "Yellow", "Green", "Blue", "Purple", "Black", "White" }; // Lang keys
         static readonly Key[] ColorKeys = { Key.R, Key.O, Key.Y, Key.G, Key.B, Key.P, Key.K, Key.W };
-        static readonly string[] ColorKeyText = { "R", "O", "Y", "G", "B", "P", "K", "W" };
         static readonly Brush PanelBg = new SolidColorBrush(Color.FromRgb(0x2B, 0x2E, 0x33));
         static readonly Brush Active = new SolidColorBrush(Color.FromRgb(0x3E, 0x6F, 0xB0));
         static readonly Brush Idle = new SolidColorBrush(Color.FromRgb(0x3A, 0x3D, 0x42));
@@ -586,14 +642,14 @@ namespace HighPen
         Zoomer zoomer = new Zoomer();
         ClickHook clickHook = new ClickHook();
 
-        bool penMode, eraser, collapsed, settingsOpen, textMode;
+        bool penMode, eraser, collapsed, settingsOpen, textMode, highlighter;
         int shownBoard;
         int board; // 0 none, 1 white, 2 black
 
         StackPanel buttons = new StackPanel();
         Border settingsPanel;
         TextBlock arrow;
-        Border zoomBtn, bubbleBtn, spotBtn, penBtn, eraserBtn, boardBtn, setBtn;
+        Border zoomBtn, bubbleBtn, spotBtn, penBtn, highlightBtn, eraserBtn, boardBtn, setBtn;
         TextBlock boardLabel;
         DispatcherTimer topTimer = new DispatcherTimer();
 
@@ -613,12 +669,14 @@ namespace HighPen
             Left = SystemParameters.WorkArea.Right - 80;
             Top = SystemParameters.WorkArea.Top + 140;
 
+            BuildActions();
             BuildContent();
 
             SourceInitialized += delegate
             {
                 Native.AddExStyle(this, Native.WS_EX_NOACTIVATE);
-                RegisterHotkeys();
+                HwndSource.FromHwnd(new WindowInteropHelper(this).Handle).AddHook(HotkeyHook);
+                RegisterHotkeys(true);
                 HwndSource.FromHwnd(new WindowInteropHelper(this).Handle).AddHook(MoveHook);
             };
             // SizeChanged comes before the window itself is resized, so check once the resize has happened
@@ -835,19 +893,33 @@ namespace HighPen
             ApplyMonitor();
         }
 
-        Panel penSwatches;
+        Panel penSwatches, highlightSwatches;
 
+        // Colour shortcuts change the tool in use: the highlighter while it is on, otherwise the pen.
         void SetPenColor(int i)
         {
-            cfg.PenColor = Palette[i];
-            cfg.Save();
-            foreach (Border b in penSwatches.Children)
+            if (highlighter)
             {
-                bool sel = string.Equals((string)b.Tag, cfg.PenColor, StringComparison.OrdinalIgnoreCase);
+                cfg.HighlightColor = Palette[i];
+                MarkSwatch(highlightSwatches, cfg.HighlightColor);
+            }
+            else
+            {
+                cfg.PenColor = Palette[i];
+                MarkSwatch(penSwatches, cfg.PenColor);
+            }
+            cfg.Save();
+            ApplyPen();
+        }
+
+        static void MarkSwatch(Panel swatches, string color)
+        {
+            foreach (Border b in swatches.Children)
+            {
+                bool sel = string.Equals((string)b.Tag, color, StringComparison.OrdinalIgnoreCase);
                 b.BorderBrush = sel ? Brushes.White : Brushes.Gray;
                 b.BorderThickness = new Thickness(sel ? 3 : 1);
             }
-            ApplyPen();
         }
 
         Border pressureBtn;
@@ -901,6 +973,7 @@ namespace HighPen
             Native.BringTopmost(this);
             if (aboutWin != null) Native.BringTopmost(aboutWin);
             if (toastWin != null) Native.BringTopmost(toastWin);
+            if (hotkeyWin != null) Native.BringTopmost(hotkeyWin);
         }
 
         // ---------- UI building ----------
@@ -1031,25 +1104,28 @@ namespace HighPen
             zoomBtn = MakeButton("", Lang.T("Zoom"), true, delegate { ToggleZoom(); });
             bubbleBtn = MakeButton("", Lang.T("Bubble"), true, delegate { ToggleText(); });
             setBtn = MakeButton("", Lang.T("Settings"), true, delegate { ToggleSettings(); });
+            highlightBtn = MakeButton("\uE7E6", Lang.T("Highlighter"), true, delegate { ToggleHighlighter(); });
             Border captureBtn = MakeButton("\uE722", Lang.T("Capture"), true, delegate { Capture(); });
             Border aboutBtn = MakeButton("\uE946", Lang.T("About"), true, delegate { ShowAbout(); });
             aboutBtn.ToolTip = Lang.T("AboutTip");
             boardLabel = (TextBlock)((StackPanel)boardBtn.Child).Children[1];
 
-            Tip(spotBtn, Lang.T("MouseSpot"), "S");
-            Tip(penBtn, Lang.T("Pen"), "P");
-            eraserBtn.ToolTip = Lang.T("EraserTip");
-            Tip(boardBtn, Lang.T("BoardTip"), "B");
-            Tip(undo, Lang.T("Undo"), "Z");
-            Tip(clear, Lang.T("ClearTip"), "C");
-            Tip(zoomBtn, ZoomTipText(), "X");
-            Tip(bubbleBtn, Lang.T("Bubble"), "T");
-            Tip(captureBtn, Lang.T("CaptureTip"), "F");
-            Tip(setBtn, Lang.T("Settings"), "D");
-            Tip(ab, Lang.T("Collapse"), "H");
+            Tip(spotBtn, Lang.T("MouseSpot"), "Spot");
+            Tip(penBtn, Lang.T("Pen"), "Pen");
+            Tip(highlightBtn, Lang.T("Highlighter"), "Highlighter");
+            eraserBtn.ToolTip = Lang.T("Eraser") + KeySuffix("Eraser") + "\n" + Lang.T("EraserTip");
+            Tip(boardBtn, Lang.T("BoardTip"), "Board");
+            Tip(undo, Lang.T("Undo"), "Undo");
+            Tip(clear, Lang.T("ClearTip"), "Clear");
+            Tip(zoomBtn, ZoomTipText(), "Zoom");
+            Tip(bubbleBtn, Lang.T("Bubble"), "Bubble");
+            Tip(captureBtn, Lang.T("CaptureTip"), "Capture");
+            Tip(setBtn, Lang.T("Settings"), "Settings");
+            Tip(ab, Lang.T("Collapse"), "Collapse");
 
             buttons.Children.Add(spotBtn);
             buttons.Children.Add(penBtn);
+            buttons.Children.Add(highlightBtn);
             buttons.Children.Add(eraserBtn);
             buttons.Children.Add(boardBtn);
             buttons.Children.Add(undo);
@@ -1066,7 +1142,7 @@ namespace HighPen
             cg.Children.Add(new Ellipse { Fill = new SolidColorBrush(Color.FromRgb(0xD9, 0x30, 0x25)), Stroke = Brushes.White, StrokeThickness = 2 });
             cg.Children.Add(new TextBlock { Text = "", FontFamily = new FontFamily("Segoe MDL2 Assets"), Foreground = Brushes.White, FontSize = 14, FontWeight = FontWeights.Bold, HorizontalAlignment = HorizontalAlignment.Center, VerticalAlignment = VerticalAlignment.Center });
             close.Child = cg;
-            Tip(close, Lang.T("Quit"), "Q");
+            Tip(close, Lang.T("Quit"), "Quit");
             close.MouseLeftButtonUp += delegate { Quit(); };
             buttons.Children.Add(close);
 
@@ -1075,9 +1151,16 @@ namespace HighPen
             return new Border { Width = 84, Background = PanelBg, BorderBrush = Line, BorderThickness = new Thickness(1), Child = col };
         }
 
-        static void Tip(Border b, string name, string key)
+        void Tip(Border b, string name, string action)
         {
-            b.ToolTip = name + "  (Ctrl+Alt+" + key + ")";
+            b.ToolTip = name + KeySuffix(action);
+        }
+
+        // "  (Ctrl+Alt+P)" for the action's current shortcut, or "" when it has none.
+        string KeySuffix(string action)
+        {
+            string c = Combo(action);
+            return c.Length == 0 ? "" : "  (" + c + ")";
         }
 
         Border MakeButton(string glyph, string label, bool segoe, MouseButtonEventHandler click)
@@ -1105,7 +1188,8 @@ namespace HighPen
                 int idx = i;
                 Border mb = new Border { Width = 34, Height = 26, Margin = new Thickness(2), Cursor = Cursors.Hand, Background = Idle };
                 mb.Child = new TextBlock { Text = (i + 1).ToString(), Foreground = Brushes.White, HorizontalAlignment = HorizontalAlignment.Center, VerticalAlignment = VerticalAlignment.Center };
-                mb.ToolTip = string.Format(Lang.T("MonitorTip"), i + 1);
+                string cycle = Combo("Monitor");
+                mb.ToolTip = string.Format(Lang.T("MonitorTip"), i + 1) + (cycle.Length == 0 ? "" : "  (" + Lang.T("Cycle") + ": " + cycle + ")");
                 mb.MouseLeftButtonUp += delegate { SetMonitor(idx); };
                 monitorBtns.Add(mb);
                 mp.Children.Add(mb);
@@ -1119,7 +1203,7 @@ namespace HighPen
             p.Children.Add(SecTitle(Lang.T("PenSize")));
             p.Children.Add(MakeSlider(1, 30, cfg.PenSize, delegate (double v) { cfg.PenSize = v; ApplyPen(); cfg.Save(); }));
 
-            pressureBtn = new Border { Height = 26, Margin = new Thickness(0, 6, 0, 0), Cursor = Cursors.Hand, ToolTip = Lang.T("Pressure") + "  (Ctrl+Alt+R)" };
+            pressureBtn = new Border { Height = 26, Margin = new Thickness(0, 6, 0, 0), Cursor = Cursors.Hand, ToolTip = Lang.T("Pressure") + KeySuffix("Pressure") };
             pressureText = new TextBlock { Foreground = Brushes.White, HorizontalAlignment = HorizontalAlignment.Center, VerticalAlignment = VerticalAlignment.Center };
             pressureBtn.Child = pressureText;
             pressureBtn.MouseLeftButtonUp += delegate { TogglePressure(); };
@@ -1128,12 +1212,20 @@ namespace HighPen
 
             p.Children.Add(new Separator { Margin = new Thickness(0, 8, 0, 4) });
 
+            p.Children.Add(SecTitle(Lang.T("HighlightColor")));
+            highlightSwatches = Swatches(cfg.HighlightColor, delegate (string c) { cfg.HighlightColor = c; ApplyPen(); cfg.Save(); }, true);
+            p.Children.Add(highlightSwatches);
+            p.Children.Add(SecTitle(Lang.T("HighlightSize")));
+            p.Children.Add(MakeSlider(5, 60, cfg.HighlightSize, delegate (double v) { cfg.HighlightSize = v; ApplyPen(); cfg.Save(); }));
+
+            p.Children.Add(new Separator { Margin = new Thickness(0, 8, 0, 4) });
+
             p.Children.Add(SecTitle(Lang.T("SpotColor")));
             p.Children.Add(Swatches(cfg.SpotColor, delegate (string c) { cfg.SpotColor = c; ApplySpot(); cfg.Save(); }, false));
             p.Children.Add(SecTitle(Lang.T("SpotSize")));
             p.Children.Add(MakeSlider(20, 200, cfg.SpotSize, delegate (double v) { cfg.SpotSize = v; ApplySpot(); cfg.Save(); }));
 
-            clicksBtn = new Border { Height = 26, Margin = new Thickness(0, 6, 0, 0), Cursor = Cursors.Hand, ToolTip = Lang.T("ClickShow") + "  (Ctrl+Alt+K)" };
+            clicksBtn = new Border { Height = 26, Margin = new Thickness(0, 6, 0, 0), Cursor = Cursors.Hand, ToolTip = Lang.T("ClickShow") + KeySuffix("Clicks") };
             clicksText = new TextBlock { Foreground = Brushes.White, HorizontalAlignment = HorizontalAlignment.Center, VerticalAlignment = VerticalAlignment.Center };
             clicksBtn.Child = clicksText;
             clicksBtn.MouseLeftButtonUp += delegate { ToggleClicks(); };
@@ -1168,6 +1260,12 @@ namespace HighPen
             }
             p.Children.Add(lp);
 
+            p.Children.Add(new Separator { Margin = new Thickness(0, 8, 0, 4) });
+            Border hk = new Border { Height = 26, Margin = new Thickness(0, 2, 0, 0), Cursor = Cursors.Hand, Background = Idle };
+            hk.Child = new TextBlock { Text = Lang.T("Hotkeys"), Foreground = Brushes.White, HorizontalAlignment = HorizontalAlignment.Center, VerticalAlignment = VerticalAlignment.Center };
+            hk.MouseLeftButtonUp += delegate { ShowHotkeyEditor(); };
+            p.Children.Add(hk);
+
             hotkeyWarn = new TextBlock { Foreground = new SolidColorBrush(Color.FromRgb(0xFF, 0x9F, 0x0A)), FontSize = 11, TextWrapping = TextWrapping.Wrap, Margin = new Thickness(0, 8, 0, 0) };
             UpdateHotkeyWarning();
             p.Children.Add(hotkeyWarn);
@@ -1188,7 +1286,7 @@ namespace HighPen
             return (Color)ColorConverter.ConvertFromString(s);
         }
 
-        static Panel Swatches(string current, Action<string> onPick, bool pen)
+        Panel Swatches(string current, Action<string> onPick, bool pen)
         {
             WrapPanel wp = new WrapPanel();
             List<Border> list = new List<Border>();
@@ -1196,7 +1294,7 @@ namespace HighPen
             {
                 string h = Palette[pi];
                 Border b = new Border { Width = 24, Height = 24, CornerRadius = new CornerRadius(12), Margin = new Thickness(2), Cursor = Cursors.Hand, Background = new SolidColorBrush(ParseColor(h)), BorderBrush = Brushes.Gray, BorderThickness = new Thickness(1), Tag = h };
-                b.ToolTip = Lang.T(ColorNames[pi]) + (pen ? "  (Ctrl+Shift+" + ColorKeyText[pi] + ")" : "");
+                b.ToolTip = Lang.T(ColorNames[pi]) + (pen ? KeySuffix("Color." + ColorNames[pi]) : "");
                 if (string.Equals(h, current, StringComparison.OrdinalIgnoreCase)) { b.BorderBrush = Brushes.White; b.BorderThickness = new Thickness(3); }
                 b.MouseLeftButtonUp += delegate
                 {
@@ -1222,9 +1320,18 @@ namespace HighPen
         void ToggleSpot() { cfg.SpotOn = !cfg.SpotOn; ApplySpot(); cfg.Save(); }
         void TogglePen()
         {
-            if (penMode && !eraser && !textMode) { SetPen(false); return; }
+            if (penMode && !eraser && !textMode && !highlighter) { SetPen(false); return; }
             eraser = false;
             textMode = false;
+            highlighter = false;
+            SetPen(true);
+        }
+        void ToggleHighlighter()
+        {
+            if (penMode && !eraser && !textMode && highlighter) { SetPen(false); return; }
+            eraser = false;
+            textMode = false;
+            highlighter = true;
             SetPen(true);
         }
         void ToggleEraser() { eraser = !eraser; textMode = false; if (eraser) penMode = true; ApplyMode(); }
@@ -1256,11 +1363,12 @@ namespace HighPen
             zoomer.Factor = f;
             for (int i = 0; i < zoomFactorBtns.Count; i++)
                 zoomFactorBtns[i].Background = Zoomer.Factors[i] == f ? Active : Idle;
-            Tip(zoomBtn, ZoomTipText(), "X");
+            Tip(zoomBtn, ZoomTipText(), "Zoom");
         }
 
         void Quit()
         {
+            if (hotkeyWin != null) hotkeyWin.Close();
             zoomer.Stop();
             clickHook.Stop();
             Microsoft.Win32.SystemEvents.DisplaySettingsChanged -= OnDisplaySettingsChanged;
@@ -1384,39 +1492,89 @@ namespace HighPen
             t.Start();
         }
 
-        // ---------- global hotkeys (Ctrl+Alt+key) ----------
+        // ---------- global hotkeys (default Ctrl+Alt+key, changeable in the shortcut editor) ----------
 
         const int WM_HOTKEY = 0x0312;
-        const uint MOD_ALT = 1, MOD_CONTROL = 2, MOD_SHIFT = 4, MOD_NOREPEAT = 0x4000;
+        const uint MOD_NOREPEAT = 0x4000;
+        const int TestHotkeyId = 0xBFFF; // used briefly to check whether another app owns a combination
         Dictionary<int, Action> hotkeys = new Dictionary<int, Action>();
 
-        void RegisterHotkeys()
+        class HotkeyAction
         {
-            IntPtr h = new WindowInteropHelper(this).Handle;
-            HwndSource.FromHwnd(h).AddHook(HotkeyHook);
-            AddHotkey(h, Key.S, ToggleSpot);
-            AddHotkey(h, Key.P, TogglePen);
-            AddHotkey(h, Key.E, EraserHotkey);
-            AddHotkey(h, Key.B, CycleBoard);
-            AddHotkey(h, Key.Z, UndoStroke);
-            AddHotkey(h, Key.C, delegate { ClearPage(); });
-            AddHotkey(h, Key.D, ToggleSettings);
-            AddHotkey(h, Key.T, ToggleText);
-            AddHotkey(h, Key.X, ToggleZoom);
-            AddHotkey(h, Key.M, CycleMonitor);
-            AddHotkey(h, Key.R, TogglePressure);
-            AddHotkey(h, Key.F, Capture);
-            AddHotkey(h, Key.K, ToggleClicks);
+            public string Id, Default;
+            public Func<string> Name;
+            public Action Run;
+        }
+
+        List<HotkeyAction> actions = new List<HotkeyAction>();
+
+        void AddAction(string id, string defaultCombo, Func<string> name, Action run)
+        {
+            actions.Add(new HotkeyAction { Id = id, Default = defaultCombo, Name = name, Run = run });
+        }
+
+        // Every action that can have a shortcut, in the order the shortcut editor lists them.
+        void BuildActions()
+        {
+            AddAction("Spot", "Ctrl+Alt+S", delegate { return Lang.T("MouseSpot"); }, ToggleSpot);
+            AddAction("Pen", "Ctrl+Alt+P", delegate { return Lang.T("Pen"); }, TogglePen);
+            AddAction("Highlighter", "Ctrl+Alt+L", delegate { return Lang.T("Highlighter"); }, ToggleHighlighter);
+            AddAction("Eraser", "Ctrl+Alt+E", delegate { return Lang.T("Eraser"); }, EraserHotkey);
+            AddAction("Board", "Ctrl+Alt+B", delegate { return Lang.T("Board"); }, CycleBoard);
+            AddAction("Undo", "Ctrl+Alt+Z", delegate { return Lang.T("Undo"); }, UndoStroke);
+            AddAction("Clear", "Ctrl+Alt+C", delegate { return Lang.T("ClearTip"); }, ClearPage);
+            AddAction("Bubble", "Ctrl+Alt+T", delegate { return Lang.T("Bubble"); }, ToggleText);
+            AddAction("Zoom", "Ctrl+Alt+X", delegate { return Lang.T("Zoom"); }, ToggleZoom);
+            AddAction("Capture", "Ctrl+Alt+F", delegate { return Lang.T("Capture"); }, Capture);
+            AddAction("Settings", "Ctrl+Alt+D", delegate { return Lang.T("Settings"); }, ToggleSettings);
+            AddAction("Collapse", "Ctrl+Alt+H", delegate { return Lang.T("Collapse"); }, ToggleCollapse);
+            AddAction("Quit", "Ctrl+Alt+Q", delegate { return Lang.T("Quit"); }, Quit);
+            AddAction("Monitor", "Ctrl+Alt+M", delegate { return Lang.T("Monitor") + " (" + Lang.T("Cycle") + ")"; }, CycleMonitor);
+            AddAction("Pressure", "Ctrl+Alt+R", delegate { return Lang.T("Pressure"); }, TogglePressure);
+            AddAction("Clicks", "Ctrl+Alt+K", delegate { return Lang.T("ClickShow"); }, ToggleClicks);
             for (int i = 0; i < Palette.Length; i++)
             {
                 int ci = i;
-                AddHotkey(h, ColorKeys[i], MOD_CONTROL | MOD_SHIFT, delegate { SetPenColor(ci); });
+                AddAction("Color." + ColorNames[i], HotkeyText.Format(HotkeyText.Ctrl | HotkeyText.Shift, ColorKeys[i]),
+                    delegate { return Lang.T("PenColor") + ": " + Lang.T(ColorNames[ci]); }, delegate { SetPenColor(ci); });
             }
-            AddHotkey(h, Key.H, ToggleCollapse);
-            AddHotkey(h, Key.Q, Quit);
+        }
+
+        // The action's current shortcut, or "" when it has none.
+        string Combo(string id)
+        {
+            string c;
+            if (cfg.Hotkeys.TryGetValue(id, out c)) return c;
+            HotkeyAction a = actions.Find(x => x.Id == id);
+            return a == null ? "" : a.Default;
+        }
+
+        void UnregisterHotkeys()
+        {
+            IntPtr h = new WindowInteropHelper(this).Handle;
+            foreach (int id in hotkeys.Keys) Native.UnregisterHotKey(h, id);
+            hotkeys.Clear();
+        }
+
+        void RegisterHotkeys(bool startup)
+        {
+            UnregisterHotkeys();
+            failedHotkeys.Clear();
+            IntPtr h = new WindowInteropHelper(this).Handle;
+            int id = 1;
+            foreach (HotkeyAction a in actions)
+            {
+                uint mods;
+                Key key;
+                string c = Combo(a.Id);
+                if (!HotkeyText.TryParse(c, out mods, out key)) continue;
+                if (Native.RegisterHotKey(h, id, mods | MOD_NOREPEAT, (uint)KeyInterop.VirtualKeyFromKey(key))) hotkeys[id] = a.Run;
+                else failedHotkeys.Add(c);
+                id++;
+            }
             UpdateHotkeyWarning();
             // tell the user once, after start-up has settled
-            if (failedHotkeys.Count > 0)
+            if (startup && failedHotkeys.Count > 0)
                 Dispatcher.BeginInvoke(DispatcherPriority.ApplicationIdle, new Action(delegate { ShowToast(HotkeyWarningText(), null, 8); }));
         }
 
@@ -1436,18 +1594,133 @@ namespace HighPen
             hotkeyWarn.Visibility = failedHotkeys.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
         }
 
-        void AddHotkey(IntPtr h, Key key, Action a)
-        {
-            AddHotkey(h, key, MOD_CONTROL | MOD_ALT, a);
-        }
+        // ---------- shortcut editor ----------
 
-        void AddHotkey(IntPtr h, Key key, uint mods, Action a)
+        Window hotkeyWin;
+
+        // Lists every action with its shortcut. Click one, then press the new combination.
+        // HighPen's own shortcuts are released while the editor is open so pressing them reaches it.
+        void ShowHotkeyEditor()
         {
-            int id = hotkeys.Count + 1;
-            if (Native.RegisterHotKey(h, id, mods | MOD_NOREPEAT, (uint)KeyInterop.VirtualKeyFromKey(key)))
-                hotkeys[id] = a;
-            else
-                failedHotkeys.Add(((mods & MOD_CONTROL) != 0 ? "Ctrl+" : "") + ((mods & MOD_ALT) != 0 ? "Alt+" : "") + ((mods & MOD_SHIFT) != 0 ? "Shift+" : "") + key);
+            if (hotkeyWin != null) { hotkeyWin.Activate(); return; }
+            UnregisterHotkeys();
+
+            StackPanel p = new StackPanel { Margin = new Thickness(20, 16, 20, 16), Width = 360 };
+            p.Children.Add(new TextBlock { Text = Lang.T("Hotkeys"), Foreground = Brushes.White, FontSize = 18, FontWeight = FontWeights.SemiBold });
+            p.Children.Add(new TextBlock { Text = Lang.T("HotkeyHint"), Foreground = Brushes.Gray, FontSize = 12, Margin = new Thickness(0, 4, 0, 10), TextWrapping = TextWrapping.Wrap });
+
+            StackPanel rows = new StackPanel();
+            p.Children.Add(new ScrollViewer { Content = rows, MaxHeight = 440, VerticalScrollBarVisibility = ScrollBarVisibility.Auto });
+            TextBlock status = new TextBlock { FontSize = 12, TextWrapping = TextWrapping.Wrap, Margin = new Thickness(0, 8, 0, 0) };
+            p.Children.Add(status);
+            Action<string> warn = delegate (string s) { status.Foreground = new SolidColorBrush(Color.FromRgb(0xFF, 0x9F, 0x0A)); status.Text = s; };
+
+            Grid btns = new Grid { Margin = new Thickness(0, 12, 0, 0) };
+            btns.ColumnDefinitions.Add(new ColumnDefinition());
+            btns.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(8) });
+            btns.ColumnDefinitions.Add(new ColumnDefinition());
+            Border reset = new Border { Height = 28, Background = Idle, Cursor = Cursors.Hand };
+            reset.Child = new TextBlock { Text = Lang.T("ResetDefaults"), Foreground = Brushes.White, HorizontalAlignment = HorizontalAlignment.Center, VerticalAlignment = VerticalAlignment.Center };
+            Border close = new Border { Height = 28, Background = Idle, Cursor = Cursors.Hand };
+            close.Child = new TextBlock { Text = Lang.T("Close"), Foreground = Brushes.White, HorizontalAlignment = HorizontalAlignment.Center, VerticalAlignment = VerticalAlignment.Center };
+            Grid.SetColumn(close, 2);
+            btns.Children.Add(reset);
+            btns.Children.Add(close);
+            p.Children.Add(btns);
+
+            Window w = new Window
+            {
+                WindowStyle = WindowStyle.None, ResizeMode = ResizeMode.NoResize, SizeToContent = SizeToContent.WidthAndHeight,
+                ShowInTaskbar = false, Topmost = true, Title = "HighPen", Background = Brushes.Transparent, AllowsTransparency = true,
+                Content = new Border { Background = PanelBg, BorderBrush = Active, BorderThickness = new Thickness(1), Child = p },
+            };
+
+            HotkeyAction waiting = null; // the action whose new shortcut is being typed
+            Dictionary<HotkeyAction, TextBlock> keyTexts = new Dictionary<HotkeyAction, TextBlock>();
+            Dictionary<HotkeyAction, Border> keyBoxes = new Dictionary<HotkeyAction, Border>();
+            Action refresh = delegate
+            {
+                foreach (HotkeyAction a in actions)
+                {
+                    string c = Combo(a.Id);
+                    keyTexts[a].Text = a == waiting ? Lang.T("PressKeys") : (c.Length == 0 ? Lang.T("NoKey") : c);
+                    keyTexts[a].Foreground = c.Length == 0 && a != waiting ? Brushes.Gray : Brushes.White;
+                    keyBoxes[a].Background = a == waiting ? Active : Idle;
+                }
+            };
+            Action<string> assign = delegate (string c)
+            {
+                if (c == waiting.Default) cfg.Hotkeys.Remove(waiting.Id);
+                else cfg.Hotkeys[waiting.Id] = c;
+                cfg.Save();
+                waiting = null;
+                refresh();
+            };
+
+            foreach (HotkeyAction a in actions)
+            {
+                HotkeyAction act = a;
+                Grid g = new Grid { Margin = new Thickness(0, 2, 0, 2) };
+                g.ColumnDefinitions.Add(new ColumnDefinition());
+                g.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(150) });
+                g.Children.Add(new TextBlock { Text = a.Name(), Foreground = Brushes.White, FontSize = 12, VerticalAlignment = VerticalAlignment.Center, TextWrapping = TextWrapping.Wrap });
+                Border box = new Border { Height = 26, Cursor = Cursors.Hand };
+                TextBlock kt = new TextBlock { FontSize = 12, HorizontalAlignment = HorizontalAlignment.Center, VerticalAlignment = VerticalAlignment.Center };
+                box.Child = kt;
+                box.MouseLeftButtonUp += delegate { waiting = act; status.Foreground = Brushes.Gray; status.Text = Lang.T("HotkeyWaitHint"); refresh(); };
+                Grid.SetColumn(box, 1);
+                g.Children.Add(box);
+                keyTexts[a] = kt;
+                keyBoxes[a] = box;
+                rows.Children.Add(g);
+            }
+            refresh();
+
+            reset.MouseLeftButtonUp += delegate { cfg.Hotkeys.Clear(); cfg.Save(); waiting = null; status.Text = ""; refresh(); };
+            close.MouseLeftButtonUp += delegate { w.Close(); };
+            w.PreviewKeyDown += delegate (object o, KeyEventArgs e)
+            {
+                e.Handled = true; // also keeps Alt+F4 and friends from acting on the editor while choosing
+                Key k = e.Key == Key.System ? e.SystemKey : (e.Key == Key.ImeProcessed ? e.ImeProcessedKey : e.Key);
+                ModifierKeys m = Keyboard.Modifiers;
+                if (waiting == null)
+                {
+                    if (m == ModifierKeys.None && (k == Key.Escape || k == Key.Enter)) w.Close();
+                    return;
+                }
+                if (k == Key.LeftCtrl || k == Key.RightCtrl || k == Key.LeftAlt || k == Key.RightAlt || k == Key.LeftShift || k == Key.RightShift || k == Key.LWin || k == Key.RWin)
+                    return; // wait for the rest of the combination
+                if (m == ModifierKeys.None && k == Key.Escape) { waiting = null; status.Text = ""; refresh(); return; }
+                if (m == ModifierKeys.None && (k == Key.Delete || k == Key.Back)) { status.Text = ""; assign(""); return; }
+                uint mods = ((m & ModifierKeys.Control) != 0 ? HotkeyText.Ctrl : 0) | ((m & ModifierKeys.Alt) != 0 ? HotkeyText.Alt : 0) | ((m & ModifierKeys.Shift) != 0 ? HotkeyText.Shift : 0);
+                if ((mods & (HotkeyText.Ctrl | HotkeyText.Alt)) == 0 && !(k >= Key.F1 && k <= Key.F24)) { warn(Lang.T("HotkeyNeedMod")); return; }
+                string c = HotkeyText.Format(mods, k);
+                HotkeyAction other = actions.Find(x => x != waiting && Combo(x.Id) == c);
+                if (other != null) { warn(string.Format(Lang.T("HotkeyDup"), other.Name())); return; }
+                IntPtr h = new WindowInteropHelper(this).Handle;
+                if (!Native.RegisterHotKey(h, TestHotkeyId, mods | MOD_NOREPEAT, (uint)KeyInterop.VirtualKeyFromKey(k))) { warn(Lang.T("HotkeyTaken")); return; }
+                Native.UnregisterHotKey(h, TestHotkeyId);
+                status.Text = "";
+                assign(c);
+            };
+            w.Closed += delegate
+            {
+                hotkeyWin = null;
+                RegisterHotkeys(false);
+                RebuildContent(); // tooltips show the new shortcuts
+                if (failedHotkeys.Count > 0) ShowToast(HotkeyWarningText(), null, 8);
+            };
+            // centered on the selected monitor
+            w.Loaded += delegate
+            {
+                System.Drawing.Rectangle wa = Native.GetScreen(cfg.Monitor).WorkingArea;
+                DpiScale d = VisualTreeHelper.GetDpi(w);
+                int pw = (int)(w.ActualWidth * d.DpiScaleX), ph = (int)(w.ActualHeight * d.DpiScaleY);
+                Native.PlaceRect(w, wa.Left + (wa.Width - pw) / 2, wa.Top + (wa.Height - ph) / 2, 0, 0, false);
+                w.Activate();
+            };
+            hotkeyWin = w;
+            w.Show();
         }
 
         IntPtr HotkeyHook(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
@@ -1476,7 +1749,7 @@ namespace HighPen
         {
             penMode = on;
             if (!on) textMode = false;
-            if (!on) { eraser = false; board = 0; }
+            if (!on) { eraser = false; highlighter = false; board = 0; }
             ApplyMode();
         }
 
@@ -1608,11 +1881,23 @@ namespace HighPen
         void ApplyPen()
         {
             DrawingAttributes da = new DrawingAttributes();
-            da.Color = ParseColor(cfg.PenColor);
-            da.Width = cfg.PenSize;
-            da.Height = cfg.PenSize;
             da.FitToCurve = true;
-            da.IgnorePressure = !cfg.Pressure;
+            if (highlighter)
+            {
+                // translucent marker, drawn beneath pen strokes (a rectangle tip spikes with FitToCurve)
+                da.Color = ParseColor(cfg.HighlightColor);
+                da.IsHighlighter = true;
+                da.Width = cfg.HighlightSize;
+                da.Height = cfg.HighlightSize;
+                da.IgnorePressure = true;
+            }
+            else
+            {
+                da.Color = ParseColor(cfg.PenColor);
+                da.Width = cfg.PenSize;
+                da.Height = cfg.PenSize;
+                da.IgnorePressure = !cfg.Pressure;
+            }
             overlay.Canvas.DefaultDrawingAttributes = da;
         }
 
@@ -1648,7 +1933,8 @@ namespace HighPen
             Native.SetClickThrough(overlay, !penMode || suspended);
             ic.IsHitTestVisible = penMode;
 
-            Highlight(penBtn, penMode && !eraser && !textMode);
+            Highlight(penBtn, penMode && !eraser && !textMode && !highlighter);
+            Highlight(highlightBtn, penMode && !eraser && !textMode && highlighter);
             Highlight(eraserBtn, eraser);
             Highlight(bubbleBtn, textMode);
             Highlight(boardBtn, board != 0);
