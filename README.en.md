@@ -68,12 +68,13 @@ The default language is **English**. On first launch, buttons and tooltips are s
 
 The chosen language is saved automatically and used on the next launch.
 
-Shortcuts are global, so they work while you are using other programs. A combination already used by another program cannot be registered; in that case HighPen lists the shortcuts it could not register at the bottom of the screen right after starting, and in the settings panel. Hovering over a button shows its name and shortcut as a tooltip.
+Shortcuts are global, so they work while you are using other programs. A combination already used by another program cannot be registered; in that case HighPen lists the shortcuts it could not register at the bottom of the screen right after starting, and in the settings panel. Hovering over a button shows its name and shortcut as a tooltip. The table lists the default shortcuts; you can change them under **Shortcuts** in the settings panel.
 
 | Button | Shortcut | Function |
 |---|---|---|
 | Spot | Ctrl+Alt+S | Turns the round spot that follows the mouse pointer on/off. Clicks pass through to the screen below. |
 | Pen | Ctrl+Alt+P | Writes on the screen. When the pen is turned off, the ink stays on screen and the mouse passes through to the screen below. Switches back to the pen from eraser or note mode. |
+| Highlighter | Ctrl+Alt+L | A wide translucent pen for marking text or pictures. What is underneath stays visible, and it is drawn beneath pen ink. Press again to turn it off. |
 | Eraser | Ctrl+Alt+E | Erases whole strokes. Pressing it again while erasing deletes all pen ink and notes on the current page. |
 | Board | Ctrl+Alt+B | Cycles white board → black board → off. Ink on the screen and on the two boards is kept separately. |
 | Undo | Ctrl+Alt+Z | Cancels the last pen stroke or eraser action. |
@@ -94,12 +95,28 @@ Shortcuts are global, so they work while you are using other programs. A combina
 | Pen color | Ctrl+Shift+first letter of the color | Red R, Orange O, Yellow Y, Green G, Blue B, Purple P, Black K (B is taken by Blue), White W |
 | Pen width | | 1–30 |
 | Pressure | Ctrl+Alt+R | The harder you press the pen, the thicker the line. A mouse always draws at the set width. |
+| Highlighter color / width | | 8 colors and widths 5–60. While the highlighter is in use, the pen color shortcuts (Ctrl+Shift+…) change the highlighter color. |
 | Spot color / size | | 8 colors and sizes 20–200. |
 | Show clicks | Ctrl+Alt+K | Briefly shows an expanding ring where you click. Off by default. |
 | Language | | Choose 한국어, 日本語 or English; the change applies immediately. The default is English (see [Changing the language](#changing-the-language)). |
+| Shortcuts | | Change any shortcut to the combination you want, or remove it (see [Changing shortcuts](#changing-shortcuts)). |
 | Version | | The current version (`HighPen v1.4.0`) is shown at the bottom of the panel. |
 
 Settings are saved automatically to `%APPDATA%\HighPen\settings.txt`.
+
+### Changing shortcuts
+
+Press **Shortcuts** near the bottom of the settings panel to open the list of every feature and its shortcut.
+
+1. Click the shortcut box of the feature you want to change. It shows "Press keys…".
+2. Press the new combination. Hold Ctrl or Alt as well; F1–F24 can also be used alone.
+3. It is saved right away, and the new shortcuts take effect when you close the window.
+
+- **Esc** cancels; **Delete** (or Backspace) removes the shortcut from that feature.
+- If another HighPen feature already uses the combination, the window tells you which one and does not accept it.
+- A combination another program uses as a global shortcut goes to that program first, so nothing happens when you press it. Pick another one.
+- **Reset all** restores every default shortcut.
+- HighPen's shortcuts are paused while the window is open.
 
 ### Writing while zoomed
 
@@ -126,6 +143,15 @@ A transparent ink layer covers the screen so you can draw directly on it. Both W
 - **Color and width:** 8 colors, width 1–30. Colors can also be changed with shortcuts.
 - **Pressure:** when on, pressing harder makes lines thicker; the set width corresponds to medium pressure. A mouse draws at a constant width. If pressure does not work, check that Windows Ink is enabled in the Wacom driver.
 - **Smoothing:** lines are smoothed into curves.
+
+### Highlighter
+
+Use it to emphasize sentences or pictures in your material. Press the highlighter button (Ctrl+Alt+L) and draw to get a wide translucent stroke.
+
+- Overlapping strokes do not get darker, and what is underneath stays visible. Pen ink drawn on the same spot stays on top of the highlighter.
+- Change the color (yellow by default) and width (20 by default) with **Highlighter color** and **Highlighter width** in the settings panel. While the highlighter is in use, the pen color shortcuts (Ctrl+Shift+R and so on) change the highlighter color.
+- Eraser, undo and clear work on it just as on pen ink.
+- Press the pen button to go back to the normal pen.
 
 ### Eraser
 
@@ -212,7 +238,7 @@ Choose the monitor the app works on with **Monitor** in the settings panel (or C
 
 ### Saved settings
 
-Pen color, width, pressure, spot color and size, whether the spot is on, show clicks, the active monitor, the toolbar position and the language are saved automatically to `%APPDATA%\HighPen\settings.txt` and reused on the next launch.
+Pen color, width, pressure, highlighter color and width, changed shortcuts, spot color and size, whether the spot is on, show clicks, the active monitor, the toolbar position and the language are saved automatically to `%APPDATA%\HighPen\settings.txt` and reused on the next launch.
 
 ## Notes / limitations
 
