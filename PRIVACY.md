@@ -2,7 +2,7 @@
 
 [English](#english) | [한국어](#한국어) | [日本語](#日本語)
 
-Last updated: 2026-10-19
+Last updated: 2026-10-21
 
 ## English
 
@@ -15,7 +15,8 @@ HighPen does not collect, store, or transfer any personal information.
   - Installed program files: `%LOCALAPPDATA%\Programs\HighPen`
   - Start menu and (optional) desktop shortcuts
   - Uninstall information for Windows Settings: `HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Uninstall\HighPen`
-- **Your drawings.** Pen strokes, notes, and board contents exist only in memory while the app runs. They are not saved to disk and are lost when the app closes.
+- **Your drawings.** Pen strokes, notes, and board contents exist only in memory while the app runs and are lost when the app closes. They are written to disk only when you press **Capture**, which saves a PNG of the monitor to `Pictures\HighPen` and copies it to the clipboard.
+- **Show clicks.** While this option is on, HighPen watches mouse button presses only to draw a ring at the pointer. Clicks are not recorded or stored.
 - **Removing data.** Uninstalling removes the program files, shortcuts, and uninstall information. To also remove your settings, delete the `%APPDATA%\HighPen` folder.
 
 Questions: stepanowon@gmail.com
@@ -31,7 +32,8 @@ HighPen은 어떤 개인정보도 수집, 저장, 전송하지 않습니다.
   - 설치된 프로그램 파일: `%LOCALAPPDATA%\Programs\HighPen`
   - 시작 메뉴 바로가기와 (선택한 경우) 바탕화면 바로가기
   - Windows 설정의 앱 제거 정보: `HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Uninstall\HighPen`
-- **필기 내용.** 펜 필기, 말풍선, 칠판 내용은 앱이 실행되는 동안 메모리에만 있습니다. 디스크에 저장되지 않으며 앱을 종료하면 사라집니다.
+- **필기 내용.** 펜 필기, 말풍선, 칠판 내용은 앱이 실행되는 동안 메모리에만 있고 앱을 종료하면 사라집니다. 사용자가 **캡처**를 누를 때만 모니터 화면을 PNG로 `사진\HighPen`에 저장하고 클립보드에 복사합니다.
+- **클릭 표시.** 이 옵션을 켜면 포인터 위치에 원을 그리기 위해서만 마우스 버튼 입력을 감지합니다. 클릭 내용은 기록하거나 저장하지 않습니다.
 - **데이터 삭제.** 제거하면 프로그램 파일, 바로가기, 제거 정보가 삭제됩니다. 설정까지 지우려면 `%APPDATA%\HighPen` 폴더를 삭제하세요.
 
 문의: stepanowon@gmail.com
@@ -47,7 +49,8 @@ HighPen は個人情報を一切収集・保存・送信しません。
   - インストールされたプログラムファイル: `%LOCALAPPDATA%\Programs\HighPen`
   - スタートメニューのショートカットと (選択した場合) デスクトップのショートカット
   - Windows 設定のアンインストール情報: `HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Uninstall\HighPen`
-- **書き込み内容。** ペンの書き込み、吹き出し、ボードの内容はアプリの実行中にメモリ上にのみ存在します。ディスクには保存されず、アプリを終了すると消えます。
+- **書き込み内容。** ペンの書き込み、吹き出し、ボードの内容はアプリの実行中にメモリ上にのみ存在し、アプリを終了すると消えます。ユーザーが **キャプチャ** を押したときだけ、モニターの画面を PNG で `ピクチャ\HighPen` に保存し、クリップボードにコピーします。
+- **クリック表示。** このオプションがオンの間、ポインター位置に円を描くためだけにマウスボタンの押下を検知します。クリックは記録も保存もしません。
 - **データの削除。** アンインストールすると、プログラムファイル、ショートカット、アンインストール情報が削除されます。設定も消すには `%APPDATA%\HighPen` フォルダーを削除してください。
 
 お問い合わせ: stepanowon@gmail.com
