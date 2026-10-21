@@ -567,7 +567,7 @@ namespace HighPen
 
     class ToolbarWindow : Window
     {
-        const string AppVersion = "1.3.0"; // keep in sync with Version in Setup.cs
+        const string AppVersion = "1.4.0"; // keep in sync with Version in Setup.cs
         const string AuthorName = "StephenWon";
         const string AuthorEmail = "stepanowon@gmail.com";
         const string RepoUrl = "https://github.com/stepanowon/high-pen";
