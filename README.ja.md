@@ -21,9 +21,11 @@ SmartScreen の警告なしでインストールされ、新しいバージョ�
 ターミナル (PowerShell またはコマンドプロンプト) で実行します。Microsoft Store のパッケージをインストールするので、Store からインストールした場合と同じです。
 
 ```
-winget install 9PDG1QN5QSL3
+winget install 9PDG1QN5QSL3 --source msstore
 ```
 
+- 初回のインストール時に Microsoft Store の規約への同意を求められます。`Y` を押すか、確認を省略するには `--accept-package-agreements --accept-source-agreements` を付けます。
+- 名前で検索: `winget search HighPen --source msstore`
 - 更新: Store が自動で更新します。手動で行う場合は `winget upgrade 9PDG1QN5QSL3`
 - アンインストール: `winget uninstall 9PDG1QN5QSL3`
 

@@ -21,9 +21,11 @@ It installs without a SmartScreen warning and updates automatically when a new v
 Run this in a terminal (PowerShell or Command Prompt). It installs the Microsoft Store package, the same as installing from the Store.
 
 ```
-winget install 9PDG1QN5QSL3
+winget install 9PDG1QN5QSL3 --source msstore
 ```
 
+- The first install asks you to accept the Microsoft Store terms. Press `Y`, or add `--accept-package-agreements --accept-source-agreements` to skip the prompt.
+- Find it by name: `winget search HighPen --source msstore`
 - Update: the Store updates it automatically, or run `winget upgrade 9PDG1QN5QSL3`
 - Uninstall: `winget uninstall 9PDG1QN5QSL3`
 

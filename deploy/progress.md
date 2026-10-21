@@ -44,7 +44,7 @@
 | 제출 (Submission 1) | 완료 | 가격 무료, 연령 등급 IARC 3+ / 전체 이용가, 한·영·일 Store 목록 |
 | 인증 | 완료 | 인증 통과 |
 | 게시 | 완료 | 첫 게시 2026-10-19 19:49 UTC (`FirstAvailableDate`). Store 페이지 열림. Partner Center "Store 현재 상태"(Submission 1)는 "currently available in the Microsoft Store" |
-| 다운로드 활성화 | **대기** | 2026-10-21 07:31 UTC(게시 후 약 36시간) 기준 Store API `IsDownloadable`/`IsPurchaseEnabled` 모두 `false`. KR·US·JP 시장 모두 같음. Store 앱에서 "이 제품은 현재 사용할 수 없습니다" |
+| 다운로드 활성화 | 완료 | 2026-10-21 10:31 UTC 확인: KR·US·JP 모두 `IsDownloadable`/`IsPurchaseEnabled` `true`. **원인:** 패키지 페이지의 Device family availability에서 **Windows 10/11 Desktop**이 체크되지 않아 게시되어도 어떤 PC에도 제공되지 않았음(Partner Center는 "Store에서 사용 가능"으로 표시, winget 설치 시 `0x803fb104`). 체크 후 제출해 해결 |
 | 게시자 연락처 | 완료 | 1.4.0 게시와 함께 Store API의 `PublisherAddress`, `PublisherPhoneNumber`가 사무실 정보로 바뀜(2026-10-21 09:16 UTC 확인). 주소의 구 이름이 `Kangdon-gu`로 표시되어 Partner Center 법률 정보 철자 확인 필요 |
 | Store 목록 검색어·짧은 설명 | **확인 필요** | 한·영·일 검색어 7개와 짧은 설명 작성. 영어·한국어 목록 저장 시 "목록을 저장할 수 없습니다" 오류 발생, 다시 저장 후 제출 필요 |
 | README Store 안내 | 완료 | 한·영·일 README에 Store 배지 추가, Store 설치를 권장 방법으로 변경 |
@@ -64,11 +64,11 @@
 
 ## 다음 할 일
 
-1. Store 다운로드 활성화 확인. 1.4.0 게시 후에도 `false`면 Partner Center 고객 지원팀에 문의. Partner Center는 "Store에서 사용 가능"인데 Store API는 다운로드 불가라는 점과, 게시자 연락처가 이전 정보로 공개되는 것을 함께 알린다
+1. 다운로드 상태 확인 명령 (참고)
    ```powershell
    (Invoke-RestMethod "https://storeedgefd.dsx.mp.microsoft.com/v9.0/products/9PDG1QN5QSL3?market=KR&locale=ko-KR&deviceFamily=Windows.Desktop").Payload | Select-Object IsDownloadable, IsPurchaseEnabled, PublisherAddress, PublisherPhoneNumber
    ```
-2. 활성화 후 Store 버전 설치 확인: Store 앱에서 설치, `winget install 9PDG1QN5QSL3`
+2. Store 버전 설치 확인: Store 앱 또는 `winget install 9PDG1QN5QSL3 --source msstore`로 설치한 뒤 `Get-AppxPackage -Name StephenWon.HighPen`에서 `Version` `1.4.0.0`, `SignatureKind` `Store` 확인
 3. Partner Center 법률 정보의 주소 철자 확인 (Store에 `Kangdon-gu`로 표시됨)
 
 ## 다음 버전 배포 절차
@@ -79,7 +79,7 @@
    ```
    gh release create v1.x.x dist/HighPen-Setup.exe dist/HighPen.exe --title "HighPen v1.x.x" --generate-notes
    ```
-4. Store 패키지를 만들고 Partner Center에서 **새 제출**의 패키지만 바꿔 제출한다 (자세한 내용: `packaging/STORE.md`).
+4. Store 패키지를 만들고 Partner Center에서 **새 제출**의 패키지만 바꿔 제출한다 (자세한 내용: `packaging/STORE.md`). 패키지 페이지에서 **Windows 10/11 Desktop** 체크가 유지되는지 반드시 확인한다.
    ```
    .\packaging\build-msix.ps1
    ```

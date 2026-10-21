@@ -31,12 +31,14 @@ Store에는 MSIX 패키지(`dist\HighPen.msix`)를 올립니다. 패키지 서�
 | 웹 사이트 | https://github.com/stepanowon/high-pen |
 | 지원 연락처 | https://github.com/stepanowon/high-pen/issues |
 | 연령 등급 | 설문에서 사용자 간 소통·개인정보 수집·구매 없음으로 답변 |
-| 패키지 | `dist\HighPen.msix` |
+| 패키지 | `dist\HighPen.msix`. 업로드 후 **Device family availability**에서 **Windows 10/11 Desktop**을 반드시 체크 (빠지면 게시되어도 아무 PC에서도 받을 수 없음) |
 | 스크린샷 | `screen\` 폴더의 화면 (1366×768 이상 권장, 최소 1장) |
 
 ### 제한된 기능(runFullTrust) 사용 사유
 
-> HighPen is a classic Win32 (WPF) desktop app for on-screen annotation during online lectures. It needs full trust to register global hotkeys and to draw a topmost transparent overlay across the whole screen and multiple monitors. It does not access the network or collect any data.
+> Win32 lecture annotation app. Needs full trust for global hotkeys, topmost overlays on all monitors, screen magnification, user-initiated screen capture, and an optional mouse hook that only draws click rings. No network access or data collection.
+
+입력 칸 길이 제한이 있어 짧게 쓴다.
 
 ### 설명
 
@@ -55,5 +57,6 @@ Store에는 MSIX 패키지(`dist\HighPen.msix`)를 올립니다. 패키지 서�
 ## 4. 심사 후
 
 - 인증 심사는 보통 1~3일 걸립니다.
-- 게시되면 Store에서 설치할 수 있고, `winget install --source msstore`로도 검색됩니다.
+- 게시되면 Store에서 설치할 수 있고, `winget install 9PDG1QN5QSL3 --source msstore`로도 설치됩니다.
+- 게시 후 다운로드 가능 여부는 Store API의 `IsDownloadable`로 확인합니다 (`deploy/progress.md` 참고).
 - 새 버전: `AppVersion`을 올리고 → `build-msix.ps1` → Partner Center에서 **새 제출**로 패키지를 바꿔 올립니다.

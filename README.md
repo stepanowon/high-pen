@@ -21,9 +21,11 @@ SmartScreen 경고 없이 설치되고, 새 버전이 나오면 자동으로 업
 터미널(PowerShell 또는 명령 프롬프트)에서 실행합니다. Microsoft Store 패키지를 설치하므로 Store에서 설치한 것과 같습니다.
 
 ```
-winget install 9PDG1QN5QSL3
+winget install 9PDG1QN5QSL3 --source msstore
 ```
 
+- 처음 설치할 때 Microsoft Store 약관 동의를 묻습니다. `Y`를 누르거나, 묻지 않게 하려면 `--accept-package-agreements --accept-source-agreements`를 붙입니다.
+- 이름으로 찾기: `winget search HighPen --source msstore`
 - 업데이트: Store가 자동으로 업데이트합니다. 직접 하려면 `winget upgrade 9PDG1QN5QSL3`
 - 제거: `winget uninstall 9PDG1QN5QSL3`
 
