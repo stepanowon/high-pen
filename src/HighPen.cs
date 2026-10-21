@@ -9,6 +9,7 @@ using System.Windows.Ink;
 using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Media;
+using System.Windows.Media.Animation;
 using System.Windows.Shapes;
 using System.Windows.Threading;
 
@@ -69,6 +70,13 @@ namespace HighPen
         [DllImport("Magnification.dll")] public static extern bool MagSetWindowSource(IntPtr h, RECT r);
         [DllImport("Magnification.dll")] public static extern bool MagSetWindowTransform(IntPtr h, ref MAGTRANSFORM t);
         [DllImport("Magnification.dll")] public static extern bool MagSetWindowFilterList(IntPtr h, uint mode, int count, IntPtr[] list);
+
+        public const int WH_MOUSE_LL = 14;
+        public const int WM_LBUTTONDOWN = 0x0201, WM_RBUTTONDOWN = 0x0204;
+        public delegate IntPtr HookProc(int code, IntPtr wParam, IntPtr lParam);
+        [DllImport("user32.dll")] public static extern IntPtr SetWindowsHookEx(int id, HookProc proc, IntPtr mod, uint thread);
+        [DllImport("user32.dll")] public static extern bool UnhookWindowsHookEx(IntPtr h);
+        [DllImport("user32.dll")] public static extern IntPtr CallNextHookEx(IntPtr h, int code, IntPtr wParam, IntPtr lParam);
 
         [DllImport("user32.dll")] public static extern IntPtr GetForegroundWindow();
         [DllImport("user32.dll")] public static extern uint GetWindowThreadProcessId(IntPtr h, out uint pid);
@@ -242,6 +250,41 @@ namespace HighPen
         }
     }
 
+    // Global low-level mouse hook that reports left/right button presses anywhere on the desktop
+    // (the overlay is click-through, so it never sees those clicks itself).
+    class ClickHook
+    {
+        Native.HookProc proc; // kept referenced so the GC does not collect the callback
+        IntPtr hook;
+        // true = left button, false = right button
+        public Action<bool> Clicked;
+
+        public void Start()
+        {
+            if (hook != IntPtr.Zero) return;
+            proc = Callback;
+            hook = Native.SetWindowsHookEx(Native.WH_MOUSE_LL, proc, Native.GetModuleHandle(null), 0);
+        }
+
+        public void Stop()
+        {
+            if (hook == IntPtr.Zero) return;
+            Native.UnhookWindowsHookEx(hook);
+            hook = IntPtr.Zero;
+        }
+
+        IntPtr Callback(int code, IntPtr wParam, IntPtr lParam)
+        {
+            if (code >= 0 && Clicked != null)
+            {
+                int msg = wParam.ToInt32();
+                if (msg == Native.WM_LBUTTONDOWN) Clicked(true);
+                else if (msg == Native.WM_RBUTTONDOWN) Clicked(false);
+            }
+            return Native.CallNextHookEx(hook, code, wParam, lParam);
+        }
+    }
+
     // UI strings in Korean / Japanese / English. Cur is an index into Codes.
     static class Lang
     {
@@ -267,6 +310,13 @@ namespace HighPen
             { "ZoomTip",       new[] { "{0}배 확대", "{0}倍拡大", "{0}x zoom" } },
             { "ZoomFactor",    new[] { "확대 배율", "拡大倍率", "Zoom level" } },
             { "Bubble",        new[] { "말풍선", "吹き出し", "Note" } },
+            { "Capture",       new[] { "캡처", "キャプチャ", "Capture" } },
+            { "CaptureTip",    new[] { "화면과 필기를 PNG로 저장하고 클립보드에 복사", "画面と書き込みを PNG で保存してクリップボードにコピー", "Save the screen with ink as PNG and copy it to the clipboard" } },
+            { "Saved",         new[] { "저장하고 클립보드에 복사했습니다\n{0}\n(클릭하면 폴더 열기)", "保存してクリップボードにコピーしました\n{0}\n(クリックでフォルダーを開く)", "Saved and copied to the clipboard\n{0}\n(click to open the folder)" } },
+            { "SavedOnly",     new[] { "저장했습니다 (클립보드 복사는 실패)\n{0}\n(클릭하면 폴더 열기)", "保存しました (クリップボードへのコピーは失敗)\n{0}\n(クリックでフォルダーを開く)", "Saved (copying to the clipboard failed)\n{0}\n(click to open the folder)" } },
+            { "CaptureFailed", new[] { "캡처하지 못했습니다", "キャプチャできませんでした", "Capture failed" } },
+            { "ClickShow",     new[] { "클릭 표시", "クリック表示", "Show clicks" } },
+            { "HotkeyFail",    new[] { "다른 프로그램이 사용 중이라 등록하지 못한 단축키:", "他のアプリが使用中のため登録できなかったショートカット:", "Shortcuts in use by another app (not registered):" } },
             { "Settings",      new[] { "설정", "設定", "Settings" } },
             { "Collapse",      new[] { "접기/펴기", "折りたたみ/展開", "Collapse/expand" } },
             { "Quit",          new[] { "종료", "終了", "Quit" } },
@@ -317,6 +367,7 @@ namespace HighPen
         public bool SpotOn = true;
         public int Monitor = 0;
         public bool Pressure = true;
+        public bool ShowClicks = false;
         public double ZoomFactor = 2;
         public int BarX = 20, BarY = 20; // offset from the monitor work area, in pixels
         public string Language = ""; // "" = English (the default)
@@ -347,6 +398,7 @@ namespace HighPen
                     else if (k == "SpotSize") s.SpotSize = double.Parse(v, System.Globalization.CultureInfo.InvariantCulture);
                     else if (k == "SpotOn") s.SpotOn = v == "1";
                     else if (k == "Pressure") s.Pressure = v == "1";
+                    else if (k == "ShowClicks") s.ShowClicks = v == "1";
                     else if (k == "ZoomFactor") s.ZoomFactor = double.Parse(v, System.Globalization.CultureInfo.InvariantCulture);
                     else if (k == "Monitor") s.Monitor = int.Parse(v);
                     else if (k == "BarX") s.BarX = int.Parse(v);
@@ -372,6 +424,7 @@ namespace HighPen
                     "SpotOn=" + (SpotOn ? "1" : "0"),
                     "Monitor=" + Monitor,
                     "Pressure=" + (Pressure ? "1" : "0"),
+                    "ShowClicks=" + (ShowClicks ? "1" : "0"),
                     "ZoomFactor=" + ZoomFactor.ToString(ic),
                     "BarX=" + BarX,
                     "BarY=" + BarY,
@@ -475,6 +528,30 @@ namespace HighPen
             spot.Visibility = on ? Visibility.Visible : Visibility.Collapsed;
         }
 
+        // Expanding ring at a click (physical screen pixels): solid for the left button, dashed for the right.
+        public void ShowRipple(Native.POINT p, Color c, bool left)
+        {
+            // grows past the spot so it is not hidden behind it
+            double size = (spot.Visibility == Visibility.Visible ? spot.Width : 0) + 60;
+            DpiScale d = VisualTreeHelper.GetDpi(this);
+            double x = p.X / d.DpiScaleX - Left;
+            double y = p.Y / d.DpiScaleY - Top;
+            Ellipse ring = new Ellipse { Width = size, Height = size, Stroke = new SolidColorBrush(c), StrokeThickness = 3, IsHitTestVisible = false, RenderTransformOrigin = new Point(0.5, 0.5) };
+            if (!left) ring.StrokeDashArray = new DoubleCollection { 2, 1.5 };
+            ScaleTransform st = new ScaleTransform(0.2, 0.2);
+            ring.RenderTransform = st;
+            Canvas.SetLeft(ring, x - size / 2);
+            Canvas.SetTop(ring, y - size / 2);
+            root.Children.Add(ring);
+            Duration dur = new Duration(TimeSpan.FromMilliseconds(450));
+            DoubleAnimation grow = new DoubleAnimation(0.2, 1, dur);
+            st.BeginAnimation(ScaleTransform.ScaleXProperty, grow);
+            st.BeginAnimation(ScaleTransform.ScaleYProperty, grow);
+            DoubleAnimation fade = new DoubleAnimation(1, 0, dur);
+            fade.Completed += delegate { root.Children.Remove(ring); };
+            ring.BeginAnimation(OpacityProperty, fade);
+        }
+
         void UpdatePosition()
         {
             if (spot.Visibility != Visibility.Visible) return;
@@ -507,6 +584,7 @@ namespace HighPen
         OverlayWindow overlay;
         SpotWindow spotWin;
         Zoomer zoomer = new Zoomer();
+        ClickHook clickHook = new ClickHook();
 
         bool penMode, eraser, collapsed, settingsOpen, textMode;
         int shownBoard;
@@ -570,8 +648,14 @@ namespace HighPen
                 Native.SetClickThrough(overlay, true);
                 ApplyMode();
                 ApplySpot();
+                ApplyClicks();
                 ReassertTop();
             };
+
+            // Keep up with monitors being plugged in or removed (and resolution changes) while running.
+            Microsoft.Win32.SystemEvents.DisplaySettingsChanged += OnDisplaySettingsChanged;
+            // The hook callback runs on this thread; do the drawing after it has returned.
+            clickHook.Clicked = delegate (bool left) { Dispatcher.BeginInvoke(new Action(delegate { OnClick(left); })); };
 
             // Slideshow / other topmost windows can cover us; re-assert periodically.
             zoomer.ViewChanged = OnZoomView;
@@ -816,6 +900,7 @@ namespace HighPen
             Native.BringTopmost(spotWin);
             Native.BringTopmost(this);
             if (aboutWin != null) Native.BringTopmost(aboutWin);
+            if (toastWin != null) Native.BringTopmost(toastWin);
         }
 
         // ---------- UI building ----------
@@ -883,9 +968,26 @@ namespace HighPen
             Lang.Cur = i;
             cfg.Language = Lang.Codes[i];
             cfg.Save();
+            RebuildContent();
+        }
+
+        // Monitors were added, removed or rearranged: rebuild the monitor list and re-place everything.
+        void OnDisplaySettingsChanged(object sender, EventArgs e)
+        {
+            Dispatcher.BeginInvoke(new Action(delegate
+            {
+                // the zoomed monitor and the pointer clip may no longer be valid
+                if (zoomer.Active) zoomer.Stop();
+                RebuildContent();
+            }));
+        }
+
+        // Rebuilds the toolbar and settings panel, keeping the current mode.
+        void RebuildContent()
+        {
             BuildContent();
             buttons.Visibility = collapsed ? Visibility.Collapsed : Visibility.Visible;
-            arrow.Text = collapsed ? "" : "";
+            arrow.Text = collapsed ? "" : "";
             Highlight(zoomBtn, zoomer.Active);
             ApplySpot();
             ApplyMonitor();
@@ -929,6 +1031,7 @@ namespace HighPen
             zoomBtn = MakeButton("", Lang.T("Zoom"), true, delegate { ToggleZoom(); });
             bubbleBtn = MakeButton("", Lang.T("Bubble"), true, delegate { ToggleText(); });
             setBtn = MakeButton("", Lang.T("Settings"), true, delegate { ToggleSettings(); });
+            Border captureBtn = MakeButton("\uE722", Lang.T("Capture"), true, delegate { Capture(); });
             Border aboutBtn = MakeButton("\uE946", Lang.T("About"), true, delegate { ShowAbout(); });
             aboutBtn.ToolTip = Lang.T("AboutTip");
             boardLabel = (TextBlock)((StackPanel)boardBtn.Child).Children[1];
@@ -941,6 +1044,7 @@ namespace HighPen
             Tip(clear, Lang.T("ClearTip"), "C");
             Tip(zoomBtn, ZoomTipText(), "X");
             Tip(bubbleBtn, Lang.T("Bubble"), "T");
+            Tip(captureBtn, Lang.T("CaptureTip"), "F");
             Tip(setBtn, Lang.T("Settings"), "D");
             Tip(ab, Lang.T("Collapse"), "H");
 
@@ -952,6 +1056,7 @@ namespace HighPen
             buttons.Children.Add(clear);
             buttons.Children.Add(bubbleBtn);
             buttons.Children.Add(zoomBtn);
+            buttons.Children.Add(captureBtn);
             buttons.Children.Add(setBtn);
             buttons.Children.Add(aboutBtn);
 
@@ -1028,6 +1133,13 @@ namespace HighPen
             p.Children.Add(SecTitle(Lang.T("SpotSize")));
             p.Children.Add(MakeSlider(20, 200, cfg.SpotSize, delegate (double v) { cfg.SpotSize = v; ApplySpot(); cfg.Save(); }));
 
+            clicksBtn = new Border { Height = 26, Margin = new Thickness(0, 6, 0, 0), Cursor = Cursors.Hand, ToolTip = Lang.T("ClickShow") + "  (Ctrl+Alt+K)" };
+            clicksText = new TextBlock { Foreground = Brushes.White, HorizontalAlignment = HorizontalAlignment.Center, VerticalAlignment = VerticalAlignment.Center };
+            clicksBtn.Child = clicksText;
+            clicksBtn.MouseLeftButtonUp += delegate { ToggleClicks(); };
+            UpdateClicksButton();
+            p.Children.Add(clicksBtn);
+
             p.Children.Add(new Separator { Margin = new Thickness(0, 8, 0, 4) });
             p.Children.Add(SecTitle(Lang.T("ZoomFactor")));
             WrapPanel zp = new WrapPanel();
@@ -1055,6 +1167,10 @@ namespace HighPen
                 lp.Children.Add(lb);
             }
             p.Children.Add(lp);
+
+            hotkeyWarn = new TextBlock { Foreground = new SolidColorBrush(Color.FromRgb(0xFF, 0x9F, 0x0A)), FontSize = 11, TextWrapping = TextWrapping.Wrap, Margin = new Thickness(0, 8, 0, 0) };
+            UpdateHotkeyWarning();
+            p.Children.Add(hotkeyWarn);
 
             p.Children.Add(new Separator { Margin = new Thickness(0, 8, 0, 4) });
             p.Children.Add(new TextBlock { Text = "HighPen v" + AppVersion, Foreground = Brushes.Gray, FontSize = 11, HorizontalAlignment = HorizontalAlignment.Center });
@@ -1143,7 +1259,130 @@ namespace HighPen
             Tip(zoomBtn, ZoomTipText(), "X");
         }
 
-        void Quit() { zoomer.Stop(); cfg.Save(); Application.Current.Shutdown(); }
+        void Quit()
+        {
+            zoomer.Stop();
+            clickHook.Stop();
+            Microsoft.Win32.SystemEvents.DisplaySettingsChanged -= OnDisplaySettingsChanged;
+            cfg.Save();
+            Application.Current.Shutdown();
+        }
+
+        // ---------- click display ----------
+
+        Border clicksBtn;
+        TextBlock clicksText;
+
+        void UpdateClicksButton()
+        {
+            clicksText.Text = Lang.T("ClickShow") + ": " + Lang.T(cfg.ShowClicks ? "On" : "Off");
+            clicksBtn.Background = cfg.ShowClicks ? Active : Idle;
+        }
+
+        void ToggleClicks()
+        {
+            cfg.ShowClicks = !cfg.ShowClicks;
+            cfg.Save();
+            UpdateClicksButton();
+            ApplyClicks();
+        }
+
+        // The mouse hook is only installed while click display is on.
+        void ApplyClicks()
+        {
+            if (cfg.ShowClicks) clickHook.Start();
+            else clickHook.Stop();
+        }
+
+        void OnClick(bool left)
+        {
+            // while drawing every pen stroke would be a click
+            if (!cfg.ShowClicks || penMode || suspended) return;
+            Native.POINT p;
+            if (!Native.GetCursorPos(out p)) return;
+            spotWin.ShowRipple(p, ParseColor(cfg.SpotColor), left);
+        }
+
+        // ---------- capture (save as PNG + copy to the clipboard) ----------
+
+        bool capturing;
+
+        // Captures the selected monitor as shown (screen, board, ink, notes, zoom) without the toolbar and spot.
+        void Capture()
+        {
+            if (capturing) return;
+            capturing = true;
+            if (toastWin != null) toastWin.Close();
+            Opacity = 0;
+            spotWin.SetSpotVisible(false);
+            // give the compositor a moment to drop the toolbar and spot from the screen
+            DispatcherTimer t = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(200) };
+            t.Tick += delegate
+            {
+                t.Stop();
+                string path = null;
+                bool copied = false;
+                try
+                {
+                    System.Drawing.Rectangle b = Native.GetScreen(cfg.Monitor).Bounds;
+                    using (System.Drawing.Bitmap bmp = new System.Drawing.Bitmap(b.Width, b.Height))
+                    {
+                        using (System.Drawing.Graphics g = System.Drawing.Graphics.FromImage(bmp))
+                            g.CopyFromScreen(b.Left, b.Top, 0, 0, b.Size); // DWM composition includes the layered ink/board overlay
+                        string dir = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyPictures), "HighPen");
+                        Directory.CreateDirectory(dir);
+                        path = System.IO.Path.Combine(dir, "HighPen_" + DateTime.Now.ToString("yyyyMMdd_HHmmss") + ".png");
+                        bmp.Save(path, System.Drawing.Imaging.ImageFormat.Png);
+                        try { System.Windows.Forms.Clipboard.SetImage(bmp); copied = true; } catch { }
+                    }
+                }
+                catch { path = null; }
+                Opacity = 1;
+                ApplySpot();
+                capturing = false;
+                if (path == null) ShowToast(Lang.T("CaptureFailed"), null, 4);
+                else ShowToast(string.Format(Lang.T(copied ? "Saved" : "SavedOnly"), path), path, 5);
+            };
+            t.Start();
+        }
+
+        // ---------- toast (short message at the bottom of the selected monitor) ----------
+
+        Window toastWin;
+
+        // Clicking the toast closes it; when selectPath is set, Explorer opens with that file selected.
+        void ShowToast(string text, string selectPath, double seconds)
+        {
+            if (toastWin != null) toastWin.Close();
+            Border box = new Border { Background = PanelBg, BorderBrush = Active, BorderThickness = new Thickness(1), Padding = new Thickness(14, 10, 14, 10), Cursor = Cursors.Hand };
+            box.Child = new TextBlock { Text = text, Foreground = Brushes.White, FontSize = 13, TextWrapping = TextWrapping.Wrap, MaxWidth = 560 };
+            Window w = new Window
+            {
+                WindowStyle = WindowStyle.None, ResizeMode = ResizeMode.NoResize, SizeToContent = SizeToContent.WidthAndHeight,
+                ShowInTaskbar = false, Topmost = true, ShowActivated = false, Title = "HighPen", Background = Brushes.Transparent, AllowsTransparency = true,
+                Content = box,
+            };
+            w.SourceInitialized += delegate { Native.AddExStyle(w, Native.WS_EX_NOACTIVATE | Native.WS_EX_TOOLWINDOW); };
+            box.MouseLeftButtonUp += delegate
+            {
+                if (selectPath != null) try { System.Diagnostics.Process.Start("explorer.exe", "/select,\"" + selectPath + "\""); } catch { }
+                w.Close();
+            };
+            // bottom centre of the selected monitor's working area
+            w.Loaded += delegate
+            {
+                System.Drawing.Rectangle wa = Native.GetScreen(cfg.Monitor).WorkingArea;
+                DpiScale d = VisualTreeHelper.GetDpi(w);
+                int pw = (int)(w.ActualWidth * d.DpiScaleX), ph = (int)(w.ActualHeight * d.DpiScaleY);
+                Native.PlaceRect(w, wa.Left + (wa.Width - pw) / 2, wa.Bottom - ph - 40, 0, 0, false);
+            };
+            DispatcherTimer t = new DispatcherTimer { Interval = TimeSpan.FromSeconds(seconds) };
+            t.Tick += delegate { t.Stop(); w.Close(); };
+            w.Closed += delegate { t.Stop(); if (toastWin == w) toastWin = null; };
+            toastWin = w;
+            w.Show();
+            t.Start();
+        }
 
         // ---------- global hotkeys (Ctrl+Alt+key) ----------
 
@@ -1166,6 +1405,8 @@ namespace HighPen
             AddHotkey(h, Key.X, ToggleZoom);
             AddHotkey(h, Key.M, CycleMonitor);
             AddHotkey(h, Key.R, TogglePressure);
+            AddHotkey(h, Key.F, Capture);
+            AddHotkey(h, Key.K, ToggleClicks);
             for (int i = 0; i < Palette.Length; i++)
             {
                 int ci = i;
@@ -1173,6 +1414,26 @@ namespace HighPen
             }
             AddHotkey(h, Key.H, ToggleCollapse);
             AddHotkey(h, Key.Q, Quit);
+            UpdateHotkeyWarning();
+            // tell the user once, after start-up has settled
+            if (failedHotkeys.Count > 0)
+                Dispatcher.BeginInvoke(DispatcherPriority.ApplicationIdle, new Action(delegate { ShowToast(HotkeyWarningText(), null, 8); }));
+        }
+
+        // Shortcuts that could not be registered, e.g. "Ctrl+Alt+S" (another app already owns them).
+        List<string> failedHotkeys = new List<string>();
+        TextBlock hotkeyWarn;
+
+        string HotkeyWarningText()
+        {
+            return Lang.T("HotkeyFail") + "\n" + string.Join(", ", failedHotkeys);
+        }
+
+        void UpdateHotkeyWarning()
+        {
+            if (hotkeyWarn == null) return;
+            hotkeyWarn.Text = HotkeyWarningText();
+            hotkeyWarn.Visibility = failedHotkeys.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
         }
 
         void AddHotkey(IntPtr h, Key key, Action a)
@@ -1185,6 +1446,8 @@ namespace HighPen
             int id = hotkeys.Count + 1;
             if (Native.RegisterHotKey(h, id, mods | MOD_NOREPEAT, (uint)KeyInterop.VirtualKeyFromKey(key)))
                 hotkeys[id] = a;
+            else
+                failedHotkeys.Add(((mods & MOD_CONTROL) != 0 ? "Ctrl+" : "") + ((mods & MOD_ALT) != 0 ? "Alt+" : "") + ((mods & MOD_SHIFT) != 0 ? "Shift+" : "") + key);
         }
 
         IntPtr HotkeyHook(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)

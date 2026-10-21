@@ -66,7 +66,7 @@ The default language is **English**. On first launch, buttons and tooltips are s
 
 The chosen language is saved automatically and used on the next launch.
 
-Shortcuts are global, so they work while you are using other programs. A combination already used by another program may fail to register. Hovering over a button shows its name and shortcut as a tooltip.
+Shortcuts are global, so they work while you are using other programs. A combination already used by another program cannot be registered; in that case HighPen lists the shortcuts it could not register at the bottom of the screen right after starting, and in the settings panel. Hovering over a button shows its name and shortcut as a tooltip.
 
 | Button | Shortcut | Function |
 |---|---|---|
@@ -78,6 +78,7 @@ Shortcuts are global, so they work while you are using other programs. A combina
 | Clear | Ctrl+Alt+C | Clears all ink and notes on the current page. |
 | Note | Ctrl+Alt+T | Places a text note where you click. Enter confirms, Shift+Enter adds a line break, Esc cancels. |
 | Zoom | Ctrl+Alt+X | Zooms the monitor under the mouse pointer (1.5x, 2x or 2.5x, chosen in Settings). |
+| Capture | Ctrl+Alt+F | Saves the active monitor, with ink, board and notes, as a PNG and copies it to the clipboard. The toolbar and spot are left out. |
 | Settings | Ctrl+Alt+D | Opens and closes the settings panel. |
 | About | | Shows the author (name, email, GitHub repository) and license. Clicking a link opens your mail app or browser. |
 | `<` | Ctrl+Alt+H | Collapses and expands the toolbar. |
@@ -92,6 +93,7 @@ Shortcuts are global, so they work while you are using other programs. A combina
 | Pen width | | 1–30 |
 | Pressure | Ctrl+Alt+R | The harder you press the pen, the thicker the line. A mouse always draws at the set width. |
 | Spot color / size | | 8 colors and sizes 20–200. |
+| Show clicks | Ctrl+Alt+K | Briefly shows an expanding ring where you click. Off by default. |
 | Language | | Choose 한국어, 日本語 or English; the change applies immediately. The default is English (see [Changing the language](#changing-the-language)). |
 | Version | | The current version (`HighPen v1.3.0`) is shown at the bottom of the panel. |
 
@@ -174,9 +176,24 @@ Zooms the monitor under the mouse pointer in real time. Pick 1.5x, 2x or 2.5x in
 - Changing the active monitor while zoomed turns zoom off.
 - **Writing while zoomed:** turning on the pen freezes the zoomed view so you can write where you see things. Turning the pen off makes the zoomed view follow the pointer again. Ink is stored in original screen coordinates, so it stays on the same content at normal size when zoom is turned off. To move to another area while zoomed, turn the pen off, move the pointer, and turn the pen on again.
 
+### Capture
+
+Use it to keep a board or on-screen ink as lecture material. Press the capture button (Ctrl+Alt+F) to take the active monitor exactly as shown: screen, ink, board, notes and zoomed view.
+
+- **Where it goes:** `Pictures\HighPen\HighPen_date_time.png`. The same image is copied to the clipboard so you can paste it right away.
+- The toolbar and the mouse spot are not captured.
+- The saved path appears briefly at the bottom of the screen; click it to open the folder in File Explorer.
+
+### Show clicks
+
+In recordings and screen shares, a ring expands and fades where you click so viewers can see what you pressed. Turn it on and off with **Show clicks** in the settings panel or Ctrl+Alt+K.
+
+- Left clicks show a solid ring and right clicks a dashed ring, in the spot color.
+- Shown only on the active monitor, and not while you are writing with the pen.
+
 ### Multiple monitors
 
-Choose the monitor the app works on with **Monitor** in the settings panel (or Ctrl+Alt+M). Ink, spot, board and toolbar appear only on that monitor, and the other monitors can be used as usual. Existing ink and notes are kept when you switch monitors. The numbers match those in Windows display settings.
+Choose the monitor the app works on with **Monitor** in the settings panel (or Ctrl+Alt+M). Ink, spot, board and toolbar appear only on that monitor, and the other monitors can be used as usual. Existing ink and notes are kept when you switch monitors. The numbers match those in Windows display settings. When a monitor is connected or disconnected while the app runs, the monitor list and window positions are updated automatically (zoom is turned off if it was on).
 
 ### Toolbar
 
@@ -193,12 +210,11 @@ Choose the monitor the app works on with **Monitor** in the settings panel (or C
 
 ### Saved settings
 
-Pen color, width, pressure, spot color and size, whether the spot is on, the active monitor, the toolbar position and the language are saved automatically to `%APPDATA%\HighPen\settings.txt` and reused on the next launch.
+Pen color, width, pressure, spot color and size, whether the spot is on, show clicks, the active monitor, the toolbar position and the language are saved automatically to `%APPDATA%\HighPen\settings.txt` and reused on the next launch.
 
 ## Notes / limitations
 
 - The executables are not code-signed, so Windows SmartScreen may show a warning when you download them from the web. Install with winget, or click **More info → Run anyway** in the warning.
-- Monitors connected or disconnected after the app starts are not picked up; restart the app.
 - On setups where monitors use different display scaling, zoom or the toolbar position may be off.
 - To write while zoomed, the pen must be on so the zoomed view does not follow the pointer.
 
