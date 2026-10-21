@@ -44,13 +44,13 @@
 | Store 목록 로고 | 완료 | [#4](https://github.com/stepanowon/high-pen/pull/4) 병합. `packaging/StoreListing/HighPen-{71,150,300}.png` |
 | 제출 (Submission 1) | 완료 | 가격 무료, 연령 등급 IARC 3+ / 전체 이용가, 한·영·일 Store 목록 |
 | 인증 | 완료 | 인증 통과 |
-| 게시 | 완료 | 첫 게시 2026-10-19 19:49 UTC (`FirstAvailableDate`). Store 페이지 열림 |
+| 게시 | 완료 | 첫 게시 2026-10-19 19:49 UTC (`FirstAvailableDate`). Store 페이지 열림. Partner Center "Store 현재 상태"(Submission 1)는 "currently available in the Microsoft Store" |
 | 다운로드 활성화 | **대기** | 2026-10-21 07:31 UTC(게시 후 약 36시간) 기준 Store API `IsDownloadable`/`IsPurchaseEnabled` 모두 `false`. KR·US·JP 시장 모두 같음. Store 앱에서 "이 제품은 현재 사용할 수 없습니다" |
 | 게시자 연락처 | **Store 반영 대기** | Store 페이지 데이터에 판매자 연락처(주소·전화)가 공개되는 것을 확인. Partner Center 법률 정보에서 사무실 주소·전화로 변경했고 승인되어 법률 정보 페이지에 표시됨. Store API에는 아직 이전 정보가 나옴(2026-10-21 07:31 UTC) |
 | Store 목록 검색어·짧은 설명 | **확인 필요** | 한·영·일 검색어 7개와 짧은 설명 작성. 영어·한국어 목록 저장 시 "목록을 저장할 수 없습니다" 오류 발생, 다시 저장 후 제출 필요 |
 | README Store 안내 | 완료 | 한·영·일 README에 Store 배지 추가, Store 설치를 권장 방법으로 변경 |
 | 1.4.0 MSIX | 완료 | `dist/HighPen.msix` (1.4.0.0) 빌드. `makeappx.exe`는 Windows SDK 미설치로 이전에 받은 SDK BuildTools를 사용 |
-| 1.4.0 제출 (Submission 2) | **할 일** | Partner Center 새 제출에서 1.3.0.0 패키지를 1.4.0.0으로 교체, 검색어·짧은 설명 수정도 함께 제출 |
+| 1.4.0 제출 (Submission 2) | **인증 중** | 2026-10-21 제출. 패키지 1.4.0.0, 검색어·짧은 설명 포함. `runFullTrust` 사유에 마우스 훅·화면 캡처 용도 명시. 2026-10-21 08:50 UTC 기준 "사전 처리 중", 인증 통과 즉시 자동 게시 |
 
 ## Store 정보
 
@@ -65,11 +65,11 @@
 
 ## 다음 할 일
 
-1. Store 다운로드 활성화 확인. 게시 후 48시간(2026-10-21 19:49 UTC)이 지나도 `false`면 Partner Center 고객 지원팀에 문의 (게시자 연락처가 아직 이전 정보로 공개되는 것도 함께 문의)
+1. Store 다운로드 활성화 확인. 1.4.0 게시 후에도 `false`면 Partner Center 고객 지원팀에 문의. Partner Center는 "Store에서 사용 가능"인데 Store API는 다운로드 불가라는 점과, 게시자 연락처가 이전 정보로 공개되는 것을 함께 알린다
    ```powershell
    (Invoke-RestMethod "https://storeedgefd.dsx.mp.microsoft.com/v9.0/products/9PDG1QN5QSL3?market=KR&locale=ko-KR&deviceFamily=Windows.Desktop").Payload | Select-Object IsDownloadable, IsPurchaseEnabled, PublisherAddress, PublisherPhoneNumber
    ```
-2. Partner Center에서 1.4.0 제출(Submission 2): 패키지를 `dist/HighPen.msix`(1.4.0.0)로 교체하고 1.3.0.0 패키지 제거, Store 목록 검색어·짧은 설명 저장, Store에 제출
+2. 1.4.0 제출(Submission 2) 인증·게시 확인. 진행 중에는 **인증 취소**를 누르지 않는다. 게시되면 다운로드 활성화와 게시자 연락처 갱신 여부를 위 명령으로 확인
 3. 활성화 후 Store 버전 설치 확인: Store 앱에서 설치, `winget install 9PDG1QN5QSL3`
 4. 게시 후 위 명령으로 `PublisherAddress`, `PublisherPhoneNumber`가 사무실 정보로 바뀌었는지 확인
 5. winget PR #455634 moderator 승인 대기. 질문 댓글이 달리면 답변
