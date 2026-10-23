@@ -23,6 +23,8 @@ enum Lang {
         "BoardTip": ["칠판 (흰색/검정/끄기)", "ボード (白/黒/オフ)", "Board (white/black/off)"],
         "WhiteBoard": ["흰 칠판", "白ボード", "White"],
         "BlackBoard": ["검은 칠판", "黒ボード", "Black"],
+        "Bubble": ["말풍선", "吹き出し", "Note"],
+        "BubbleTip": ["클릭한 곳에 글 붙이기. Enter 확정, Shift+Enter 줄바꿈, Esc 취소", "クリックした所に文字を貼る。Enter で確定、Shift+Enter で改行、Esc で取り消し", "Click to place text. Enter confirms, Shift+Enter adds a line, Esc cancels"],
         "Undo": ["되돌리기", "元に戻す", "Undo"],
         "Clear": ["지우기", "全消去", "Clear"],
         "ClearTip": ["전체 지우기", "すべて消去", "Clear all"],
@@ -306,7 +308,22 @@ final class Stroke {
     }
 }
 
-enum Tool { case pen, highlighter, eraser }
+enum Tool { case pen, highlighter, eraser, text }
+
+// A text note, top-left at `at` (content coordinates), white with a border in the pen colour.
+struct Bubble {
+    let text: String, at: CGPoint, color: NSColor, size: CGFloat
+
+    func draw() {
+        let str = NSAttributedString(string: text, attributes: [.font: NSFont.systemFont(ofSize: size), .foregroundColor: NSColor.black])
+        let r = str.boundingRect(with: NSSize(width: 600, height: CGFloat.greatestFiniteMagnitude), options: [.usesLineFragmentOrigin, .usesFontLeading])
+        let box = NSRect(x: at.x, y: at.y - ceil(r.height) - 12, width: ceil(r.width) + 20, height: ceil(r.height) + 12)
+        let p = NSBezierPath(roundedRect: box.insetBy(dx: 1, dy: 1), xRadius: 12, yRadius: 12)
+        NSColor(white: 1, alpha: 0xEE / 255.0).setFill(); p.fill()
+        p.lineWidth = 2; color.setStroke(); p.stroke()
+        str.draw(in: box.insetBy(dx: 10, dy: 6))
+    }
+}
 
 // One undo step: a pen stroke, or every stroke removed by one eraser drag.
 struct Edit {
@@ -315,8 +332,13 @@ struct Edit {
 }
 
 // Ink for three pages: 0 = screen annotations, 1 = white board, 2 = black board.
-final class InkView: NSView {
+final class InkView: NSView, NSTextViewDelegate {
     var pages: [[Stroke]] = [[], [], []]
+    var bubbles: [[Bubble]] = [[], [], []]
+    var bubbleStyle: () -> (NSColor, CGFloat) = { (.red, 16) }
+    var onBubbleEnd: () -> Void = {}
+    private var editor: NSTextView?
+    private var editorTop = CGPoint.zero // view coordinates
     var history: [[Edit]] = [[], [], []]
     var page = 0 { didSet { needsDisplay = true } }
     var tool = Tool.pen
@@ -350,6 +372,8 @@ final class InkView: NSView {
 
     override func mouseDown(with e: NSEvent) {
         cursor.set()
+        if editor != nil { endBubble(commit: true); return } // clicking elsewhere confirms the note
+        if tool == .text { beginBubble(convert(e.locationInWindow, from: nil)); return }
         if tool == .eraser { erased = []; erase(at: point(e)); return }
         let s = newStroke()
         s.add(point(e), pressure(e))
@@ -405,7 +429,69 @@ final class InkView: NSView {
     func clear() {
         pages[page] = []
         history[page] = []
+        bubbles[page] = []
         needsDisplay = true
+    }
+
+    // ---------- speech bubbles (not part of undo; only Clear removes them) ----------
+
+    func beginBubble(_ v: CGPoint) {
+        let (color, size) = bubbleStyle()
+        let tv = NSTextView(frame: NSRect(x: v.x, y: v.y, width: 120, height: 0))
+        tv.font = .systemFont(ofSize: size * zoomScale)
+        tv.textColor = .black
+        tv.backgroundColor = .white
+        tv.insertionPointColor = .black
+        tv.isRichText = false
+        tv.allowsUndo = true
+        tv.textContainerInset = NSSize(width: 4, height: 6)
+        tv.isVerticallyResizable = false
+        tv.isHorizontallyResizable = false
+        tv.textContainer?.widthTracksTextView = false
+        tv.textContainer?.containerSize = NSSize(width: 600 * zoomScale, height: CGFloat.greatestFiniteMagnitude)
+        tv.wantsLayer = true
+        tv.layer?.borderColor = color.cgColor
+        tv.layer?.borderWidth = 2
+        tv.delegate = self
+        editor = tv
+        editorTop = v
+        addSubview(tv)
+        fitEditor()
+        window?.makeKey()
+        window?.makeFirstResponder(tv)
+    }
+
+    // Grows with the text, keeping its top-left at the click.
+    private func fitEditor() {
+        guard let tv = editor, let lm = tv.layoutManager, let tc = tv.textContainer else { return }
+        lm.ensureLayout(for: tc)
+        let u = lm.usedRect(for: tc).union(lm.extraLineFragmentRect)
+        let w = max(120, ceil(u.width) + 8 + tv.font!.pointSize), h = ceil(u.height) + 12
+        tv.frame = NSRect(x: editorTop.x, y: editorTop.y - h, width: w, height: h)
+    }
+
+    func endBubble(commit: Bool) {
+        guard let tv = editor else { return }
+        editor = nil
+        let t = tv.string.trimmingCharacters(in: .whitespacesAndNewlines)
+        if commit && !t.isEmpty {
+            let (color, size) = bubbleStyle()
+            bubbles[page].append(Bubble(text: t, at: content(editorTop), color: color, size: size))
+            needsDisplay = true
+        }
+        tv.removeFromSuperview()
+        onBubbleEnd()
+    }
+
+    func textDidChange(_ n: Notification) { fitEditor() }
+    func textDidEndEditing(_ n: Notification) { endBubble(commit: true) }
+
+    // Enter confirms (Shift+Enter adds a line, Enter while an input method is composing just finishes the character), Esc cancels.
+    func textView(_ tv: NSTextView, doCommandBy sel: Selector) -> Bool {
+        if sel == #selector(NSResponder.cancelOperation(_:)) { endBubble(commit: false); return true }
+        if sel == #selector(NSResponder.insertNewline(_:)) && !tv.hasMarkedText()
+            && NSApp.currentEvent?.modifierFlags.contains(.shift) != true { endBubble(commit: true); return true }
+        return false
     }
 
     override func draw(_ r: NSRect) {
@@ -415,6 +501,7 @@ final class InkView: NSView {
         // highlighter beneath the pen
         for s in pages[page] where s.highlighter { s.draw(ctx) }
         for s in pages[page] where !s.highlighter { s.draw(ctx) }
+        for b in bubbles[page] { b.draw() }
     }
 }
 
@@ -623,7 +710,7 @@ final class Controller: NSObject, NSApplicationDelegate, NSWindowDelegate {
     let hintWin = Panel(level: 4, clickThrough: true)
     let hintLabel = NSTextField(wrappingLabelWithString: "")
     weak var hintOwner: NSView?
-    let penCursor = symbolCursor("pencil"), highlightCursor = symbolCursor("highlighter"), eraserCursor = ringCursor(16)
+    let penCursor = symbolCursor("pencil"), highlightCursor = symbolCursor("highlighter"), eraserCursor = ringCursor(16), textCursor = NSCursor.iBeam
     let zoomer = Zoomer()
     var spotTimer: Timer?
 
@@ -650,6 +737,7 @@ final class Controller: NSObject, NSApplicationDelegate, NSWindowDelegate {
             HotkeyAction(id: "Pen", def: Hotkey(mods: ctrlOpt, key: kVK_ANSI_P, name: "P"), title: { Lang.t("Pen") }, run: { [unowned self] in self.togglePen() }),
             HotkeyAction(id: "Highlighter", def: Hotkey(mods: ctrlOpt, key: kVK_ANSI_L, name: "L"), title: { Lang.t("Highlighter") }, run: { [unowned self] in self.toggleHighlighter() }),
             HotkeyAction(id: "Eraser", def: Hotkey(mods: ctrlOpt, key: kVK_ANSI_E, name: "E"), title: { Lang.t("Eraser") }, run: { [unowned self] in self.eraserHotkey() }),
+            HotkeyAction(id: "Bubble", def: Hotkey(mods: ctrlOpt, key: kVK_ANSI_T, name: "T"), title: { Lang.t("Bubble") }, run: { [unowned self] in self.toggleBubble() }),
             HotkeyAction(id: "Board", def: Hotkey(mods: ctrlOpt, key: kVK_ANSI_B, name: "B"), title: { Lang.t("Board") }, run: { [unowned self] in self.cycleBoard() }),
             HotkeyAction(id: "Undo", def: Hotkey(mods: ctrlOpt, key: kVK_ANSI_Z, name: "Z"), title: { Lang.t("Undo") }, run: { [unowned self] in self.ink.undo() }),
             HotkeyAction(id: "Clear", def: Hotkey(mods: ctrlOpt, key: kVK_ANSI_C, name: "C"), title: { Lang.t("ClearTip") }, run: { [unowned self] in self.ink.clear() }),
@@ -676,6 +764,9 @@ final class Controller: NSObject, NSApplicationDelegate, NSWindowDelegate {
         setupHint()
 
         overlay.contentView = ink
+        overlay.keyable = true // typing into a speech bubble
+        ink.bubbleStyle = { (Cfg.palette[Cfg.penColor], max(16, CGFloat(Cfg.penSize) * 4)) }
+        ink.onBubbleEnd = { [unowned self] in if self.tool == .text { self.tool = .pen; self.applyMode() } }
         spot.contentView = spotView
         bar.isMovableByWindowBackground = true
         bar.delegate = self
@@ -918,6 +1009,7 @@ final class Controller: NSObject, NSApplicationDelegate, NSWindowDelegate {
         col.addArrangedSubview(makeButton("Board", "rectangle.inset.filled", Lang.t("Board"), tip(Lang.t("BoardTip"), "Board")) { [unowned self] in self.cycleBoard() })
         col.addArrangedSubview(makeButton("Undo", "arrow.uturn.backward", Lang.t("Undo"), tip(Lang.t("Undo"), "Undo")) { [unowned self] in self.ink.undo() })
         col.addArrangedSubview(makeButton("Clear", "trash", Lang.t("Clear"), tip(Lang.t("ClearTip"), "Clear")) { [unowned self] in self.ink.clear() })
+        col.addArrangedSubview(makeButton("Bubble", "text.bubble", Lang.t("Bubble"), tip(Lang.t("Bubble"), "Bubble") + "\n" + Lang.t("BubbleTip")) { [unowned self] in self.toggleBubble() })
         col.addArrangedSubview(makeButton("Zoom", "plus.magnifyingglass", Lang.t("Zoom"), tip(Lang.t("Zoom"), "Zoom")) { [unowned self] in self.toggleZoom() })
         col.addArrangedSubview(makeButton("Capture", "camera", Lang.t("Capture"), tip(Lang.t("CaptureTip"), "Capture")) { [unowned self] in self.capture() })
         col.addArrangedSubview(makeButton("Settings", "gearshape", Lang.t("Settings"), tip(Lang.t("Settings"), "Settings")) { [unowned self] in self.toggleSettings() })
@@ -1055,6 +1147,10 @@ final class Controller: NSObject, NSApplicationDelegate, NSWindowDelegate {
         if penMode && tool == .eraser { tool = .pen } else { tool = .eraser; penMode = true }
         applyMode()
     }
+    func toggleBubble() {
+        if penMode && tool == .text { tool = .pen } else { tool = .text; penMode = true }
+        applyMode()
+    }
     // First press enters eraser mode; pressing again while erasing wipes the page.
     func eraserHotkey() { if penMode && tool == .eraser { ink.clear() } else { toggleEraser() } }
     func toggleSettings() { settingsOpen.toggle(); applyMode() }
@@ -1150,9 +1246,10 @@ final class Controller: NSObject, NSApplicationDelegate, NSWindowDelegate {
     }
 
     func applyMode() {
+        if tool != .text || ink.page != board { ink.endBubble(commit: true) } // switching tool or page confirms the note being typed
         ink.page = board
         ink.tool = tool
-        ink.cursor = tool == .eraser ? eraserCursor : tool == .highlighter ? highlightCursor : penCursor
+        ink.cursor = tool == .text ? textCursor : tool == .eraser ? eraserCursor : tool == .highlighter ? highlightCursor : penCursor
         updateFocus()
         (penMode ? ink.cursor : NSCursor.arrow).set() // the pointer may already be over the overlay
         overlay.ignoresMouseEvents = !penMode
@@ -1163,6 +1260,7 @@ final class Controller: NSObject, NSApplicationDelegate, NSWindowDelegate {
         highlight("Pen", penMode && tool == .pen)
         highlight("Highlighter", penMode && tool == .highlighter)
         highlight("Eraser", penMode && tool == .eraser)
+        highlight("Bubble", penMode && tool == .text)
         highlight("Board", board != 0)
         highlight("Zoom", zoomer.active)
         highlight("Settings", settingsOpen)
@@ -1484,6 +1582,9 @@ func selfTest() {
     precondition(v.pages[0].count == 1, "undo restores the erased stroke")
     v.undo()
     precondition(v.pages[0].isEmpty, "undo removes the drawn stroke")
+    v.bubbles[0] = [Bubble(text: "a", at: .zero, color: .red, size: 16)]
+    v.clear()
+    precondition(v.bubbles[0].isEmpty, "clear removes speech bubbles")
     v.zoomScale = 2
     v.zoomOrigin = CGPoint(x: 100, y: 50)
     precondition(v.content(CGPoint(x: 40, y: 20)) == CGPoint(x: 120, y: 60), "zoomed input maps back to content")
