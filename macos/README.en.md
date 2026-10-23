@@ -8,7 +8,13 @@
 
 The macOS version of the pen app for online lectures. It runs on macOS 14 (Sonoma) or later, on both Apple silicon and Intel Macs.
 
-> In development. There is no App Store release or notarized download yet. Build it from source or install it from a DMG you build yourself.
+## Download
+
+**[Download HighPen-1.0.0.dmg](https://github.com/stepanowon/high-pen/releases/download/macos-v1.0.0/HighPen-1.0.0.dmg)** (pre-release [macos-v1.0.0](https://github.com/stepanowon/high-pen/releases/tag/macos-v1.0.0))
+
+Open the DMG and drag HighPen onto the Applications folder. If macOS blocks it on first launch with an "unidentified developer" warning, open it as described under [DMG package](#dmg-package).
+
+> This is a pre-release. There is no App Store release or Apple notarization yet.
 
 ## Build
 

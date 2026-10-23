@@ -13,7 +13,7 @@
 | プラットフォーム | 状態 | ドキュメント |
 |---|---|---|
 | Windows 10/11 | 配布中 (Microsoft Store、winget、exe) | [インストールと使い方](windows/README.ja.md) |
-| macOS 14 以降 | 開発中 (ソースからビルド、DMG) | [ビルドと使い方](macos/README.ja.md) |
+| macOS 14 以降 | プレリリース (DMG) | [ビルドと使い方](macos/README.ja.md) |
 
 ### Windows
 
@@ -23,7 +23,9 @@ Microsoft Store からのインストールをおすすめします。winget、�
 
 ### macOS
 
-macOS 14 (Sonoma) 以降、Apple シリコンと Intel の Mac に対応しています。まだ開発中で App Store では配布していないため、ソースからビルドするか、ビルドスクリプトで作成した DMG からインストールします。ビルド方法、機能とショートカット、権限の設定は [macOS 版ドキュメント](macos/README.ja.md)をご覧ください。
+**[HighPen-1.0.0.dmg をダウンロード](https://github.com/stepanowon/high-pen/releases/download/macos-v1.0.0/HighPen-1.0.0.dmg)** (プレリリース [macos-v1.0.0](https://github.com/stepanowon/high-pen/releases/tag/macos-v1.0.0))
+
+macOS 14 (Sonoma) 以降、Apple シリコンと Intel の Mac に対応しています。DMG を開き、HighPen を Applications フォルダーにドラッグするとインストールされます。App Store での配布と Apple の公証はまだないため、初回起動時に警告が出ることがあります。ビルド方法、機能とショートカット、権限の設定は [macOS 版ドキュメント](macos/README.ja.md)をご覧ください。
 
 ## リポジトリ構成
 
