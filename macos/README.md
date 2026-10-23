@@ -12,7 +12,14 @@
 
 **[HighPen-1.1.0.dmg 받기](https://github.com/stepanowon/high-pen/releases/download/macos-v1.1.0/HighPen-1.1.0.dmg)** (사전 릴리스 [macos-v1.1.0](https://github.com/stepanowon/high-pen/releases/tag/macos-v1.1.0))
 
-DMG를 열고 HighPen을 Applications 폴더로 끌어다 놓으면 설치됩니다. 처음 열 때 "확인되지 않은 개발자" 경고로 막히면 [DMG 패키지](#dmg-패키지)에 있는 방법으로 엽니다.
+1. DMG를 열고 HighPen을 Applications 폴더로 끌어다 놓습니다.
+2. **처음 열기 전에** 터미널에서 다음 명령을 실행합니다. 그러면 경고 없이 바로 열립니다.
+
+```sh
+xattr -dr com.apple.quarantine /Applications/HighPen.app
+```
+
+아직 Apple 공증을 받지 않아서, 이 명령 없이 열면 "Apple은 'HighPen'에 악성 코드가 없음을 확인할 수 없습니다" 경고가 나옵니다. 이때 **휴지통으로 이동**을 누르면 앱이 삭제되니 **완료**를 누르세요. 그다음 시스템 설정 > 개인정보 보호 및 보안 아래쪽의 **그래도 열기**를 누르고 암호를 입력하면 열립니다. 이미 휴지통으로 옮겨졌다면 다시 Applications로 꺼낸 뒤 위 명령을 실행합니다.
 
 > 사전 릴리스입니다. 아직 App Store 배포와 Apple 공증은 없습니다.
 
@@ -37,10 +44,7 @@ open dist/HighPen.app
 
 DMG를 열고 HighPen을 Applications 폴더로 끌어다 놓으면 설치됩니다.
 
-아직 Apple 개발자 인증서 서명과 공증(notarization)을 하지 않아서, 인터넷으로 받은 DMG의 앱을 처음 열면 "확인되지 않은 개발자" 경고와 함께 실행이 막힙니다. 다음 중 한 가지 방법으로 엽니다.
-
-- 시스템 설정 > 개인정보 보호 및 보안 아래쪽의 **확인 없이 열기**를 누릅니다.
-- 터미널에서 `xattr -dr com.apple.quarantine /Applications/HighPen.app`을 실행합니다.
+아직 Apple 개발자 인증서 서명과 공증(notarization)을 하지 않아서, 인터넷으로 받은 DMG의 앱은 처음 열 때 실행이 막힙니다. 여는 방법은 [다운로드](#다운로드)를 참고하세요.
 
 경고 없이 배포하려면 Apple Developer Program 가입 후 Developer ID 서명과 공증이 필요합니다.
 
