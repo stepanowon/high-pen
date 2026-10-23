@@ -23,7 +23,7 @@ Microsoft Store에서 설치하는 것을 권장합니다. winget, 설치 없이
 
 ### macOS
 
-**[HighPen-1.0.0.dmg 받기](https://github.com/stepanowon/high-pen/releases/download/macos-v1.0.0/HighPen-1.0.0.dmg)** (사전 릴리스 [macos-v1.0.0](https://github.com/stepanowon/high-pen/releases/tag/macos-v1.0.0))
+**[HighPen-1.1.0.dmg 받기](https://github.com/stepanowon/high-pen/releases/download/macos-v1.1.0/HighPen-1.1.0.dmg)** (사전 릴리스 [macos-v1.1.0](https://github.com/stepanowon/high-pen/releases/tag/macos-v1.1.0))
 
 macOS 14 (Sonoma) 이상, Apple 실리콘과 Intel Mac을 지원합니다. DMG를 열고 HighPen을 Applications 폴더로 끌어다 놓으면 설치됩니다. 아직 App Store 배포와 Apple 공증은 없어서 처음 열 때 경고가 나올 수 있습니다. 빌드 방법, 기능과 단축키, 권한 설정은 [macOS 문서](macos/README.md)를 참고하세요.
 
