@@ -13,7 +13,7 @@ HighPen is a pen app for online lectures. You can write directly on the screen, 
 | Platform | Status | Docs |
 |---|---|---|
 | Windows 10/11 | Available (Microsoft Store, winget, exe) | [Installation and usage](windows/README.en.md) |
-| macOS | Planned | |
+| macOS 14+ | In development (build from source, DMG) | [Build and usage](macos/README.en.md) |
 
 ### Windows
 
@@ -21,11 +21,16 @@ HighPen is a pen app for online lectures. You can write directly on the screen, 
 
 Installing from the Microsoft Store is recommended. For other options (winget, a portable exe, the installer) and a description of every feature, see the [Windows docs](windows/README.en.md).
 
+### macOS
+
+Runs on macOS 14 (Sonoma) or later, on Apple silicon and Intel Macs. It is still in development and not on the App Store yet: build it from source or install it from a DMG made by the build script. For building, features and shortcuts, and permissions, see the [macOS docs](macos/README.en.md).
+
 ## Repository layout
 
 | Path | Contents |
 |---|---|
 | `windows/` | The Windows app (source, build scripts, executables, Store packaging, release notes) |
+| `macos/` | The macOS app (source, build and DMG packaging script, docs) |
 | `screen/` | Screenshots and the trailer video used in the docs |
 | `PRIVACY.md` | Privacy policy |
 

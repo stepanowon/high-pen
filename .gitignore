@@ -1,2 +1,4 @@
 .claude/
 windows/dist/*.msix
+macos/dist/
+.DS_Store
