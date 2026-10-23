@@ -31,11 +31,11 @@ winget install 9PDG1QN5QSL3 --source msstore
 
 ### インストールせずに実行
 
-[HighPen.exe](https://github.com/stepanowon/high-pen/raw/main/dist/HighPen.exe) をダウンロードしてそのまま実行します。インストールは不要です。
+[HighPen.exe](https://github.com/stepanowon/high-pen/raw/main/windows/dist/HighPen.exe) をダウンロードしてそのまま実行します。インストールは不要です。
 
 ### インストーラーでインストール
 
-1. [HighPen-Setup.exe](https://github.com/stepanowon/high-pen/raw/main/dist/HighPen-Setup.exe) をダウンロードして実行します。
+1. [HighPen-Setup.exe](https://github.com/stepanowon/high-pen/raw/main/windows/dist/HighPen-Setup.exe) をダウンロードして実行します。
 2. インストールするかどうかと、デスクトップにショートカットを作成するかどうかを選びます。
 3. インストールが終わるとすぐに起動できます。
 

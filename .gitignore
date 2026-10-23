@@ -1,2 +1,2 @@
 .claude/
-dist/*.msix
+windows/dist/*.msix

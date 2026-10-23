@@ -73,6 +73,8 @@
 
 ## 다음 버전 배포 절차
 
+Windows 앱 파일은 모두 `windows/` 아래에 있다. 아래 경로와 명령은 `windows` 디렉토리 기준이다.
+
 1. `src/HighPen.cs`의 `AppVersion`과 `src/Setup.cs`의 `Version`을 같이 올린다.
 2. `.\build.ps1`로 `dist\HighPen.exe`, `dist\HighPen-Setup.exe`를 빌드한다.
 3. 커밋·푸시한 뒤 릴리스를 만든다.

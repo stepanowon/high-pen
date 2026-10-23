@@ -2,6 +2,8 @@
 
 Store에는 MSIX 패키지(`dist\HighPen.msix`)를 올립니다. 패키지 서명은 Store가 하므로 인증서가 필요 없습니다.
 
+이 문서의 경로와 명령은 모두 `windows` 디렉토리 기준입니다.
+
 ## 1. 앱 이름 예약과 패키지 ID
 
 1. [Partner Center](https://partner.microsoft.com/dashboard/apps-and-games/overview)에서 **새 제품 → MSIX 또는 PWA 앱**을 고르고 이름 `HighPen`을 예약합니다.

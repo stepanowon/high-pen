@@ -31,11 +31,11 @@ winget install 9PDG1QN5QSL3 --source msstore
 
 ### Run without installing
 
-Download [HighPen.exe](https://github.com/stepanowon/high-pen/raw/main/dist/HighPen.exe) and run it directly. No installation needed.
+Download [HighPen.exe](https://github.com/stepanowon/high-pen/raw/main/windows/dist/HighPen.exe) and run it directly. No installation needed.
 
 ### Install with the installer
 
-1. Download [HighPen-Setup.exe](https://github.com/stepanowon/high-pen/raw/main/dist/HighPen-Setup.exe) and run it.
+1. Download [HighPen-Setup.exe](https://github.com/stepanowon/high-pen/raw/main/windows/dist/HighPen-Setup.exe) and run it.
 2. Confirm the installation and choose whether to create a desktop shortcut.
 3. When the installation finishes, you can start the app right away.
 
