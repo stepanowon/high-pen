@@ -10,7 +10,7 @@
 
 ## 다운로드
 
-**[HighPen-1.0.0.dmg 받기](https://github.com/stepanowon/high-pen/releases/download/macos-v1.0.0/HighPen-1.0.0.dmg)** (사전 릴리스 [macos-v1.0.0](https://github.com/stepanowon/high-pen/releases/tag/macos-v1.0.0))
+**[HighPen-1.1.0.dmg 받기](https://github.com/stepanowon/high-pen/releases/download/macos-v1.1.0/HighPen-1.1.0.dmg)** (사전 릴리스 [macos-v1.1.0](https://github.com/stepanowon/high-pen/releases/tag/macos-v1.1.0))
 
 DMG를 열고 HighPen을 Applications 폴더로 끌어다 놓으면 설치됩니다. 처음 열 때 "확인되지 않은 개발자" 경고로 막히면 [DMG 패키지](#dmg-패키지)에 있는 방법으로 엽니다.
 
