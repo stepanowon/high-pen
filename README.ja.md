@@ -13,7 +13,7 @@
 | プラットフォーム | 状態 | ドキュメント |
 |---|---|---|
 | Windows 10/11 | 配布中 (Microsoft Store、winget、exe) | [インストールと使い方](windows/README.ja.md) |
-| macOS | 開発予定 | |
+| macOS 14 以降 | 開発中 (ソースからビルド、DMG) | [ビルドと使い方](macos/README.ja.md) |
 
 ### Windows
 
@@ -21,11 +21,16 @@
 
 Microsoft Store からのインストールをおすすめします。winget、インストール不要の exe、インストーラーなどほかの方法と機能の説明は [Windows 版ドキュメント](windows/README.ja.md)をご覧ください。
 
+### macOS
+
+macOS 14 (Sonoma) 以降、Apple シリコンと Intel の Mac に対応しています。まだ開発中で App Store では配布していないため、ソースからビルドするか、ビルドスクリプトで作成した DMG からインストールします。ビルド方法、機能とショートカット、権限の設定は [macOS 版ドキュメント](macos/README.ja.md)をご覧ください。
+
 ## リポジトリ構成
 
 | パス | 内容 |
 |---|---|
 | `windows/` | Windows アプリ (ソース、ビルドスクリプト、実行ファイル、Store パッケージ、配布記録) |
+| `macos/` | macOS アプリ (ソース、ビルド・DMG パッケージ作成スクリプト、ドキュメント) |
 | `screen/` | ドキュメント用のスクリーンショットと紹介動画 |
 | `PRIVACY.md` | プライバシーポリシー |
 

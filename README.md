@@ -13,7 +13,7 @@
 | 플랫폼 | 상태 | 문서 |
 |---|---|---|
 | Windows 10/11 | 배포 중 (Microsoft Store, winget, exe) | [설치와 사용 방법](windows/README.md) |
-| macOS | 개발 예정 | |
+| macOS 14 이상 | 개발 중 (소스 빌드, DMG) | [빌드와 사용 방법](macos/README.md) |
 
 ### Windows
 
@@ -21,11 +21,16 @@
 
 Microsoft Store에서 설치하는 것을 권장합니다. winget, 설치 없이 실행하는 exe, 설치 파일 등 다른 방법과 기능 설명은 [Windows 문서](windows/README.md)를 참고하세요.
 
+### macOS
+
+macOS 14 (Sonoma) 이상, Apple 실리콘과 Intel Mac을 지원합니다. 아직 개발 중이라 App Store 배포는 없으며, 소스에서 빌드하거나 빌드 스크립트로 만든 DMG로 설치합니다. 빌드 방법, 기능과 단축키, 권한 설정은 [macOS 문서](macos/README.md)를 참고하세요.
+
 ## 저장소 구조
 
 | 경로 | 내용 |
 |---|---|
 | `windows/` | Windows 앱 (소스, 빌드 스크립트, 실행 파일, Store 패키징, 배포 기록) |
+| `macos/` | macOS 앱 (소스, 빌드·DMG 패키징 스크립트, 문서) |
 | `screen/` | 문서용 스크린샷과 소개 영상 |
 | `PRIVACY.md` | 개인정보 처리방침 |
 
