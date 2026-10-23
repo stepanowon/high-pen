@@ -13,7 +13,7 @@
 | 플랫폼 | 상태 | 문서 |
 |---|---|---|
 | Windows 10/11 | 배포 중 (Microsoft Store, winget, exe) | [설치와 사용 방법](windows/README.md) |
-| macOS 14 이상 | 개발 중 (소스 빌드, DMG) | [빌드와 사용 방법](macos/README.md) |
+| macOS 14 이상 | 사전 릴리스 (DMG) | [빌드와 사용 방법](macos/README.md) |
 
 ### Windows
 
@@ -23,7 +23,9 @@ Microsoft Store에서 설치하는 것을 권장합니다. winget, 설치 없이
 
 ### macOS
 
-macOS 14 (Sonoma) 이상, Apple 실리콘과 Intel Mac을 지원합니다. 아직 개발 중이라 App Store 배포는 없으며, 소스에서 빌드하거나 빌드 스크립트로 만든 DMG로 설치합니다. 빌드 방법, 기능과 단축키, 권한 설정은 [macOS 문서](macos/README.md)를 참고하세요.
+**[HighPen-1.0.0.dmg 받기](https://github.com/stepanowon/high-pen/releases/download/macos-v1.0.0/HighPen-1.0.0.dmg)** (사전 릴리스 [macos-v1.0.0](https://github.com/stepanowon/high-pen/releases/tag/macos-v1.0.0))
+
+macOS 14 (Sonoma) 이상, Apple 실리콘과 Intel Mac을 지원합니다. DMG를 열고 HighPen을 Applications 폴더로 끌어다 놓으면 설치됩니다. 아직 App Store 배포와 Apple 공증은 없어서 처음 열 때 경고가 나올 수 있습니다. 빌드 방법, 기능과 단축키, 권한 설정은 [macOS 문서](macos/README.md)를 참고하세요.
 
 ## 저장소 구조
 

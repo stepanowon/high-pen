@@ -8,7 +8,13 @@
 
 비대면 강의용 펜 앱의 macOS 버전입니다. macOS 14 (Sonoma) 이상, Apple 실리콘과 Intel Mac을 모두 지원합니다.
 
-> 개발 중입니다. 아직 App Store나 공증된 배포 파일이 없습니다. 소스에서 빌드하거나 직접 만든 DMG로 설치합니다.
+## 다운로드
+
+**[HighPen-1.0.0.dmg 받기](https://github.com/stepanowon/high-pen/releases/download/macos-v1.0.0/HighPen-1.0.0.dmg)** (사전 릴리스 [macos-v1.0.0](https://github.com/stepanowon/high-pen/releases/tag/macos-v1.0.0))
+
+DMG를 열고 HighPen을 Applications 폴더로 끌어다 놓으면 설치됩니다. 처음 열 때 "확인되지 않은 개발자" 경고로 막히면 [DMG 패키지](#dmg-패키지)에 있는 방법으로 엽니다.
+
+> 사전 릴리스입니다. 아직 App Store 배포와 Apple 공증은 없습니다.
 
 ## 빌드
 

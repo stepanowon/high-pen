@@ -8,7 +8,13 @@
 
 オンライン授業向けペンアプリの macOS 版です。macOS 14 (Sonoma) 以降で、Apple シリコンと Intel の Mac の両方に対応しています。
 
-> 開発中です。App Store 版や公証済みの配布ファイルはまだありません。ソースからビルドするか、自分で作成した DMG からインストールしてください。
+## ダウンロード
+
+**[HighPen-1.0.0.dmg をダウンロード](https://github.com/stepanowon/high-pen/releases/download/macos-v1.0.0/HighPen-1.0.0.dmg)** (プレリリース [macos-v1.0.0](https://github.com/stepanowon/high-pen/releases/tag/macos-v1.0.0))
+
+DMG を開き、HighPen を Applications フォルダーにドラッグするとインストールされます。初回起動時に「開発元が未確認」の警告でブロックされた場合は、[DMG パッケージ](#dmg-パッケージ)の方法で開いてください。
+
+> プレリリースです。App Store での配布と Apple の公証はまだありません。
 
 ## ビルド
 
