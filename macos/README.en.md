@@ -55,6 +55,7 @@ Distributing without the warning requires joining the Apple Developer Program, t
 | Board | ⌃⌥B | White board → black board → off. Kept separately from the screen annotations |
 | Undo | ⌃⌥Z | One stroke, or everything removed by one eraser drag |
 | Clear | ⌃⌥C | Clears the current page |
+| Note | ⌃⌥T | Text box at the clicked spot. Enter confirms, Shift+Enter adds a line, Esc cancels. Removed only by Clear |
 | Zoom | ⌃⌥X | Live 1.5x / 2x / 2.5x zoom. Turning the pen on freezes the view so you can write on the zoomed screen |
 | Capture | ⌃⌥F | Saves the screen with ink as a PNG in `~/Pictures/HighPen` and copies it to the clipboard |
 | Settings | ⌃⌥D | Colors, widths, spot, zoom level, monitor, language (Korean, Japanese, English) |
