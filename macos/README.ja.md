@@ -12,7 +12,14 @@
 
 **[HighPen-1.1.0.dmg をダウンロード](https://github.com/stepanowon/high-pen/releases/download/macos-v1.1.0/HighPen-1.1.0.dmg)** (プレリリース [macos-v1.1.0](https://github.com/stepanowon/high-pen/releases/tag/macos-v1.1.0))
 
-DMG を開き、HighPen を Applications フォルダーにドラッグするとインストールされます。初回起動時に「開発元が未確認」の警告でブロックされた場合は、[DMG パッケージ](#dmg-パッケージ)の方法で開いてください。
+1. DMG を開き、HighPen を Applications フォルダーにドラッグします。
+2. **初めて開く前に**、ターミナルで次のコマンドを実行します。警告なしでそのまま開けます。
+
+```sh
+xattr -dr com.apple.quarantine /Applications/HighPen.app
+```
+
+まだ Apple の公証を受けていないため、このコマンドなしで開くと「“HighPen”にマルウェアが含まれていないことを Apple は検証できません」という警告が出ます。**ゴミ箱に入れる**を押すとアプリが削除されるので、**完了**を押してください。その後、システム設定 > プライバシーとセキュリティ の下にある **このまま開く** を押してパスワードを入力すると開けます。すでにゴミ箱に移された場合は、Applications に戻してから上のコマンドを実行します。
 
 > プレリリースです。App Store での配布と Apple の公証はまだありません。
 
@@ -37,10 +44,7 @@ open dist/HighPen.app
 
 DMG を開き、HighPen を Applications フォルダーにドラッグするとインストールされます。
 
-まだ Apple の開発者証明書による署名と公証 (notarization) を行っていないため、インターネットからダウンロードした DMG のアプリを初めて開くと「開発元が未確認」の警告が出て起動がブロックされます。次のいずれかの方法で開いてください。
-
-- システム設定 > プライバシーとセキュリティ の下にある **このまま開く** をクリックします。
-- ターミナルで `xattr -dr com.apple.quarantine /Applications/HighPen.app` を実行します。
+まだ Apple の開発者証明書による署名と公証 (notarization) を行っていないため、インターネットからダウンロードした DMG のアプリは初回起動時にブロックされます。開き方は[ダウンロード](#ダウンロード)をご覧ください。
 
 警告なしで配布するには、Apple Developer Program に登録して Developer ID 署名と公証を行う必要があります。
 

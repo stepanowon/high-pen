@@ -12,7 +12,14 @@ The macOS version of the pen app for online lectures. It runs on macOS 14 (Sonom
 
 **[Download HighPen-1.1.0.dmg](https://github.com/stepanowon/high-pen/releases/download/macos-v1.1.0/HighPen-1.1.0.dmg)** (pre-release [macos-v1.1.0](https://github.com/stepanowon/high-pen/releases/tag/macos-v1.1.0))
 
-Open the DMG and drag HighPen onto the Applications folder. If macOS blocks it on first launch with an "unidentified developer" warning, open it as described under [DMG package](#dmg-package).
+1. Open the DMG and drag HighPen onto the Applications folder.
+2. **Before opening it the first time**, run this in Terminal. HighPen then opens without any warning.
+
+```sh
+xattr -dr com.apple.quarantine /Applications/HighPen.app
+```
+
+HighPen is not notarized by Apple yet, so without this command macOS warns that it "cannot verify 'HighPen' is free of malware". Click **Done**, not **Move to Trash** (that deletes the app). Then click **Open Anyway** near the bottom of System Settings > Privacy & Security and enter your password. If the app already went to the Trash, move it back to Applications and run the command above.
 
 > This is a pre-release. There is no App Store release or Apple notarization yet.
 
@@ -37,10 +44,7 @@ The version is set in one place: `VERSION` in `build.sh`.
 
 Open the DMG and drag HighPen onto the Applications folder to install it.
 
-The app is not yet signed with an Apple developer certificate or notarized, so when it comes from a DMG downloaded from the internet, macOS blocks it the first time with an "unidentified developer" warning. Open it in one of these ways:
-
-- Click **Open Anyway** near the bottom of System Settings > Privacy & Security.
-- Run `xattr -dr com.apple.quarantine /Applications/HighPen.app` in Terminal.
+The app is not yet signed with an Apple developer certificate or notarized, so macOS blocks it the first time when it comes from a DMG downloaded from the internet. See [Download](#download) for how to open it.
 
 Distributing without the warning requires joining the Apple Developer Program, then Developer ID signing and notarization.
 
