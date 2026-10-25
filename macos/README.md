@@ -10,7 +10,7 @@
 
 ## 다운로드
 
-**[HighPen-1.1.0.dmg 받기](https://github.com/stepanowon/high-pen/releases/download/macos-v1.1.0/HighPen-1.1.0.dmg)** (사전 릴리스 [macos-v1.1.0](https://github.com/stepanowon/high-pen/releases/tag/macos-v1.1.0))
+**[HighPen-1.2.0.dmg 받기](https://github.com/stepanowon/high-pen/releases/download/macos-v1.2.0/HighPen-1.2.0.dmg)** (사전 릴리스 [macos-v1.2.0](https://github.com/stepanowon/high-pen/releases/tag/macos-v1.2.0))
 
 1. DMG를 열고 HighPen을 Applications 폴더로 끌어다 놓습니다.
 2. **처음 열기 전에** 터미널에서 다음 명령을 실행합니다. 그러면 경고 없이 바로 열립니다.
@@ -75,6 +75,8 @@ DMG를 열고 HighPen을 Applications 폴더로 끌어다 놓으면 설치됩니
 
 툴바는 머리 부분을 끌어서 옮길 수 있고, 위치와 설정은 자동으로 저장됩니다. Dock 아이콘을 누르면 접힌 툴바가 다시 펼쳐집니다. 툴바와 설정 항목 위에 포인터를 올리면 이름과 단축키가 보입니다.
 
+다중 모니터에서는 설정의 **작동 모니터**(또는 ⌃⌥M)로 고른 모니터를 기억합니다. 모니터 순서가 바뀌어도 그대로이고, 그 모니터의 연결이 끊어지면 메인 모니터로 옮겨 갔다가 다시 연결하면 원래 모니터로 돌아옵니다(확대 중이었다면 확대는 꺼집니다).
+
 펜·형광펜·지우개를 켜면 포인터가 해당 도구 모양으로 바뀝니다. macOS는 활성 앱만 포인터 모양을 바꿀 수 있어서, 펜 모드(와 단축키 설정 창) 동안은 HighPen이 활성 앱이 되고 끝나면 원래 앱(예: 슬라이드쇼)으로 돌아갑니다. 따라서 펜 모드 중에는 키보드 입력(슬라이드 넘기기 등)이 원래 앱으로 가지 않습니다. HighPen 단축키는 언제나 동작합니다.
 
 ## 권한
@@ -93,6 +95,6 @@ DMG를 열고 HighPen을 Applications 폴더로 끌어다 놓으면 설치됩니
 
 | 경로 | 내용 |
 |---|---|
-| `src/HighPen.swift` | 앱 전체 (AppKit, ScreenCaptureKit, Carbon 단축키) |
+| `src/HighPen/` | 앱 소스 (AppKit, ScreenCaptureKit, Carbon 단축키). 책임별 파일: `main.swift`(진입점), `Controller.swift`(조합·조정), `ToolState.swift`(도구 상태 규칙), `InkView.swift`·`Stroke.swift`(필기·말풍선), `Toolbar.swift`, `SettingsPanel.swift`, `Hints.swift`, `Popups.swift`(토스트·정보), `HotkeyEditor.swift`, `Hotkeys.swift`·`Hotkey.swift`(단축키), `Zoomer.swift`, `ScreenCapture.swift`, `Spot.swift`, `FocusKeeper.swift`, `Settings.swift`, `Monitors.swift`, `Lang.swift`, `Theme.swift`·`Controls.swift`, `SelfTest.swift` |
 | `src/make-icon.swift` | 앱 아이콘 생성 (Windows 아이콘과 같은 디자인을 macOS 아이콘 규격에 맞춰 크기별로 그림) |
 | `build.sh` | `swiftc`로 arm64·x86_64 빌드 → `lipo` → `.app` 번들 생성, 아이콘 생성, ad-hoc 서명, DMG 패키징 |

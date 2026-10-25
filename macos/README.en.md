@@ -10,7 +10,7 @@ The macOS version of the pen app for online lectures. It runs on macOS 14 (Sonom
 
 ## Download
 
-**[Download HighPen-1.1.0.dmg](https://github.com/stepanowon/high-pen/releases/download/macos-v1.1.0/HighPen-1.1.0.dmg)** (pre-release [macos-v1.1.0](https://github.com/stepanowon/high-pen/releases/tag/macos-v1.1.0))
+**[Download HighPen-1.2.0.dmg](https://github.com/stepanowon/high-pen/releases/download/macos-v1.2.0/HighPen-1.2.0.dmg)** (pre-release [macos-v1.2.0](https://github.com/stepanowon/high-pen/releases/tag/macos-v1.2.0))
 
 1. Open the DMG and drag HighPen onto the Applications folder.
 2. **Before opening it the first time**, run this in Terminal. HighPen then opens without any warning.
@@ -75,6 +75,8 @@ In Settings > **Shortcuts**, click an item, then press the new combination. Esc 
 
 Drag the toolbar by its header to move it; its position and all settings are saved automatically. Clicking the Dock icon expands a collapsed toolbar. Hover over a toolbar button or a settings item to see its name and shortcut.
 
+With several monitors, HighPen remembers the monitor chosen under **Monitor** in Settings (or with ⌃⌥M), even if the monitor order changes. If that monitor is disconnected, HighPen moves to the main monitor, and returns once it is connected again (zoom is turned off if it was on).
+
 Turning on the pen, highlighter or eraser changes the pointer to that tool. Only the active app can change the pointer on macOS, so HighPen becomes the active app while pen mode (or the shortcut editor) is on, and hands focus back to the app you were using (a slideshow, for example) afterwards. Keyboard input (such as advancing slides) therefore does not reach that app during pen mode. HighPen's shortcuts always work.
 
 ## Permissions
@@ -93,6 +95,6 @@ The app is signed against its bundle id (`com.stepanowon.HighPen`) so the permis
 
 | Path | Contents |
 |---|---|
-| `src/HighPen.swift` | The whole app (AppKit, ScreenCaptureKit, Carbon hotkeys) |
+| `src/HighPen/` | App sources (AppKit, ScreenCaptureKit, Carbon hotkeys), one file per responsibility: `main.swift` (entry point), `Controller.swift` (wiring), `ToolState.swift` (tool rules), `InkView.swift` / `Stroke.swift` (ink, speech bubbles), `Toolbar.swift`, `SettingsPanel.swift`, `Hints.swift`, `Popups.swift` (toast, about), `HotkeyEditor.swift`, `Hotkeys.swift` / `Hotkey.swift` (shortcuts), `Zoomer.swift`, `ScreenCapture.swift`, `Spot.swift`, `FocusKeeper.swift`, `Settings.swift`, `Monitors.swift`, `Lang.swift`, `Theme.swift` / `Controls.swift`, `SelfTest.swift` |
 | `src/make-icon.swift` | Draws the app icon at every size (the Windows icon's design on the macOS icon grid) |
 | `build.sh` | Builds arm64 and x86_64 with `swiftc` → `lipo` → `.app` bundle, icon, ad-hoc signing, DMG packaging |
