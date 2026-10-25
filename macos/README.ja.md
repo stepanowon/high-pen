@@ -10,7 +10,7 @@
 
 ## ダウンロード
 
-**[HighPen-1.1.0.dmg をダウンロード](https://github.com/stepanowon/high-pen/releases/download/macos-v1.1.0/HighPen-1.1.0.dmg)** (プレリリース [macos-v1.1.0](https://github.com/stepanowon/high-pen/releases/tag/macos-v1.1.0))
+**[HighPen-1.2.0.dmg をダウンロード](https://github.com/stepanowon/high-pen/releases/download/macos-v1.2.0/HighPen-1.2.0.dmg)** (プレリリース [macos-v1.2.0](https://github.com/stepanowon/high-pen/releases/tag/macos-v1.2.0))
 
 1. DMG を開き、HighPen を Applications フォルダーにドラッグします。
 2. **初めて開く前に**、ターミナルで次のコマンドを実行します。警告なしでそのまま開けます。
