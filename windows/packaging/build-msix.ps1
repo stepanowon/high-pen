@@ -16,7 +16,7 @@ if (-not $MakeAppx) {
 $makePri = Join-Path (Split-Path $MakeAppx) 'makepri.exe'
 
 # the Store needs a four-part version with 0 as the last part
-$m = Select-String -Path (Join-Path $root 'src\HighPen.cs') -Pattern 'AppVersion = "([^"]+)"'
+$m = Select-String -Path (Join-Path $root 'src\HighPen\Theme.cs') -Pattern 'AppVersion = "([^"]+)"'
 $version = $m.Matches[0].Groups[1].Value + '.0'
 
 & (Join-Path $root 'build.ps1') -Target app
