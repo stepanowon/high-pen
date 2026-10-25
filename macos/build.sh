@@ -4,14 +4,14 @@
 #   ./build.sh test       build, then run the self-check
 #   ./build.sh dmg        build, then package dist/HighPen-<version>.dmg (drag the app onto Applications)
 set -e
-VERSION=1.1.0
+VERSION=1.2.0
 cd "${0:A:h}"
 APP=dist/HighPen.app
 rm -rf $APP dist/obj
 mkdir -p $APP/Contents/MacOS $APP/Contents/Resources dist/obj
 
 for arch in arm64 x86_64; do
-    swiftc -O -swift-version 5 -target $arch-apple-macos14 -o dist/obj/HighPen-$arch src/HighPen.swift
+    swiftc -O -swift-version 5 -target $arch-apple-macos14 -o dist/obj/HighPen-$arch src/HighPen/*.swift
 done
 lipo -create -output $APP/Contents/MacOS/HighPen dist/obj/HighPen-arm64 dist/obj/HighPen-x86_64
 

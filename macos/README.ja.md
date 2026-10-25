@@ -10,7 +10,7 @@
 
 ## ダウンロード
 
-**[HighPen-1.1.0.dmg をダウンロード](https://github.com/stepanowon/high-pen/releases/download/macos-v1.1.0/HighPen-1.1.0.dmg)** (プレリリース [macos-v1.1.0](https://github.com/stepanowon/high-pen/releases/tag/macos-v1.1.0))
+**[HighPen-1.2.0.dmg をダウンロード](https://github.com/stepanowon/high-pen/releases/download/macos-v1.2.0/HighPen-1.2.0.dmg)** (プレリリース [macos-v1.2.0](https://github.com/stepanowon/high-pen/releases/tag/macos-v1.2.0))
 
 1. DMG を開き、HighPen を Applications フォルダーにドラッグします。
 2. **初めて開く前に**、ターミナルで次のコマンドを実行します。警告なしでそのまま開けます。
@@ -75,6 +75,8 @@ DMG を開き、HighPen を Applications フォルダーにドラッグすると
 
 ツールバーは上部をドラッグして移動でき、位置と設定は自動的に保存されます。Dock アイコンをクリックすると、折りたたんだツールバーが再び展開されます。ツールバーや設定項目にポインターを合わせると、名前とショートカットが表示されます。
 
+複数モニターでは、設定の **使用モニター**（または ⌃⌥M）で選んだモニターを記憶します。モニターの順番が変わってもそのままで、そのモニターの接続が切れるとメインモニターに移り、再び接続すると元のモニターに戻ります（拡大中だった場合、拡大はオフになります）。
+
 ペン・蛍光ペン・消しゴムをオンにすると、ポインターがその道具の形に変わります。macOS ではアクティブなアプリしかポインターの形を変えられないため、ペンモード (とショートカット設定ウインドウ) の間は HighPen がアクティブになり、終わると元のアプリ (スライドショーなど) に戻ります。そのため、ペンモード中はキーボード入力 (スライド送りなど) が元のアプリに届きません。HighPen のショートカットは常に使えます。
 
 ## 権限
@@ -93,6 +95,6 @@ DMG を開き、HighPen を Applications フォルダーにドラッグすると
 
 | パス | 内容 |
 |---|---|
-| `src/HighPen.swift` | アプリ全体 (AppKit、ScreenCaptureKit、Carbon ショートカット) |
+| `src/HighPen/` | アプリのソース (AppKit、ScreenCaptureKit、Carbon ショートカット)。責務ごとのファイル: `main.swift` (エントリポイント)、`Controller.swift` (組み立て・調整)、`ToolState.swift` (ツール状態のルール)、`InkView.swift`・`Stroke.swift` (書き込み・吹き出し)、`Toolbar.swift`、`SettingsPanel.swift`、`Hints.swift`、`Popups.swift` (トースト・情報)、`HotkeyEditor.swift`、`Hotkeys.swift`・`Hotkey.swift` (ショートカット)、`Zoomer.swift`、`ScreenCapture.swift`、`Spot.swift`、`FocusKeeper.swift`、`Settings.swift`、`Monitors.swift`、`Lang.swift`、`Theme.swift`・`Controls.swift`、`SelfTest.swift` |
 | `src/make-icon.swift` | アプリアイコンの生成 (Windows のアイコンと同じデザインを macOS のアイコン規格に合わせてサイズごとに描画) |
 | `build.sh` | `swiftc` で arm64・x86_64 をビルド → `lipo` → `.app` バンドル作成、アイコン生成、ad-hoc 署名、DMG パッケージ作成 |
