@@ -10,7 +10,7 @@ The macOS version of the pen app for online lectures. It runs on macOS 14 (Sonom
 
 ## Download
 
-**[Download HighPen-1.2.0.dmg](https://github.com/stepanowon/high-pen/releases/download/macos-v1.2.0/HighPen-1.2.0.dmg)** (pre-release [macos-v1.2.0](https://github.com/stepanowon/high-pen/releases/tag/macos-v1.2.0))
+**[Download HighPen-1.2.0.dmg](https://github.com/stepanowon/high-pen/releases/download/macos-v1.2.0/HighPen-1.2.0.dmg)** (release [macos-v1.2.0](https://github.com/stepanowon/high-pen/releases/tag/macos-v1.2.0))
 
 1. Open the DMG and drag HighPen onto the Applications folder.
 2. **Before opening it the first time**, run this in Terminal. HighPen then opens without any warning.
@@ -21,7 +21,7 @@ xattr -dr com.apple.quarantine /Applications/HighPen.app
 
 HighPen is not notarized by Apple yet, so without this command macOS warns that it "cannot verify 'HighPen' is free of malware". Click **Done**, not **Move to Trash** (that deletes the app). Then click **Open Anyway** near the bottom of System Settings > Privacy & Security and enter your password. If the app already went to the Trash, move it back to Applications and run the command above.
 
-> This is a pre-release. There is no App Store release or Apple notarization yet.
+> HighPen is not on the App Store and is not notarized by Apple yet.
 
 ## Build
 
