@@ -21,7 +21,7 @@ if ($Target -ne 'setup') {
     & "$fw\csc.exe" /nologo /target:winexe /optimize+ "/win32icon:$ico" "/out:$out" `
         "/r:$wpf\PresentationFramework.dll" "/r:$wpf\PresentationCore.dll" `
         "/r:$wpf\WindowsBase.dll" "/r:$fw\System.Xaml.dll" "/r:$fw\System.Windows.Forms.dll" "/r:$fw\System.Drawing.dll" `
-        (Join-Path $src 'HighPen.cs')
+        (Join-Path $src 'HighPen\*.cs')
     if ($LASTEXITCODE -ne 0) { exit 1 }
     Write-Host "Built $out"
 }

@@ -1,0 +1,91 @@
+using System;
+using System.Collections.Generic;
+
+namespace HighPen
+{
+    // UI strings in Korean / Japanese / English. Cur is an index into Codes.
+    static class Lang
+    {
+        public static readonly string[] Codes = { "ko", "ja", "en" };
+        public static readonly string[] Names = { "한국어", "日本語", "English" };
+        public static int Cur;
+
+        static readonly Dictionary<string, string[]> Text = new Dictionary<string, string[]>
+        {
+            { "Spot",          new[] { "스팟", "スポット", "Spot" } },
+            { "MouseSpot",     new[] { "마우스 스팟", "マウススポット", "Mouse spot" } },
+            { "Pen",           new[] { "펜", "ペン", "Pen" } },
+            { "Eraser",        new[] { "지우개", "消しゴム", "Eraser" } },
+            { "EraserTip",     new[] { "지우개 상태에서 단축키를 한 번 더 누르면 전체 삭제", "消しゴム中にもう一度ショートカットを押すと全消去", "Press the shortcut again while erasing to clear all" } },
+            { "Highlighter",   new[] { "형광펜", "蛍光ペン", "Highlighter" } },
+            { "HighlightColor", new[] { "형광펜 색상", "蛍光ペンの色", "Highlighter color" } },
+            { "HighlightSize", new[] { "형광펜 두께", "蛍光ペンの太さ", "Highlighter width" } },
+            { "Board",         new[] { "칠판", "ボード", "Board" } },
+            { "BoardTip",      new[] { "칠판 (흰색/검정/끄기)", "ボード (白/黒/オフ)", "Board (white/black/off)" } },
+            { "WhiteBoard",    new[] { "흰 칠판", "白ボード", "White" } },
+            { "BlackBoard",    new[] { "검은 칠판", "黒ボード", "Black" } },
+            { "Undo",          new[] { "되돌리기", "元に戻す", "Undo" } },
+            { "Clear",         new[] { "지우기", "全消去", "Clear" } },
+            { "ClearTip",      new[] { "전체 지우기", "すべて消去", "Clear all" } },
+            { "Zoom",          new[] { "확대", "拡大", "Zoom" } },
+            { "ZoomTip",       new[] { "{0}배 확대", "{0}倍拡大", "{0}x zoom" } },
+            { "ZoomFactor",    new[] { "확대 배율", "拡大倍率", "Zoom level" } },
+            { "Bubble",        new[] { "말풍선", "吹き出し", "Note" } },
+            { "Capture",       new[] { "캡처", "キャプチャ", "Capture" } },
+            { "CaptureTip",    new[] { "화면과 필기를 PNG로 저장하고 클립보드에 복사", "画面と書き込みを PNG で保存してクリップボードにコピー", "Save the screen with ink as PNG and copy it to the clipboard" } },
+            { "Saved",         new[] { "저장하고 클립보드에 복사했습니다\n{0}\n(클릭하면 폴더 열기)", "保存してクリップボードにコピーしました\n{0}\n(クリックでフォルダーを開く)", "Saved and copied to the clipboard\n{0}\n(click to open the folder)" } },
+            { "SavedOnly",     new[] { "저장했습니다 (클립보드 복사는 실패)\n{0}\n(클릭하면 폴더 열기)", "保存しました (クリップボードへのコピーは失敗)\n{0}\n(クリックでフォルダーを開く)", "Saved (copying to the clipboard failed)\n{0}\n(click to open the folder)" } },
+            { "CaptureFailed", new[] { "캡처하지 못했습니다", "キャプチャできませんでした", "Capture failed" } },
+            { "ClickShow",     new[] { "클릭 표시", "クリック表示", "Show clicks" } },
+            { "HotkeyFail",    new[] { "다른 프로그램이 사용 중이라 등록하지 못한 단축키:", "他のアプリが使用中のため登録できなかったショートカット:", "Shortcuts in use by another app (not registered):" } },
+            { "Hotkeys",       new[] { "단축키 설정", "ショートカット設定", "Shortcuts" } },
+            { "HotkeyHint",    new[] { "바꿀 항목을 누른 뒤 새 조합을 누르세요.\nEsc 취소, Delete 단축키 없애기", "変更する項目を押してから新しい組み合わせを押してください。\nEsc で取り消し、Delete でショートカットなし", "Click an item, then press the new combination.\nEsc cancels, Delete removes the shortcut." } },
+            { "PressKeys",     new[] { "키를 누르세요…", "キーを押してください…", "Press keys…" } },
+            { "NoKey",         new[] { "없음", "なし", "None" } },
+            { "HotkeyNeedMod", new[] { "Ctrl 또는 Alt와 함께 눌러야 합니다 (F1~F24는 단독 사용 가능)", "Ctrl か Alt と一緒に押してください (F1~F24 は単独で使えます)", "Hold Ctrl or Alt as well (F1–F24 can be used alone)" } },
+            { "HotkeyDup",     new[] { "이미 '{0}'에 쓰는 조합입니다", "すでに「{0}」で使っている組み合わせです", "Already used for \"{0}\"" } },
+            { "HotkeyWaitHint", new[] { "눌러도 반응이 없으면 다른 프로그램이 이미 쓰는 조합입니다.", "押しても反応がない場合は、ほかのアプリがすでに使っている組み合わせです。", "If nothing happens, another app already uses that combination." } },
+            { "HotkeyTaken",   new[] { "다른 프로그램이 사용 중인 조합입니다", "ほかのアプリが使用中の組み合わせです", "Another app is using this combination" } },
+            { "ResetDefaults", new[] { "기본값으로", "既定に戻す", "Reset all" } },
+            { "Cycle",         new[] { "순환", "切替", "cycle" } },
+            { "Settings",      new[] { "설정", "設定", "Settings" } },
+            { "Collapse",      new[] { "접기/펴기", "折りたたみ/展開", "Collapse/expand" } },
+            { "Quit",          new[] { "종료", "終了", "Quit" } },
+            { "About",         new[] { "정보", "情報", "About" } },
+            { "AboutTip",      new[] { "저작자 및 라이선스 정보", "作者とライセンス情報", "Author and license" } },
+            { "Tagline",       new[] { "비대면 강의용 Windows 펜 앱", "オンライン授業向け Windows ペンアプリ", "A Windows pen app for online lectures" } },
+            { "Author",        new[] { "저작자", "作者", "Author" } },
+            { "Email",         new[] { "이메일", "メール", "Email" } },
+            { "Website",       new[] { "웹사이트", "Web サイト", "Website" } },
+            { "License",       new[] { "라이선스", "ライセンス", "License" } },
+            { "Close",         new[] { "닫기", "閉じる", "Close" } },
+            { "Monitor",       new[] { "작동 모니터", "使用モニター", "Monitor" } },
+            { "MonitorTip",    new[] { "모니터 {0}", "モニター {0}", "Monitor {0}" } },
+            { "PenColor",      new[] { "펜 색상", "ペンの色", "Pen color" } },
+            { "PenSize",       new[] { "펜 두께", "ペンの太さ", "Pen width" } },
+            { "Pressure",      new[] { "필압 반영", "筆圧", "Pressure" } },
+            { "On",            new[] { "켜짐", "オン", "on" } },
+            { "Off",           new[] { "꺼짐", "オフ", "off" } },
+            { "SpotColor",     new[] { "스팟 색상", "スポットの色", "Spot color" } },
+            { "SpotSize",      new[] { "스팟 크기", "スポットの大きさ", "Spot size" } },
+            { "Language",      new[] { "언어", "言語", "Language" } },
+            { "Red",           new[] { "빨강", "赤", "Red" } },
+            { "Orange",        new[] { "주황", "オレンジ", "Orange" } },
+            { "Yellow",        new[] { "노랑", "黄", "Yellow" } },
+            { "Green",         new[] { "초록", "緑", "Green" } },
+            { "Blue",          new[] { "파랑", "青", "Blue" } },
+            { "Purple",        new[] { "보라", "紫", "Purple" } },
+            { "Black",         new[] { "검정", "黒", "Black" } },
+            { "White",         new[] { "흰색", "白", "White" } },
+        };
+
+        public static string T(string key) { return Text[key][Cur]; }
+
+        // Saved code, or English when nothing (or an unsupported code) is saved.
+        public static int FromCode(string code)
+        {
+            int i = Array.IndexOf(Codes, code);
+            return i < 0 ? 2 : i;
+        }
+    }
+}

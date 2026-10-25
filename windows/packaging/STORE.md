@@ -20,7 +20,7 @@ Store에는 MSIX 패키지(`dist\HighPen.msix`)를 올립니다. 패키지 서�
 ```
 
 - Windows SDK의 `makeappx.exe`, `makepri.exe`를 씁니다. SDK가 없으면 NuGet 패키지 [Microsoft.Windows.SDK.BuildTools](https://www.nuget.org/packages/Microsoft.Windows.SDK.BuildTools)를 받아 압축을 풀고 `-MakeAppx <bin\...\x64\makeappx.exe>`로 지정합니다.
-- 버전은 `src\HighPen.cs`의 `AppVersion` 뒤에 `.0`을 붙여 정합니다(예: `1.3.0` → `1.3.0.0`). Store는 마지막 자리가 0이어야 하고, 새로 올릴 때마다 이전보다 커야 합니다.
+- 버전은 `src\HighPen\Theme.cs`의 `AppVersion` 뒤에 `.0`을 붙여 정합니다(예: `1.3.0` → `1.3.0.0`). Store는 마지막 자리가 0이어야 하고, 새로 올릴 때마다 이전보다 커야 합니다.
 - 로고(`packaging\Assets`)는 `src\make-icon.ps1`이 아이콘과 함께 만듭니다.
 
 ## 3. 제출 항목
