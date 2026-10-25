@@ -10,7 +10,7 @@
 
 ## ダウンロード
 
-**[HighPen-1.2.0.dmg をダウンロード](https://github.com/stepanowon/high-pen/releases/download/macos-v1.2.0/HighPen-1.2.0.dmg)** (プレリリース [macos-v1.2.0](https://github.com/stepanowon/high-pen/releases/tag/macos-v1.2.0))
+**[HighPen-1.2.0.dmg をダウンロード](https://github.com/stepanowon/high-pen/releases/download/macos-v1.2.0/HighPen-1.2.0.dmg)** (リリース [macos-v1.2.0](https://github.com/stepanowon/high-pen/releases/tag/macos-v1.2.0))
 
 1. DMG を開き、HighPen を Applications フォルダーにドラッグします。
 2. **初めて開く前に**、ターミナルで次のコマンドを実行します。警告なしでそのまま開けます。
@@ -21,7 +21,7 @@ xattr -dr com.apple.quarantine /Applications/HighPen.app
 
 まだ Apple の公証を受けていないため、このコマンドなしで開くと「“HighPen”にマルウェアが含まれていないことを Apple は検証できません」という警告が出ます。**ゴミ箱に入れる**を押すとアプリが削除されるので、**完了**を押してください。その後、システム設定 > プライバシーとセキュリティ の下にある **このまま開く** を押してパスワードを入力すると開けます。すでにゴミ箱に移された場合は、Applications に戻してから上のコマンドを実行します。
 
-> プレリリースです。App Store での配布と Apple の公証はまだありません。
+> App Store にはまだ登録しておらず、Apple の公証も受けていません。
 
 ## ビルド
 

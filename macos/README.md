@@ -10,7 +10,7 @@
 
 ## 다운로드
 
-**[HighPen-1.2.0.dmg 받기](https://github.com/stepanowon/high-pen/releases/download/macos-v1.2.0/HighPen-1.2.0.dmg)** (사전 릴리스 [macos-v1.2.0](https://github.com/stepanowon/high-pen/releases/tag/macos-v1.2.0))
+**[HighPen-1.2.0.dmg 받기](https://github.com/stepanowon/high-pen/releases/download/macos-v1.2.0/HighPen-1.2.0.dmg)** (릴리스 [macos-v1.2.0](https://github.com/stepanowon/high-pen/releases/tag/macos-v1.2.0))
 
 1. DMG를 열고 HighPen을 Applications 폴더로 끌어다 놓습니다.
 2. **처음 열기 전에** 터미널에서 다음 명령을 실행합니다. 그러면 경고 없이 바로 열립니다.
@@ -21,7 +21,7 @@ xattr -dr com.apple.quarantine /Applications/HighPen.app
 
 아직 Apple 공증을 받지 않아서, 이 명령 없이 열면 "Apple은 'HighPen'에 악성 코드가 없음을 확인할 수 없습니다" 경고가 나옵니다. 이때 **휴지통으로 이동**을 누르면 앱이 삭제되니 **완료**를 누르세요. 그다음 시스템 설정 > 개인정보 보호 및 보안 아래쪽의 **그래도 열기**를 누르고 암호를 입력하면 열립니다. 이미 휴지통으로 옮겨졌다면 다시 Applications로 꺼낸 뒤 위 명령을 실행합니다.
 
-> 사전 릴리스입니다. 아직 App Store 배포와 Apple 공증은 없습니다.
+> 아직 App Store에는 등록하지 않았고 Apple 공증도 받지 않았습니다.
 
 ## 빌드
 

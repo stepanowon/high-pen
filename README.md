@@ -13,7 +13,7 @@
 | 플랫폼 | 상태 | 문서 |
 |---|---|---|
 | Windows 10/11 | 배포 중 (Microsoft Store, winget, exe) | [설치와 사용 방법](windows/README.md) |
-| macOS 14 이상 | 사전 릴리스 (DMG) | [빌드와 사용 방법](macos/README.md) |
+| macOS 14 이상 | 배포 중 (DMG, App Store 미등록) | [빌드와 사용 방법](macos/README.md) |
 
 ### Windows
 
@@ -23,7 +23,7 @@ Microsoft Store에서 설치하는 것을 권장합니다. winget, 설치 없이
 
 ### macOS
 
-**[HighPen-1.2.0.dmg 받기](https://github.com/stepanowon/high-pen/releases/download/macos-v1.2.0/HighPen-1.2.0.dmg)** (사전 릴리스 [macos-v1.2.0](https://github.com/stepanowon/high-pen/releases/tag/macos-v1.2.0))
+**[HighPen-1.2.0.dmg 받기](https://github.com/stepanowon/high-pen/releases/download/macos-v1.2.0/HighPen-1.2.0.dmg)** (릴리스 [macos-v1.2.0](https://github.com/stepanowon/high-pen/releases/tag/macos-v1.2.0))
 
 macOS 14 (Sonoma) 이상, Apple 실리콘과 Intel Mac을 지원합니다. DMG를 열고 HighPen을 Applications 폴더로 끌어다 놓으면 설치됩니다. 아직 Apple 공증을 받지 않아서, **처음 열기 전에** 터미널에서 다음 명령을 실행해야 경고 없이 열립니다. (명령 없이 열었다가 경고 창에서 **휴지통으로 이동**을 누르면 앱이 삭제됩니다.)
 

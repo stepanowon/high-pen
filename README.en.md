@@ -13,7 +13,7 @@ HighPen is a pen app for online lectures. You can write directly on the screen, 
 | Platform | Status | Docs |
 |---|---|---|
 | Windows 10/11 | Available (Microsoft Store, winget, exe) | [Installation and usage](windows/README.en.md) |
-| macOS 14+ | Pre-release (DMG) | [Build and usage](macos/README.en.md) |
+| macOS 14+ | Available (DMG, not on the App Store) | [Build and usage](macos/README.en.md) |
 
 ### Windows
 
@@ -23,7 +23,7 @@ Installing from the Microsoft Store is recommended. For other options (winget, a
 
 ### macOS
 
-**[Download HighPen-1.2.0.dmg](https://github.com/stepanowon/high-pen/releases/download/macos-v1.2.0/HighPen-1.2.0.dmg)** (pre-release [macos-v1.2.0](https://github.com/stepanowon/high-pen/releases/tag/macos-v1.2.0))
+**[Download HighPen-1.2.0.dmg](https://github.com/stepanowon/high-pen/releases/download/macos-v1.2.0/HighPen-1.2.0.dmg)** (release [macos-v1.2.0](https://github.com/stepanowon/high-pen/releases/tag/macos-v1.2.0))
 
 Runs on macOS 14 (Sonoma) or later, on Apple silicon and Intel Macs. Open the DMG and drag HighPen onto the Applications folder. HighPen is not notarized by Apple yet, so **before opening it the first time**, run this in Terminal to open it without a warning. (If you open it without the command and click **Move to Trash** in the warning, the app is deleted.)
 
