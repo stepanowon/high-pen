@@ -7,7 +7,7 @@ namespace HighPen
 {
     static class AppInfo
     {
-        public const string AppVersion = "1.5.0"; // keep in sync with Version in Setup.cs
+        public const string AppVersion = "1.6.0"; // keep in sync with Version in Setup.cs
         public const string AuthorName = "StephenWon";
         public const string AuthorEmail = "stepanowon@gmail.com";
         public const string RepoUrl = "https://github.com/stepanowon/high-pen";
