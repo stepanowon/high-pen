@@ -11,7 +11,7 @@ rm -rf $APP dist/obj
 mkdir -p $APP/Contents/MacOS $APP/Contents/Resources dist/obj
 
 for arch in arm64 x86_64; do
-    swiftc -O -swift-version 5 -target $arch-apple-macos14 -o dist/obj/HighPen-$arch src/HighPen.swift
+    swiftc -O -swift-version 5 -target $arch-apple-macos14 -o dist/obj/HighPen-$arch src/HighPen/*.swift
 done
 lipo -create -output $APP/Contents/MacOS/HighPen dist/obj/HighPen-arm64 dist/obj/HighPen-x86_64
 
