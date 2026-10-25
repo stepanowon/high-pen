@@ -223,7 +223,7 @@ In recordings and screen shares, a ring expands and fades where you click so vie
 
 ### Multiple monitors
 
-Choose the monitor the app works on with **Monitor** in the settings panel (or Ctrl+Alt+M). Ink, spot, board and toolbar appear only on that monitor, and the other monitors can be used as usual. Existing ink and notes are kept when you switch monitors. The numbers match those in Windows display settings. When a monitor is connected or disconnected while the app runs, the monitor list and window positions are updated automatically (zoom is turned off if it was on).
+Choose the monitor the app works on with **Monitor** in the settings panel (or Ctrl+Alt+M). Ink, spot, board and toolbar appear only on that monitor, and the other monitors can be used as usual. Existing ink and notes are kept when you switch monitors. The numbers match those in Windows display settings. When a monitor is connected or disconnected while the app runs, the monitor list and window positions are updated automatically (zoom is turned off if it was on). If the active monitor is disconnected, HighPen moves to the primary monitor within a second and returns when that monitor is reconnected. The chosen monitor is remembered even if the monitor order changes.
 
 ### Toolbar
 
@@ -246,6 +246,7 @@ Pen color, width, pressure, highlighter color and width, changed shortcuts, spot
 
 - The executables are not code-signed, so Windows SmartScreen may show a warning when you download them from the web. Install from the Microsoft Store or with winget, or click **More info → Run anyway** in the warning.
 - On setups where monitors use different display scaling, zoom or the toolbar position may be off.
+- For a monitor connected through an adapter (e.g. USB-C↔HDMI), Windows may not treat unplugging the monitor-side cable as a disconnect, so HighPen does not move either. Unplug the adapter from the PC, or use **Disconnect this display** in display settings.
 - To write while zoomed, the pen must be on so the zoomed view does not follow the pointer.
 
 ## Privacy
