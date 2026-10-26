@@ -101,11 +101,11 @@ Shortcuts are global, so they work while you are using other programs. A combina
 | Pressure | Ctrl+Alt+R | The harder you press the pen, the thicker the line. A mouse always draws at the set width. |
 | Highlighter color / width | | 8 colors and widths 5–60. While the highlighter is in use, the pen color shortcuts (Ctrl+Shift+…) change the highlighter color. |
 | Spot color / size | | 8 colors and sizes 20–200. |
-| Break length | | Length of the break timer. Pick 10 min, 15 min, 1 h or 1 h 30 min with the buttons, or 1–120 minutes with the slider. Default 10 minutes. |
+| Break length | | Length of the break timer. Pick 10 min, 15 min, 1 h or 1 h 30 min with the buttons, or 5–120 minutes in 5-minute steps with the slider. Default 10 minutes. |
 | Show clicks | Ctrl+Alt+K | Briefly shows an expanding ring where you click. Off by default. |
 | Language | | Choose 한국어, 日本語 or English; the change applies immediately. The default is English (see [Changing the language](#changing-the-language)). |
 | Shortcuts | | Change any shortcut to the combination you want, or remove it (see [Changing shortcuts](#changing-shortcuts)). |
-| Version | | The current version (`HighPen v1.7.2`) is shown at the bottom of the panel. |
+| Version | | The current version (`HighPen v1.7.3`) is shown at the bottom of the panel. |
 
 Settings are saved automatically to `%APPDATA%\HighPen\settings.txt`.
 
@@ -223,7 +223,7 @@ Use it to keep a board or on-screen ink as lecture material. Press the capture b
 
 Shows how much of a break is left during a lecture. Press the break button (Ctrl+Alt+W) and the whole active monitor dims with the time left in large digits, easy to read for viewers on a shared screen.
 
-- **Length:** pick it under **Break length** in the settings panel with the 10 min, 15 min, 1 h and 1 h 30 min buttons or the slider (1–120 minutes). It is saved for the next launch. A change made while the timer runs applies to the next break.
+- **Length:** pick it under **Break length** in the settings panel with the 10 min, 15 min, 1 h and 1 h 30 min buttons or the slider (5–120 minutes in 5-minute steps). It is saved for the next launch. A change made while the timer runs applies to the next break.
 - The time the lecture resumes (e.g. "Back at 13:26") is shown under the countdown, and the last minute turns orange.
 - When time is up, a red 00:00 and "The break is over" stay on screen until you press the break button or Ctrl+Alt+W again.
 - The timer screen lets clicks through, so you can keep using the PC during the break, and the toolbar stays visible above it.

@@ -9,8 +9,15 @@ namespace HighPen
     // The break lengths offered, in minutes.
     static class BreakTimes
     {
-        public const int Min = 1, Max = 120;
+        public const int Min = 5, Max = 120, Step = 5;
         public static readonly int[] Presets = { 10, 15, 60, 90 };
+
+        // Rounds to the nearest step and keeps it in range.
+        public static int Clamp(int minutes)
+        {
+            int m = (int)Math.Round(minutes / (double)Step, MidpointRounding.AwayFromZero) * Step;
+            return Math.Max(Min, Math.Min(Max, m));
+        }
 
         // "90" -> "1시간 30분" / "1時間30分" / "1 h 30 min"
         public static string Label(int minutes)

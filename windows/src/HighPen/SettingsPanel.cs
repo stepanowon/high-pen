@@ -151,12 +151,12 @@ namespace HighPen
             p.Children.Add(bp);
             breakSlider = MakeSlider(BreakTimes.Min, BreakTimes.Max, cfg.BreakMinutes, delegate (double v)
             {
-                int m = (int)Math.Round(v);
+                int m = BreakTimes.Clamp((int)Math.Round(v));
                 if (m != cfg.BreakMinutes) actions.SetBreakMinutes(m);
             });
             breakSlider.Margin = new Thickness(0, 4, 0, 0);
             breakSlider.IsSnapToTickEnabled = true;
-            breakSlider.TickFrequency = 1;
+            breakSlider.TickFrequency = BreakTimes.Step;
             p.Children.Add(breakSlider);
             MarkBreakMinutes(cfg.BreakMinutes);
             p.Children.Add(Divider());
