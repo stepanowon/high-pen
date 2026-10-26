@@ -411,7 +411,7 @@ namespace HighPen
         // A break already running keeps its length.
         public void SetBreakMinutes(int minutes)
         {
-            cfg.BreakMinutes = Math.Max(BreakTimes.Min, Math.Min(BreakTimes.Max, minutes));
+            cfg.BreakMinutes = BreakTimes.Clamp(minutes);
             Save();
             Toolbar.SettingsPanel.MarkBreakMinutes(cfg.BreakMinutes);
         }

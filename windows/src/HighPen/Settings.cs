@@ -31,7 +31,7 @@ namespace HighPen
         {
             if (Array.IndexOf(Zoomer.Factors, ZoomFactor) < 0) ZoomFactor = 2;
             HighlightSize = Math.Max(5, Math.Min(60, HighlightSize));
-            BreakMinutes = Math.Max(BreakTimes.Min, Math.Min(BreakTimes.Max, BreakMinutes));
+            BreakMinutes = BreakTimes.Clamp(BreakMinutes);
         }
     }
 
