@@ -19,6 +19,8 @@ final class Toolbar: NSObject, NSWindowDelegate {
     private var buttons: [String: NSButton] = [:]
     private var column = NSStackView()
     private var collapseBtn = NSButton()
+    private var name = NSTextField()
+    private var headerWidth: NSLayoutConstraint?
     private var placing = false
 
     init(hints: Hints) {
@@ -30,14 +32,17 @@ final class Toolbar: NSObject, NSWindowDelegate {
 
     func build(_ items: [ToolbarButton], collapseTip: String, onCollapse: @escaping () -> Void) {
         buttons = [:]
-        // header: drag area (the whole panel is draggable by its background) + collapse arrow
+        // header: collapse arrow + drag area (the whole panel is draggable by its background).
+        // The arrow is on the left so that, collapsed, it stays put.
         let header = NSView()
         header.wantsLayer = true
         header.layer?.backgroundColor = rgb(0x4A522A).cgColor
-        fixedSize(header, 84, 30)
-        let name = label("HighPen", size: 11)
+        fixedSize(header, nil, 30)
+        headerWidth = header.widthAnchor.constraint(equalToConstant: 84)
+        headerWidth?.isActive = true
+        name = label("HighPen", size: 11)
         name.font = .systemFont(ofSize: 11, weight: .semibold)
-        name.frame = NSRect(x: 6, y: 7, width: 54, height: 16)
+        name.frame = NSRect(x: 34, y: 7, width: 50, height: 16)
         header.addSubview(name)
         collapseBtn = NSButton(image: NSImage(), target: nil, action: nil)
         collapseBtn.on { _ in onCollapse() }
@@ -46,7 +51,7 @@ final class Toolbar: NSObject, NSWindowDelegate {
         collapseBtn.wantsLayer = true
         collapseBtn.layer?.backgroundColor = idleBg.cgColor
         hints.attach(collapseBtn, collapseTip)
-        collapseBtn.frame = NSRect(x: 56, y: 0, width: 28, height: 30)
+        collapseBtn.frame = NSRect(x: 0, y: 0, width: 28, height: 30)
         header.addSubview(collapseBtn)
 
         let col = NSStackView()
@@ -92,9 +97,12 @@ final class Toolbar: NSObject, NSWindowDelegate {
 
     func setTitle(_ id: String, _ t: String) { buttons[id]?.attributedTitle = buttonTitle(t) }
 
+    // Collapsed, only the arrow is left, so the title no longer covers what is underneath.
     func setCollapsed(_ c: Bool) {
         column.isHidden = c
-        collapseBtn.image = NSImage(systemSymbolName: c ? "chevron.down" : "chevron.up", accessibilityDescription: Lang.t("Collapse"))
+        name.isHidden = c
+        headerWidth?.constant = c ? 28 : 84
+        collapseBtn.image = NSImage(systemSymbolName: c ? "chevron.right" : "chevron.left", accessibilityDescription: Lang.t("Collapse"))
     }
 
     // At the saved offset from the top-left of the selected monitor, kept inside it.

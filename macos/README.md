@@ -10,7 +10,7 @@
 
 ## 다운로드
 
-**[HighPen-1.2.0.dmg 받기](https://github.com/stepanowon/high-pen/releases/download/macos-v1.2.0/HighPen-1.2.0.dmg)** (릴리스 [macos-v1.2.0](https://github.com/stepanowon/high-pen/releases/tag/macos-v1.2.0))
+**[HighPen-1.3.0.dmg 받기](https://github.com/stepanowon/high-pen/releases/download/macos-v1.3.0/HighPen-1.3.0.dmg)** (릴리스 [macos-v1.3.0](https://github.com/stepanowon/high-pen/releases/tag/macos-v1.3.0))
 
 1. DMG를 열고 HighPen을 Applications 폴더로 끌어다 놓습니다.
 2. **처음 열기 전에** 터미널에서 다음 명령을 실행합니다. 그러면 경고 없이 바로 열립니다.
@@ -61,9 +61,11 @@ DMG를 열고 HighPen을 Applications 폴더로 끌어다 놓으면 설치됩니
 | 전체 지우기 | ⌃⌥C | 현재 페이지 지우기 |
 | 말풍선 | ⌃⌥T | 클릭한 위치에 글 상자. Enter 확정, Shift+Enter 줄바꿈, Esc 취소. 전체 지우기로만 삭제 |
 | 확대 | ⌃⌥X | 1.5x / 2x / 2.5x 실시간 확대. 펜을 켜면 화면이 고정되어 확대된 화면 위에 필기 |
+| 확대 고정 | ⌃⇧X | 확대 중에 확대 화면을 그 자리에 고정하거나 풂. 고정하면 포인터를 움직여도 화면이 움직이지 않고 확대 버튼에 "확대 고정"이 표시됨. 고정 중에는 보이는 화면과 실제 클릭 위치가 다르니 클릭하려면 고정을 풀 것. 확대를 끄면 고정도 풀림 |
 | 캡처 | ⌃⌥F | 화면과 필기를 `~/Pictures/HighPen`에 PNG로 저장하고 클립보드에 복사 |
-| 설정 | ⌃⌥D | 색상, 두께, 스팟, 확대 배율, 모니터, 언어(한·일·영) |
-| 접기/펴기 | ⌃⌥H | 툴바 접기 |
+| 쉬는 시간 | ⌃⌥W | 작동 모니터 전체에 남은 시간과 다시 시작하는 시각을 크게 표시. 마지막 1분은 주황색, 끝나면 빨간 00:00이 남고 한 번 더 누르면 닫힘. 클릭은 통과되고 툴바는 그 위에 보임 |
+| 설정 | ⌃⌥D | 색상, 두께, 스팟, 확대 배율, 쉬는 시간 길이(10분·15분·1시간·1시간 30분 버튼 또는 5~120분 슬라이더, 5분 단위, 기본 10분), 모니터, 언어(한·일·영) |
+| 접기/펴기 | ⌃⌥H | 툴바 접기. 맨 위 줄 왼쪽의 `<` 버튼으로도 접고, 접으면 `>` 버튼만 남음 |
 | 모니터 순환 | ⌃⌥M | 다중 모니터에서 작동 모니터 변경 |
 | 펜 색상 | ⌃⌥1 ~ ⌃⌥8 | 빨강, 주황, 노랑, 초록, 파랑, 보라, 검정, 흰색 (형광펜 사용 중이면 형광펜 색상) |
 | 정보 | | 버전, 저작자, 연락처, 라이선스 |
@@ -95,6 +97,6 @@ DMG를 열고 HighPen을 Applications 폴더로 끌어다 놓으면 설치됩니
 
 | 경로 | 내용 |
 |---|---|
-| `src/HighPen/` | 앱 소스 (AppKit, ScreenCaptureKit, Carbon 단축키). 책임별 파일: `main.swift`(진입점), `Controller.swift`(조합·조정), `ToolState.swift`(도구 상태 규칙), `InkView.swift`·`Stroke.swift`(필기·말풍선), `Toolbar.swift`, `SettingsPanel.swift`, `Hints.swift`, `Popups.swift`(토스트·정보), `HotkeyEditor.swift`, `Hotkeys.swift`·`Hotkey.swift`(단축키), `Zoomer.swift`, `ScreenCapture.swift`, `Spot.swift`, `FocusKeeper.swift`, `Settings.swift`, `Monitors.swift`, `Lang.swift`, `Theme.swift`·`Controls.swift`, `SelfTest.swift` |
+| `src/HighPen/` | 앱 소스 (AppKit, ScreenCaptureKit, Carbon 단축키). 책임별 파일: `main.swift`(진입점), `Controller.swift`(조합·조정), `ToolState.swift`(도구 상태 규칙), `InkView.swift`·`Stroke.swift`(필기·말풍선), `Toolbar.swift`, `SettingsPanel.swift`, `Hints.swift`, `Popups.swift`(토스트·정보), `HotkeyEditor.swift`, `Hotkeys.swift`·`Hotkey.swift`(단축키), `Zoomer.swift`, `BreakTimer.swift`(쉬는 시간), `ScreenCapture.swift`, `Spot.swift`, `FocusKeeper.swift`, `Settings.swift`, `Monitors.swift`, `Lang.swift`, `Theme.swift`·`Controls.swift`, `SelfTest.swift` |
 | `src/make-icon.swift` | 앱 아이콘 생성 (Windows 아이콘과 같은 디자인을 macOS 아이콘 규격에 맞춰 크기별로 그림) |
 | `build.sh` | `swiftc`로 arm64·x86_64 빌드 → `lipo` → `.app` 번들 생성, 아이콘 생성, ad-hoc 서명, DMG 패키징 |

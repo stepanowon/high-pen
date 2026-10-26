@@ -42,5 +42,11 @@ func selfTest() {
     precondition(t.board == 2 && t.visiblePenColor(Cfg.black) == Cfg.white, "black board keeps the pen visible")
     t.togglePen()
     precondition(!t.penMode && t.board == 0, "pen off leaves the board")
+    precondition(BreakTimes.clamp(7) == 5 && BreakTimes.clamp(8) == 10 && BreakTimes.clamp(0) == 5 && BreakTimes.clamp(999) == 120, "break length steps and range")
+    precondition(BreakTimes.clock(599) == "09:59" && BreakTimes.clock(3600) == "1:00:00" && BreakTimes.clock(0) == "00:00", "break clock")
+    let lang = Lang.cur
+    Lang.cur = 0
+    precondition(BreakTimes.label(15) == "15분" && BreakTimes.label(60) == "1시간" && BreakTimes.label(90) == "1시간 30분", "break labels")
+    Lang.cur = lang
     print("selftest ok")
 }

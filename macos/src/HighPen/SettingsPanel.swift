@@ -19,6 +19,7 @@ final class SettingsPanel {
     private let hotkeys: Hotkeys
     private weak var delegate: SettingsPanelDelegate?
     private var penSwatches: NSSegmentedControl?, highlightSwatches: NSSegmentedControl?
+    private var breakTitle = NSTextField(), breakBtns: [NSButton] = [], breakSlider = NSSlider()
 
     init(hints: Hints, hotkeys: Hotkeys, delegate: SettingsPanelDelegate) {
         self.hints = hints; self.hotkeys = hotkeys; self.delegate = delegate
@@ -26,6 +27,18 @@ final class SettingsPanel {
 
     func showPenColor(_ i: Int) { penSwatches?.selectedSegment = i }
     func showHighlightColor(_ i: Int) { highlightSwatches?.selectedSegment = i }
+
+    // Updates the title, the preset buttons and the slider. A break already running keeps its length.
+    private func showBreakMinutes(_ m: Int) {
+        breakTitle.stringValue = String(format: Lang.t("BreakLength"), BreakTimes.label(m))
+        for (b, p) in zip(breakBtns, BreakTimes.presets) { b.layer?.backgroundColor = (p == m ? activeBg : idleBg).cgColor }
+        if Int(breakSlider.doubleValue.rounded()) != m { breakSlider.doubleValue = Double(m) }
+    }
+
+    private func setBreakMinutes(_ m: Int) {
+        Cfg.breakMinutes = BreakTimes.clamp(m)
+        showBreakMinutes(Cfg.breakMinutes)
+    }
 
     // To the right of the toolbar, or to its left when it would run past the monitor edge.
     func place(beside bar: NSRect, visible: Bool) {
@@ -95,6 +108,32 @@ final class SettingsPanel {
             Cfg.zoomIndex = i
             self.delegate?.zoomChanged()
         })
+        sep()
+
+        breakTitle = label("")
+        col.addArrangedSubview(breakTitle)
+        breakBtns = BreakTimes.presets.map { m in
+            let b = NSButton(title: BreakTimes.label(m), target: nil, action: nil)
+            b.isBordered = false
+            b.wantsLayer = true
+            b.attributedTitle = NSAttributedString(string: b.title, attributes: [.foregroundColor: NSColor.white, .font: NSFont.systemFont(ofSize: 11)])
+            b.on { [unowned self] _ in self.setBreakMinutes(m) }
+            fixedSize(b, 93, 24)
+            return b
+        }
+        for i in stride(from: 0, to: breakBtns.count, by: 2) { // two to a row
+            let row = NSStackView(views: Array(breakBtns[i..<min(i + 2, breakBtns.count)]))
+            row.spacing = 4
+            col.addArrangedSubview(row)
+        }
+        breakSlider = slider(Double(BreakTimes.min), Double(BreakTimes.max), Double(Cfg.breakMinutes)) { [unowned self] v in
+            let m = BreakTimes.clamp(Int(v.rounded()))
+            if m != Cfg.breakMinutes { self.setBreakMinutes(m) }
+        }
+        breakSlider.numberOfTickMarks = (BreakTimes.max - BreakTimes.min) / BreakTimes.step + 1
+        breakSlider.allowsTickMarkValuesOnly = true
+        col.addArrangedSubview(breakSlider)
+        showBreakMinutes(Cfg.breakMinutes)
         sep()
 
         title("Language")

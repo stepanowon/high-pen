@@ -25,6 +25,7 @@ enum Cfg {
     static var spotColor: Int { get { int("SpotColor", 2, 0...7) } set { d.set(newValue, forKey: "SpotColor") } }
     static var spotSize: Double { get { num("SpotSize", 70, 20...200) } set { d.set(newValue, forKey: "SpotSize") } }
     static var spotOn: Bool { get { flag("SpotOn", true) } set { d.set(newValue, forKey: "SpotOn") } }
+    static var breakMinutes: Int { get { BreakTimes.clamp(int("BreakMinutes", 10, 0...1000)) } set { d.set(newValue, forKey: "BreakMinutes") } }
     static var zoomIndex: Int { get { int("ZoomIndex", 1, 0...2) } set { d.set(newValue, forKey: "ZoomIndex") } }
     // The chosen monitor is remembered by display UUID, so it survives monitors being reordered. While it is
     // disconnected HighPen uses the main monitor, and returns to it once it is connected again.

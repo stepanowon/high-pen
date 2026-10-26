@@ -10,7 +10,7 @@ The macOS version of the pen app for online lectures. It runs on macOS 14 (Sonom
 
 ## Download
 
-**[Download HighPen-1.2.0.dmg](https://github.com/stepanowon/high-pen/releases/download/macos-v1.2.0/HighPen-1.2.0.dmg)** (release [macos-v1.2.0](https://github.com/stepanowon/high-pen/releases/tag/macos-v1.2.0))
+**[Download HighPen-1.3.0.dmg](https://github.com/stepanowon/high-pen/releases/download/macos-v1.3.0/HighPen-1.3.0.dmg)** (release [macos-v1.3.0](https://github.com/stepanowon/high-pen/releases/tag/macos-v1.3.0))
 
 1. Open the DMG and drag HighPen onto the Applications folder.
 2. **Before opening it the first time**, run this in Terminal. HighPen then opens without any warning.
@@ -61,9 +61,11 @@ Distributing without the warning requires joining the Apple Developer Program, t
 | Clear | ⌃⌥C | Clears the current page |
 | Note | ⌃⌥T | Text box at the clicked spot. Enter confirms, Shift+Enter adds a line, Esc cancels. Removed only by Clear |
 | Zoom | ⌃⌥X | Live 1.5x / 2x / 2.5x zoom. Turning the pen on freezes the view so you can write on the zoomed screen |
+| Zoom lock | ⌃⇧X | While zoomed, locks the zoomed view in place (or unlocks it). Locked, the view stays put as the pointer moves and the Zoom button reads "Locked". What you see then is not where you click, so unlock to click. Turning zoom off also unlocks |
 | Capture | ⌃⌥F | Saves the screen with ink as a PNG in `~/Pictures/HighPen` and copies it to the clipboard |
-| Settings | ⌃⌥D | Colors, widths, spot, zoom level, monitor, language (Korean, Japanese, English) |
-| Collapse/expand | ⌃⌥H | Collapses the toolbar |
+| Break | ⌃⌥W | Shows the time left and when class resumes, large, over the whole selected monitor. The last minute is orange; when time is up a red 00:00 stays until you press it again. Clicks pass through and the toolbar stays on top |
+| Settings | ⌃⌥D | Colors, widths, spot, zoom level, break length (10 min, 15 min, 1 h, 1 h 30 min buttons or a 5–120 minute slider in 5-minute steps; 10 minutes by default), monitor, language (Korean, Japanese, English) |
+| Collapse/expand | ⌃⌥H | Collapses the toolbar (also the `<` button at the left of the header). Collapsed, only the `>` button is left |
 | Cycle monitor | ⌃⌥M | Changes the monitor HighPen works on, with several monitors |
 | Pen color | ⌃⌥1 – ⌃⌥8 | Red, orange, yellow, green, blue, purple, black, white (the highlighter color while the highlighter is on) |
 | About | | Version, author, contact, license |
@@ -95,6 +97,6 @@ The app is signed against its bundle id (`com.stepanowon.HighPen`) so the permis
 
 | Path | Contents |
 |---|---|
-| `src/HighPen/` | App sources (AppKit, ScreenCaptureKit, Carbon hotkeys), one file per responsibility: `main.swift` (entry point), `Controller.swift` (wiring), `ToolState.swift` (tool rules), `InkView.swift` / `Stroke.swift` (ink, speech bubbles), `Toolbar.swift`, `SettingsPanel.swift`, `Hints.swift`, `Popups.swift` (toast, about), `HotkeyEditor.swift`, `Hotkeys.swift` / `Hotkey.swift` (shortcuts), `Zoomer.swift`, `ScreenCapture.swift`, `Spot.swift`, `FocusKeeper.swift`, `Settings.swift`, `Monitors.swift`, `Lang.swift`, `Theme.swift` / `Controls.swift`, `SelfTest.swift` |
+| `src/HighPen/` | App sources (AppKit, ScreenCaptureKit, Carbon hotkeys), one file per responsibility: `main.swift` (entry point), `Controller.swift` (wiring), `ToolState.swift` (tool rules), `InkView.swift` / `Stroke.swift` (ink, speech bubbles), `Toolbar.swift`, `SettingsPanel.swift`, `Hints.swift`, `Popups.swift` (toast, about), `HotkeyEditor.swift`, `Hotkeys.swift` / `Hotkey.swift` (shortcuts), `Zoomer.swift`, `BreakTimer.swift` (break timer), `ScreenCapture.swift`, `Spot.swift`, `FocusKeeper.swift`, `Settings.swift`, `Monitors.swift`, `Lang.swift`, `Theme.swift` / `Controls.swift`, `SelfTest.swift` |
 | `src/make-icon.swift` | Draws the app icon at every size (the Windows icon's design on the macOS icon grid) |
 | `build.sh` | Builds arm64 and x86_64 with `swiftc` → `lipo` → `.app` bundle, icon, ad-hoc signing, DMG packaging |
