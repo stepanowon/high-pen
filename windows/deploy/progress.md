@@ -1,6 +1,6 @@
 # 배포 진행 상황
 
-마지막 업데이트: 2026-10-21
+마지막 업데이트: 2026-10-26
 
 ## 목표
 
@@ -22,6 +22,9 @@
 | README 정리 | 완료 | [#2](https://github.com/stepanowon/high-pen/pull/2) 병합: winget 설치 안내 추가, SignPath 설정 제거 |
 | 1.4.0 기능 추가 | 완료 | [#9](https://github.com/stepanowon/high-pen/pull/9) 병합: 캡처(Ctrl+Alt+F), 클릭 표시(Ctrl+Alt+K), 모니터 연결/해제 자동 대응, 단축키 충돌 안내, 접기 화살표 버그 수정 |
 | 1.4.0 릴리스 | 완료 | [#10](https://github.com/stepanowon/high-pen/pull/10) 병합(버전 변경). GitHub 릴리스 [HighPen v1.4.0](https://github.com/stepanowon/high-pen/releases/tag/v1.4.0) (`HighPen-Setup.exe`, `HighPen.exe`) |
+| 1.7.3 기능 추가 | 완료 | [#29](https://github.com/stepanowon/high-pen/pull/29) 병합: 쉬는 시간 슬라이더를 5분 단위(5~120분)로 변경, 저장된 값도 가장 가까운 5분 단위로 맞춤. 버튼(10분·15분·1시간·1시간 30분)은 그대로 |
+| 1.7.3 버전 변경 | 완료 | [#30](https://github.com/stepanowon/high-pen/pull/30)에서 버전 표기를 1.7.2로 되돌렸다가 [#31](https://github.com/stepanowon/high-pen/pull/31)에서 1.7.3으로 올림 (main `39a0232`) |
+| 1.7.3 릴리스 | 완료 | GitHub 릴리스 [HighPen v1.7.3](https://github.com/stepanowon/high-pen/releases/tag/v1.7.3) (`HighPen-Setup.exe`, `HighPen.exe`, `HighPen.msix`), 한·일·영 변경 내용 포함 |
 
 ### winget
 
@@ -50,6 +53,8 @@
 | README Store 안내 | 완료 | 한·영·일 README에 Store 배지 추가, Store 설치를 권장 방법으로 변경 |
 | 1.4.0 MSIX | 완료 | `dist/HighPen.msix` (1.4.0.0) 빌드. `makeappx.exe`는 Windows SDK 미설치로 이전에 받은 SDK BuildTools를 사용 |
 | 1.4.0 제출 (Submission 2) | 완료 | 2026-10-21 제출, 약 20분 만에 인증 통과 후 게시. 패키지 1.4.0.0, 검색어·짧은 설명·새 기능 설명(한·영·일) 포함. `runFullTrust` 사유에 마우스 훅·화면 캡처 용도 명시. Partner Center "Store 현재 상태"가 Submission 2로 바뀜 |
+| 1.7.3 MSIX | 완료 | `dist/HighPen.msix` (1.7.3.0) 빌드. `makeappx.exe`는 `C:\Users\stepa\.claude\jobs\1e54521f\tmp\sdkbt\x\bin\10.0.28000.0\x64\makeappx.exe` 사용(임시 폴더라 지워질 수 있음) |
+| 1.7.3 제출 | **할 일** | Partner Center에서 새 제출로 1.7.3.0 패키지 업로드. 새 기능 설명(한·영·일) 준비됨 |
 
 ## Store 정보
 
