@@ -10,7 +10,15 @@ namespace HighPen
     static class BreakTimes
     {
         public const int Min = 1, Max = 120;
-        public static readonly int[] Presets = { 5, 10, 15, 20 };
+        public static readonly int[] Presets = { 10, 15, 60, 90 };
+
+        // "90" -> "1시간 30분" / "1時間30分" / "1 h 30 min"
+        public static string Label(int minutes)
+        {
+            if (minutes < 60) return string.Format(Lang.T("Minutes"), minutes);
+            if (minutes % 60 == 0) return string.Format(Lang.T("Hours"), minutes / 60);
+            return string.Format(Lang.T("HoursMinutes"), minutes / 60, minutes % 60);
+        }
     }
 
     // Break-time countdown over the whole selected monitor, so it is easy to read on a shared screen.

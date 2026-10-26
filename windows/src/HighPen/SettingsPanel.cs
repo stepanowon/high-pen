@@ -61,7 +61,7 @@ namespace HighPen
         // Updates the title, the preset buttons and the slider.
         public void MarkBreakMinutes(int minutes)
         {
-            breakTitle.Text = string.Format(Lang.T("BreakLength"), minutes);
+            breakTitle.Text = string.Format(Lang.T("BreakLength"), BreakTimes.Label(minutes));
             for (int i = 0; i < breakBtns.Count; i++) Theme.Highlight(breakBtns[i], BreakTimes.Presets[i] == minutes);
             if ((int)Math.Round(breakSlider.Value) != minutes) breakSlider.Value = minutes;
         }
@@ -142,7 +142,7 @@ namespace HighPen
             foreach (int m in BreakTimes.Presets)
             {
                 int mv = m;
-                Border bb = Theme.TextButton(string.Format(Lang.T("Minutes"), m), 41, 26, new Thickness(2));
+                Border bb = Theme.TextButton(BreakTimes.Label(m), 87, 26, new Thickness(2));
                 ((TextBlock)bb.Child).FontSize = 11;
                 bb.MouseLeftButtonUp += delegate { actions.SetBreakMinutes(mv); };
                 breakBtns.Add(bb);
