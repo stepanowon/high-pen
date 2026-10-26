@@ -9,7 +9,7 @@ namespace HighPen
     // The break lengths offered, in minutes.
     static class BreakTimes
     {
-        public const int Min = 1, Max = 60;
+        public const int Min = 1, Max = 120;
         public static readonly int[] Presets = { 5, 10, 15, 20 };
     }
 
@@ -75,7 +75,9 @@ namespace HighPen
             // round up, so the display reaches 00:00 exactly when the break ends
             int secs = over ? 0 : (int)Math.Ceiling(left.TotalSeconds);
             title.Text = Lang.T(over ? "BreakOver" : "BreakTitle");
-            time.Text = string.Format("{0:00}:{1:00}", secs / 60, secs % 60);
+            time.Text = secs >= 3600
+                ? string.Format("{0}:{1:00}:{2:00}", secs / 3600, secs / 60 % 60, secs % 60)
+                : string.Format("{0:00}:{1:00}", secs / 60, secs % 60);
             time.Foreground = over ? OverBrush : (left <= Warn ? Theme.Warning : TimeBrush);
             resume.Text = string.Format(Lang.T("BreakEnds"), end.ToString("HH:mm"));
             resume.Visibility = over ? Visibility.Hidden : Visibility.Visible;
