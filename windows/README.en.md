@@ -105,7 +105,7 @@ Shortcuts are global, so they work while you are using other programs. A combina
 | Show clicks | Ctrl+Alt+K | Briefly shows an expanding ring where you click. Off by default. |
 | Language | | Choose 한국어, 日本語 or English; the change applies immediately. The default is English (see [Changing the language](#changing-the-language)). |
 | Shortcuts | | Change any shortcut to the combination you want, or remove it (see [Changing shortcuts](#changing-shortcuts)). |
-| Version | | The current version (`HighPen v1.7.2`) is shown at the bottom of the panel. |
+| Version | | The current version (`HighPen v1.7.3`) is shown at the bottom of the panel. |
 
 Settings are saved automatically to `%APPDATA%\HighPen\settings.txt`.
 
