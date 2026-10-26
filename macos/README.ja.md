@@ -10,7 +10,7 @@
 
 ## ダウンロード
 
-**[HighPen-1.2.0.dmg をダウンロード](https://github.com/stepanowon/high-pen/releases/download/macos-v1.2.0/HighPen-1.2.0.dmg)** (リリース [macos-v1.2.0](https://github.com/stepanowon/high-pen/releases/tag/macos-v1.2.0))
+**[HighPen-1.3.0.dmg をダウンロード](https://github.com/stepanowon/high-pen/releases/download/macos-v1.3.0/HighPen-1.3.0.dmg)** (リリース [macos-v1.3.0](https://github.com/stepanowon/high-pen/releases/tag/macos-v1.3.0))
 
 1. DMG を開き、HighPen を Applications フォルダーにドラッグします。
 2. **初めて開く前に**、ターミナルで次のコマンドを実行します。警告なしでそのまま開けます。
@@ -61,9 +61,11 @@ DMG を開き、HighPen を Applications フォルダーにドラッグすると
 | 全消去 | ⌃⌥C | 現在のページを消去 |
 | 吹き出し | ⌃⌥T | クリックした位置に文字ボックス。Enter で確定、Shift+Enter で改行、Esc で取り消し。全消去でのみ削除 |
 | 拡大 | ⌃⌥X | 1.5 倍 / 2 倍 / 2.5 倍のリアルタイム拡大。ペンをオンにすると画面が固定され、拡大した画面に書き込めます |
+| 拡大画面の固定 | ⌃⇧X | 拡大中に拡大画面をその場で固定/解除。固定するとポインターを動かしても画面が動かず、拡大ボタンに「拡大固定」と表示されます。固定中は見えている画面と実際のクリック位置が異なるため、クリックするときは固定を解除してください。拡大をオフにすると固定も解除されます |
 | キャプチャ | ⌃⌥F | 画面と書き込みを `~/Pictures/HighPen` に PNG で保存し、クリップボードにコピー |
-| 設定 | ⌃⌥D | 色、太さ、スポット、拡大倍率、モニター、言語 (韓国語・日本語・英語) |
-| 折りたたみ/展開 | ⌃⌥H | ツールバーを折りたたみ |
+| 休憩 | ⌃⌥W | 使用モニター全体に残り時間と再開時刻を大きく表示。最後の 1 分はオレンジ色、終了後は赤い 00:00 が残り、もう一度押すと閉じます。クリックは透過し、ツールバーはその上に表示されます |
+| 設定 | ⌃⌥D | 色、太さ、スポット、拡大倍率、休憩時間 (10分・15分・1時間・1時間30分 のボタンまたは 5~120 分のスライダー、5 分単位、既定 10 分)、モニター、言語 (韓国語・日本語・英語) |
+| 折りたたみ/展開 | ⌃⌥H | ツールバーを折りたたみ (上部左側の `<` ボタンでも可)。折りたたむと `>` ボタンだけが残ります |
 | モニター切替 | ⌃⌥M | 複数モニターで使用するモニターを変更 |
 | ペンの色 | ⌃⌥1 ~ ⌃⌥8 | 赤、オレンジ、黄、緑、青、紫、黒、白 (蛍光ペン使用中は蛍光ペンの色) |
 | 情報 | | バージョン、作者、連絡先、ライセンス |
@@ -95,6 +97,6 @@ DMG を開き、HighPen を Applications フォルダーにドラッグすると
 
 | パス | 内容 |
 |---|---|
-| `src/HighPen/` | アプリのソース (AppKit、ScreenCaptureKit、Carbon ショートカット)。責務ごとのファイル: `main.swift` (エントリポイント)、`Controller.swift` (組み立て・調整)、`ToolState.swift` (ツール状態のルール)、`InkView.swift`・`Stroke.swift` (書き込み・吹き出し)、`Toolbar.swift`、`SettingsPanel.swift`、`Hints.swift`、`Popups.swift` (トースト・情報)、`HotkeyEditor.swift`、`Hotkeys.swift`・`Hotkey.swift` (ショートカット)、`Zoomer.swift`、`ScreenCapture.swift`、`Spot.swift`、`FocusKeeper.swift`、`Settings.swift`、`Monitors.swift`、`Lang.swift`、`Theme.swift`・`Controls.swift`、`SelfTest.swift` |
+| `src/HighPen/` | アプリのソース (AppKit、ScreenCaptureKit、Carbon ショートカット)。責務ごとのファイル: `main.swift` (エントリポイント)、`Controller.swift` (組み立て・調整)、`ToolState.swift` (ツール状態のルール)、`InkView.swift`・`Stroke.swift` (書き込み・吹き出し)、`Toolbar.swift`、`SettingsPanel.swift`、`Hints.swift`、`Popups.swift` (トースト・情報)、`HotkeyEditor.swift`、`Hotkeys.swift`・`Hotkey.swift` (ショートカット)、`Zoomer.swift`、`BreakTimer.swift` (休憩タイマー)、`ScreenCapture.swift`、`Spot.swift`、`FocusKeeper.swift`、`Settings.swift`、`Monitors.swift`、`Lang.swift`、`Theme.swift`・`Controls.swift`、`SelfTest.swift` |
 | `src/make-icon.swift` | アプリアイコンの生成 (Windows のアイコンと同じデザインを macOS のアイコン規格に合わせてサイズごとに描画) |
 | `build.sh` | `swiftc` で arm64・x86_64 をビルド → `lipo` → `.app` バンドル作成、アイコン生成、ad-hoc 署名、DMG パッケージ作成 |

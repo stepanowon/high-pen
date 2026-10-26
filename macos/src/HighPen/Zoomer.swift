@@ -17,6 +17,8 @@ final class Zoomer: NSObject, SCStreamOutput {
     private(set) var factor: CGFloat = 2
     // While frozen the view stays put so the user can draw on it.
     var frozen = false
+    // Set by the user (zoom lock): the view stays put while the pointer moves. Cleared when zoom stops.
+    var locked = false
     // Bottom-left of the area being shown, in screen-local points (nil = zoom off).
     private(set) var origin: CGPoint?
     var onChange: () -> Void = {}
@@ -65,6 +67,7 @@ final class Zoomer: NSObject, SCStreamOutput {
         window.orderOut(nil)
         view.layer?.contents = nil
         origin = nil
+        locked = false
         onChange()
     }
 
@@ -75,7 +78,7 @@ final class Zoomer: NSObject, SCStreamOutput {
     }
 
     func update(force: Bool) {
-        guard active, force || !frozen else { return }
+        guard active, force || !(frozen || locked) else { return }
         var p = NSEvent.mouseLocation
         p.x = min(max(p.x, frame.minX), frame.maxX - 1)
         p.y = min(max(p.y, frame.minY), frame.maxY - 1)

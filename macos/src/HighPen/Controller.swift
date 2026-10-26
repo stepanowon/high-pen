@@ -10,6 +10,7 @@ final class Controller: NSObject, NSApplicationDelegate, SettingsPanelDelegate {
     let ink = InkView()
     let zoomer = Zoomer()
     let spot = Spot()
+    let breakTimer = BreakTimer()
     let hints = Hints()
     let focus = FocusKeeper()
     let toast = Toast()
@@ -36,7 +37,9 @@ final class Controller: NSObject, NSApplicationDelegate, SettingsPanelDelegate {
             HotkeyAction(id: "Undo", def: Hotkey(mods: ctrlOpt, key: kVK_ANSI_Z, name: "Z"), title: { Lang.t("Undo") }, run: { [unowned self] in self.ink.undo() }),
             HotkeyAction(id: "Clear", def: Hotkey(mods: ctrlOpt, key: kVK_ANSI_C, name: "C"), title: { Lang.t("ClearTip") }, run: { [unowned self] in self.ink.clear() }),
             HotkeyAction(id: "Zoom", def: Hotkey(mods: ctrlOpt, key: kVK_ANSI_X, name: "X"), title: { Lang.t("Zoom") }, run: { [unowned self] in self.toggleZoom() }),
+            HotkeyAction(id: "ZoomLock", def: Hotkey(mods: controlKey | shiftKey, key: kVK_ANSI_X, name: "X"), title: { Lang.t("ZoomLock") }, run: { [unowned self] in self.toggleZoomLock() }),
             HotkeyAction(id: "Capture", def: Hotkey(mods: ctrlOpt, key: kVK_ANSI_F, name: "F"), title: { Lang.t("Capture") }, run: { [unowned self] in self.capture() }),
+            HotkeyAction(id: "Break", def: Hotkey(mods: ctrlOpt, key: kVK_ANSI_W, name: "W"), title: { Lang.t("BreakTip") }, run: { [unowned self] in self.toggleBreak() }),
             HotkeyAction(id: "Settings", def: Hotkey(mods: ctrlOpt, key: kVK_ANSI_D, name: "D"), title: { Lang.t("Settings") }, run: { [unowned self] in self.toggleSettings() }),
             HotkeyAction(id: "Collapse", def: Hotkey(mods: ctrlOpt, key: kVK_ANSI_H, name: "H"), title: { Lang.t("Collapse") }, run: { [unowned self] in self.toggleCollapse() }),
             HotkeyAction(id: "Monitor", def: Hotkey(mods: ctrlOpt, key: kVK_ANSI_M, name: "M"), title: { Lang.t("Monitor") + " (" + Lang.t("Cycle") + ")" }, run: { [unowned self] in self.cycleMonitor() }),
@@ -63,8 +66,9 @@ final class Controller: NSObject, NSApplicationDelegate, SettingsPanelDelegate {
             ToolbarButton("Undo", "arrow.uturn.backward", Lang.t("Undo"), tip(Lang.t("Undo"), "Undo")) { [unowned self] in self.ink.undo() },
             ToolbarButton("Clear", "trash", Lang.t("Clear"), tip(Lang.t("ClearTip"), "Clear")) { [unowned self] in self.ink.clear() },
             ToolbarButton("Bubble", "text.bubble", Lang.t("Bubble"), tip(Lang.t("Bubble"), "Bubble") + "\n" + Lang.t("BubbleTip")) { [unowned self] in self.toggleBubble() },
-            ToolbarButton("Zoom", "plus.magnifyingglass", Lang.t("Zoom"), tip(Lang.t("Zoom"), "Zoom")) { [unowned self] in self.toggleZoom() },
+            ToolbarButton("Zoom", "plus.magnifyingglass", Lang.t("Zoom"), tip(Lang.t("Zoom"), "Zoom") + "\n" + tip(Lang.t("ZoomLock"), "ZoomLock")) { [unowned self] in self.toggleZoom() },
             ToolbarButton("Capture", "camera", Lang.t("Capture"), tip(Lang.t("CaptureTip"), "Capture")) { [unowned self] in self.capture() },
+            ToolbarButton("Break", "stopwatch", Lang.t("Break"), tip(Lang.t("BreakTip"), "Break")) { [unowned self] in self.toggleBreak() },
             ToolbarButton("Settings", "gearshape", Lang.t("Settings"), tip(Lang.t("Settings"), "Settings")) { [unowned self] in self.toggleSettings() },
             ToolbarButton("About", "info.circle", Lang.t("About"), Lang.t("AboutTip")) { [unowned self] in self.about.toggle() },
             ToolbarButton("Quit", "xmark.circle.fill", Lang.t("Quit"), tip(Lang.t("Quit"), "Quit"), tint: rgb(0xFF453A)) { NSApp.terminate(nil) },
@@ -152,6 +156,7 @@ final class Controller: NSObject, NSApplicationDelegate, SettingsPanelDelegate {
 
     func placeWindows() {
         overlay.setFrame(screen(Cfg.monitor).frame, display: true)
+        breakTimer.window.setFrame(screen(Cfg.monitor).frame, display: true)
         placeBar()
     }
 
@@ -228,6 +233,18 @@ final class Controller: NSObject, NSApplicationDelegate, SettingsPanelDelegate {
         }
     }
 
+    // Keeps the zoomed view where it is while the pointer moves on (and lets it follow again). Only while zoomed.
+    func toggleZoomLock() {
+        guard zoomer.active else { return }
+        zoomer.locked.toggle()
+        applyMode()
+    }
+
+    func toggleBreak() {
+        if breakTimer.running { breakTimer.stop() } else { breakTimer.start(Cfg.breakMinutes) }
+        applyMode()
+    }
+
     func applyZoomTransform() {
         if let o = zoomer.origin, tools.board == 0 {
             ink.zoomScale = zoomer.factor
@@ -263,6 +280,8 @@ final class Controller: NSObject, NSApplicationDelegate, SettingsPanelDelegate {
         toolbar.highlight("Bubble", t.penMode && t.tool == .text)
         toolbar.highlight("Board", t.board != 0)
         toolbar.highlight("Zoom", zoomer.active)
+        toolbar.setTitle("Zoom", Lang.t(zoomer.active && zoomer.locked ? "ZoomLocked" : "Zoom")) // locked, the button reads "Locked"
+        toolbar.highlight("Break", breakTimer.running)
         toolbar.highlight("Settings", settingsOpen)
         toolbar.setTitle("Board", Lang.t(["Board", "WhiteBoard", "BlackBoard"][t.board]))
         toolbar.setCollapsed(collapsed)
