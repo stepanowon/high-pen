@@ -14,6 +14,8 @@ namespace HighPen
         IntPtr[] exclude;
         // While frozen the view stays put so the user can draw on it.
         public bool Frozen;
+        // Set by the user (zoom lock): the view stays put while the pointer moves. Cleared when zoom stops.
+        public bool Locked;
         // Reports the zoomed monitor bounds and the source rect being shown (empty bounds = zoom off).
         public Action<System.Drawing.Rectangle, Native.RECT> ViewChanged;
         System.Drawing.Rectangle current, locked;
@@ -30,7 +32,7 @@ namespace HighPen
                 if (!Active) return;
                 ApplyTransform();
                 current = System.Drawing.Rectangle.Empty;
-                bool f = Frozen; Frozen = false; Update(); Frozen = f;
+                bool f = Frozen, l = Locked; Frozen = Locked = false; Update(); Frozen = f; Locked = l;
             }
         }
 
@@ -78,6 +80,7 @@ namespace HighPen
             {
                 Native.ClipCursor(IntPtr.Zero);
                 locked = System.Drawing.Rectangle.Empty;
+                Locked = false;
                 Native.DestroyWindow(host); host = IntPtr.Zero; mag = IntPtr.Zero; Native.MagUninitialize();
                 if (ViewChanged != null) ViewChanged(System.Drawing.Rectangle.Empty, new Native.RECT());
             }
@@ -91,7 +94,7 @@ namespace HighPen
         void Update()
         {
             if (!Active) return;
-            if (Frozen && current != System.Drawing.Rectangle.Empty) return;
+            if ((Frozen || Locked) && current != System.Drawing.Rectangle.Empty) return;
             Native.POINT p;
             if (!Native.GetCursorPos(out p)) return;
             // the zoomed monitor is fixed when zoom starts; the pointer is confined to it

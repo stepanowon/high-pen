@@ -12,6 +12,7 @@ namespace HighPen
         readonly ISettingsStore store;
         readonly OverlayWindow overlay;
         readonly SpotWindow spotWin;
+        readonly BreakWindow breakWin;
         readonly Zoomer zoomer;
         readonly ClickHook clickHook;
         readonly IScreenCapture screenCapture;
@@ -36,12 +37,13 @@ namespace HighPen
         Native.RECT zoomSource;
 
         public Controller(Settings cfg, ISettingsStore store, OverlayWindow overlay, SpotWindow spotWin,
-            Zoomer zoomer, ClickHook clickHook, IScreenCapture screenCapture)
+            BreakWindow breakWin, Zoomer zoomer, ClickHook clickHook, IScreenCapture screenCapture)
         {
             this.cfg = cfg;
             this.store = store;
             this.overlay = overlay;
             this.spotWin = spotWin;
+            this.breakWin = breakWin;
             this.zoomer = zoomer;
             this.clickHook = clickHook;
             this.screenCapture = screenCapture;
@@ -86,6 +88,7 @@ namespace HighPen
             topmost.Add(zoomer);
             topmost.Add(overlay);
             topmost.Add(spotWin);
+            topmost.Add(breakWin);
             topmost.Add(Toolbar);
             // Drawing activates the overlay, which lifts it above the toolbar until the next reassert;
             // without this a toolbar click right after drawing could land on the overlay instead.
@@ -109,7 +112,9 @@ namespace HighPen
             bindings.Add("Clear", "Ctrl+Alt+C", delegate { return Lang.T("ClearTip"); }, Clear);
             bindings.Add("Bubble", "Ctrl+Alt+T", delegate { return Lang.T("Bubble"); }, ToggleText);
             bindings.Add("Zoom", "Ctrl+Alt+X", delegate { return Lang.T("Zoom"); }, ToggleZoom);
+            bindings.Add("ZoomLock", "Ctrl+Shift+X", delegate { return Lang.T("ZoomLock"); }, ToggleZoomLock);
             bindings.Add("Capture", "Ctrl+Alt+F", delegate { return Lang.T("Capture"); }, Capture);
+            bindings.Add("Break", "Ctrl+Alt+W", delegate { return Lang.T("BreakTip"); }, ToggleBreak);
             bindings.Add("Settings", "Ctrl+Alt+D", delegate { return Lang.T("Settings"); }, ToggleSettings);
             bindings.Add("Collapse", "Ctrl+Alt+H", delegate { return Lang.T("Collapse"); }, ToggleCollapse);
             bindings.Add("Quit", "Ctrl+Alt+Q", delegate { return Lang.T("Quit"); }, Quit);
@@ -172,6 +177,7 @@ namespace HighPen
             monitorSignature = Monitors.Signature();
             overlay.MoveToScreen(cfg.Monitor);
             spotWin.MoveToScreen(cfg.Monitor);
+            breakWin.MoveToScreen(cfg.Monitor);
             Toolbar.PlaceOnMonitor();
             topmost.Reassert();
         }
@@ -211,7 +217,9 @@ namespace HighPen
         {
             Toolbar.Rebuild();
             ShowHotkeyWarning();
-            Toolbar.ShowZoom(zoomer.Active);
+            Toolbar.ShowZoom(zoomer.Active, zoomer.Locked);
+            Toolbar.ShowBreak(breakWin.Running);
+            Toolbar.SettingsPanel.MarkBreakMinutes(cfg.BreakMinutes);
             ApplySpot();
             ApplyMonitor();
             ApplyMode();
@@ -309,8 +317,24 @@ namespace HighPen
         public void ToggleZoom()
         {
             if (zoomer.Active) zoomer.Stop();
-            else zoomer.Start(new IntPtr[] { WindowUtil.Handle(Toolbar), WindowUtil.Handle(overlay), WindowUtil.Handle(spotWin) });
-            Toolbar.ShowZoom(zoomer.Active);
+            else zoomer.Start(new IntPtr[] { WindowUtil.Handle(Toolbar), WindowUtil.Handle(overlay), WindowUtil.Handle(spotWin), WindowUtil.Handle(breakWin) });
+            Toolbar.ShowZoom(zoomer.Active, zoomer.Locked);
+            topmost.Reassert();
+        }
+
+        // Keeps the zoomed view where it is while the pointer moves on (and lets it follow again). Only while zoomed.
+        void ToggleZoomLock()
+        {
+            if (!zoomer.Active) return;
+            zoomer.Locked = !zoomer.Locked;
+            Toolbar.ShowZoom(true, zoomer.Locked);
+        }
+
+        public void ToggleBreak()
+        {
+            if (breakWin.Running) breakWin.Stop();
+            else breakWin.Start(cfg.BreakMinutes);
+            Toolbar.ShowBreak(breakWin.Running);
             topmost.Reassert();
         }
 
@@ -352,7 +376,7 @@ namespace HighPen
             // choosing the monitor HighPen fell back to also makes it the chosen one
             if (i == cfg.Monitor && device == cfg.MonitorDevice) return;
             // zoom belongs to the previous monitor (and confines the pointer to it)
-            if (zoomer.Active) { zoomer.Stop(); Toolbar.ShowZoom(false); }
+            if (zoomer.Active) { zoomer.Stop(); Toolbar.ShowZoom(false, false); }
             cfg.Monitor = i;
             cfg.MonitorDevice = device;
             Save();
@@ -382,6 +406,14 @@ namespace HighPen
             zoomer.Factor = f;
             Toolbar.SettingsPanel.MarkZoomFactor(f);
             Toolbar.UpdateZoomTip();
+        }
+
+        // A break already running keeps its length.
+        public void SetBreakMinutes(int minutes)
+        {
+            cfg.BreakMinutes = Math.Max(BreakTimes.Min, Math.Min(BreakTimes.Max, minutes));
+            Save();
+            Toolbar.SettingsPanel.MarkBreakMinutes(cfg.BreakMinutes);
         }
 
         // Rebuilds the toolbar in the new language, keeping the current mode.

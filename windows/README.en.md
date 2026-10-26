@@ -6,7 +6,7 @@
 
 [← Back to the HighPen overview](../README.en.md)
 
-HighPen is a Windows pen app for online lectures. You can write directly on the screen, highlight the mouse pointer with a spotlight, zoom in on the screen, and bring up a whiteboard. It works with pen tablets such as Wacom (Windows Ink) as well as with a mouse.
+HighPen is a Windows pen app for online lectures. You can write directly on the screen, highlight the mouse pointer with a spotlight, zoom in on the screen, and bring up a whiteboard or a break timer. It works with pen tablets such as Wacom (Windows Ink) as well as with a mouse.
 
 ![HighPen toolbar and mouse spot](../screen/전체화면1.png)
 
@@ -83,7 +83,9 @@ Shortcuts are global, so they work while you are using other programs. A combina
 | Clear | Ctrl+Alt+C | Clears all ink and notes on the current page. |
 | Note | Ctrl+Alt+T | Places a text note where you click. Enter confirms, Shift+Enter adds a line break, Esc cancels. |
 | Zoom | Ctrl+Alt+X | Zooms the monitor under the mouse pointer (1.5x, 2x or 2.5x, chosen in Settings). |
+| Lock zoom | Ctrl+Shift+X | While zoomed, locks the zoomed view in place or unlocks it. While locked, moving the mouse does not move the view, and the zoom button reads "Locked". |
 | Capture | Ctrl+Alt+F | Saves the active monitor, with ink, board and notes, as a PNG and copies it to the clipboard. The toolbar and spot are left out. |
+| Break | Ctrl+Alt+W | Starts and stops the break timer. The time left is shown in large digits over the whole active monitor. |
 | Settings | Ctrl+Alt+D | Opens and closes the settings panel. |
 | About | | Shows the author (name, email, GitHub repository) and license. Clicking a link opens your mail app or browser. |
 | `<` | Ctrl+Alt+H | Collapses and expands the toolbar. |
@@ -99,10 +101,11 @@ Shortcuts are global, so they work while you are using other programs. A combina
 | Pressure | Ctrl+Alt+R | The harder you press the pen, the thicker the line. A mouse always draws at the set width. |
 | Highlighter color / width | | 8 colors and widths 5–60. While the highlighter is in use, the pen color shortcuts (Ctrl+Shift+…) change the highlighter color. |
 | Spot color / size | | 8 colors and sizes 20–200. |
+| Break length | | Length of the break timer. Pick 5, 10, 15 or 20 minutes with the buttons, or 1–60 minutes with the slider. Default 10 minutes. |
 | Show clicks | Ctrl+Alt+K | Briefly shows an expanding ring where you click. Off by default. |
 | Language | | Choose 한국어, 日本語 or English; the change applies immediately. The default is English (see [Changing the language](#changing-the-language)). |
 | Shortcuts | | Change any shortcut to the combination you want, or remove it (see [Changing shortcuts](#changing-shortcuts)). |
-| Version | | The current version (`HighPen v1.6.0`) is shown at the bottom of the panel. |
+| Version | | The current version (`HighPen v1.7.0`) is shown at the bottom of the panel. |
 
 Settings are saved automatically to `%APPDATA%\HighPen\settings.txt`.
 
@@ -204,6 +207,8 @@ Zooms the monitor under the mouse pointer in real time. Pick 1.5x, 2x or 2.5x in
 - The toolbar is not zoomed and keeps its normal size.
 - The monitor the pointer was on when zoom was turned on is zoomed, and the pointer cannot leave that monitor while zoomed. To zoom another monitor, turn zoom off, move the pointer, and turn it on again.
 - Changing the active monitor while zoomed turns zoom off.
+- **Lock the zoomed view (Ctrl+Shift+X):** press it while zoomed to keep the zoomed view where it is, so it no longer moves around as you move the mouse. The zoom button then reads "Locked". Press it again to let the view follow the pointer again. Turning zoom off also unlocks it.
+- While locked, what you see is not where a click lands. Use the locked view to explain or write with the pen, and unlock it to click.
 - **Writing while zoomed:** turning on the pen freezes the zoomed view so you can write where you see things. Turning the pen off makes the zoomed view follow the pointer again. Ink is stored in original screen coordinates, so it stays on the same content at normal size when zoom is turned off. To move to another area while zoomed, turn the pen off, move the pointer, and turn the pen on again.
 
 ### Capture
@@ -213,6 +218,15 @@ Use it to keep a board or on-screen ink as lecture material. Press the capture b
 - **Where it goes:** `Pictures\HighPen\HighPen_date_time.png`. The same image is copied to the clipboard so you can paste it right away.
 - The toolbar and the mouse spot are not captured.
 - The saved path appears briefly at the bottom of the screen; click it to open the folder in File Explorer.
+
+### Break timer
+
+Shows how much of a break is left during a lecture. Press the break button (Ctrl+Alt+W) and the whole active monitor dims with the time left in large digits, easy to read for viewers on a shared screen.
+
+- **Length:** pick it under **Break length** in the settings panel with the 5, 10, 15 and 20 minute buttons or the slider (1–60 minutes). It is saved for the next launch. A change made while the timer runs applies to the next break.
+- The time the lecture resumes (e.g. "Back at 13:26") is shown under the countdown, and the last minute turns orange.
+- When time is up, a red 00:00 and "The break is over" stay on screen until you press the break button or Ctrl+Alt+W again.
+- The timer screen lets clicks through, so you can keep using the PC during the break, and the toolbar stays visible above it.
 
 ### Show clicks
 
@@ -229,9 +243,7 @@ Choose the monitor the app works on with **Monitor** in the settings panel (or C
 
 - Drag the top row (HighPen) to move the toolbar; the position is saved and used on the next launch. If the saved position is off screen, it returns to the top-left corner.
 - The toolbar stays inside the selected monitor. Whether you drag it or it grows (expanding, opening the settings panel), it is kept within that monitor's work area (excluding the taskbar).
-- Use the `<` button to collapse and expand it. When collapsed, only the HighPen title row remains, as shown below.
-
-  ![Collapsed toolbar](../screen/전체화면2.png)
+- Use the `<` button on the left of the top row to collapse and expand it. When collapsed, the HighPen title disappears too and only the `>` button remains, so you can click what was behind the toolbar. Press `>` to expand it again in the same place. The toolbar cannot be dragged while collapsed.
 
 - The settings panel opens to the right of the toolbar, or to its left when the toolbar is at the right edge of the screen.
 - Hovering over a button shows its name and shortcut as a tooltip.
@@ -240,7 +252,7 @@ Choose the monitor the app works on with **Monitor** in the settings panel (or C
 
 ### Saved settings
 
-Pen color, width, pressure, highlighter color and width, changed shortcuts, spot color and size, whether the spot is on, show clicks, the active monitor, the toolbar position and the language are saved automatically to `%APPDATA%\HighPen\settings.txt` and reused on the next launch.
+Pen color, width, pressure, highlighter color and width, changed shortcuts, spot color and size, whether the spot is on, show clicks, the zoom level, the break length, the active monitor, the toolbar position and the language are saved automatically to `%APPDATA%\HighPen\settings.txt` and reused on the next launch.
 
 ## Notes / limitations
 

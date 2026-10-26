@@ -23,6 +23,7 @@ namespace HighPen
         void ToggleText();
         void ToggleZoom();
         void Capture();
+        void ToggleBreak();
         void ToggleSettings();
         void ShowAbout();
         void ToggleCollapse();
@@ -36,6 +37,8 @@ namespace HighPen
     class ToolbarWindow : Window, ITopmost
     {
         const string GlyphCollapse = "", GlyphExpand = "";
+        // the bar, and what is left of it when collapsed: the arrow and the border
+        const double BarWidth = 84, ArrowWidth = 28, CollapsedWidth = ArrowWidth + 2;
 
         readonly Settings cfg;
         readonly HotkeyBindings bindings;
@@ -48,9 +51,9 @@ namespace HighPen
         public SettingsPanel SettingsPanel { get; private set; }
 
         StackPanel buttons, barRow;
-        Border mainPanel;
-        TextBlock arrow, boardLabel;
-        Border zoomBtn, bubbleBtn, spotBtn, penBtn, highlightBtn, eraserBtn, boardBtn, setBtn;
+        Border mainPanel, grip;
+        TextBlock arrow, boardLabel, zoomLabel;
+        Border zoomBtn, bubbleBtn, spotBtn, penBtn, highlightBtn, eraserBtn, boardBtn, setBtn, breakBtn;
         // The settings panel opens to the right of the bar, or to its left when it would run past
         // the right edge of the monitor. The window moves so the bar itself stays where it is.
         bool settingsLeft;
@@ -97,6 +100,7 @@ namespace HighPen
             ShowCollapsed();
         }
 
+        // Collapsed, only the arrow is left, so the title no longer covers what is underneath.
         public void ToggleCollapse()
         {
             Collapsed = !Collapsed;
@@ -106,6 +110,8 @@ namespace HighPen
         void ShowCollapsed()
         {
             buttons.Visibility = Collapsed ? Visibility.Collapsed : Visibility.Visible;
+            grip.Visibility = Collapsed ? Visibility.Collapsed : Visibility.Visible;
+            mainPanel.Width = Collapsed ? CollapsedWidth : BarWidth;
             arrow.Text = Collapsed ? GlyphExpand : GlyphCollapse;
         }
 
@@ -122,11 +128,19 @@ namespace HighPen
         }
 
         public void ShowSpot(bool on) { Theme.Highlight(spotBtn, on); }
-        public void ShowZoom(bool on) { Theme.Highlight(zoomBtn, on); }
+        // While the zoomed view is locked the button reads "Locked".
+        public void ShowZoom(bool on, bool locked)
+        {
+            Theme.Highlight(zoomBtn, on);
+            zoomLabel.Text = Lang.T(on && locked ? "ZoomLocked" : "Zoom");
+        }
+
+        public void ShowBreak(bool on) { Theme.Highlight(breakBtn, on); }
 
         public void UpdateZoomTip()
         {
             Tip(zoomBtn, string.Format(Lang.T("ZoomTip"), cfg.ZoomFactor.ToString(System.Globalization.CultureInfo.InvariantCulture)), "Zoom");
+            zoomBtn.ToolTip += "\n" + Lang.T("ZoomLock") + bindings.KeySuffix("ZoomLock");
         }
 
         // ---------- placement: the toolbar stays inside the working area of the selected monitor ----------
@@ -241,12 +255,12 @@ namespace HighPen
         {
             StackPanel col = new StackPanel();
 
-            // header: grip (drag) + collapse arrow
+            // header: collapse arrow + grip (drag). The arrow is on the left so that, collapsed, it stays put.
             Grid header = new Grid();
             header.Height = 30;
-            header.ColumnDefinitions.Add(new ColumnDefinition());
             header.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
-            Border grip = new Border();
+            header.ColumnDefinitions.Add(new ColumnDefinition());
+            grip = new Border();
             grip.Background = new SolidColorBrush(Color.FromRgb(0x4A, 0x52, 0x2A));
             grip.Cursor = Cursors.SizeAll;
             grip.MouseLeftButtonDown += delegate
@@ -255,11 +269,11 @@ namespace HighPen
                 actions.BarMoved();
             };
             grip.Child = new TextBlock { Text = "HighPen", Foreground = Brushes.White, FontSize = 11, FontWeight = FontWeights.SemiBold, VerticalAlignment = VerticalAlignment.Center, Margin = new Thickness(6, 0, 0, 0), IsHitTestVisible = false, TextWrapping = TextWrapping.NoWrap };
-            Border ab = new Border { Width = 28, Background = Theme.Idle, Cursor = Cursors.Hand };
+            Border ab = new Border { Width = ArrowWidth, Background = Theme.Idle, Cursor = Cursors.Hand };
             arrow = new TextBlock { Text = GlyphCollapse, FontFamily = Theme.Icons, Foreground = Brushes.White, FontSize = 14, HorizontalAlignment = HorizontalAlignment.Center, VerticalAlignment = VerticalAlignment.Center };
             ab.Child = arrow;
             ab.MouseLeftButtonUp += delegate { actions.ToggleCollapse(); };
-            Grid.SetColumn(ab, 1);
+            Grid.SetColumn(grip, 1);
             header.Children.Add(grip);
             header.Children.Add(ab);
             col.Children.Add(header);
@@ -275,8 +289,10 @@ namespace HighPen
             AddButton("", true, Lang.T("Clear"), Lang.T("ClearTip"), "Clear", actions.Clear);
             bubbleBtn = AddButton("", true, Lang.T("Bubble"), Lang.T("Bubble"), "Bubble", actions.ToggleText);
             zoomBtn = AddButton("", true, Lang.T("Zoom"), null, null, actions.ToggleZoom);
+            zoomLabel = (TextBlock)((StackPanel)zoomBtn.Child).Children[1];
             UpdateZoomTip();
             AddButton("", true, Lang.T("Capture"), Lang.T("CaptureTip"), "Capture", actions.Capture);
+            breakBtn = AddButton("", true, Lang.T("Break"), Lang.T("BreakTip"), "Break", actions.ToggleBreak);
             setBtn = AddButton("", true, Lang.T("Settings"), Lang.T("Settings"), "Settings", actions.ToggleSettings);
             Border aboutBtn = AddButton("", true, Lang.T("About"), null, null, actions.ShowAbout);
             aboutBtn.ToolTip = Lang.T("AboutTip");
@@ -294,7 +310,7 @@ namespace HighPen
 
             col.Children.Add(buttons);
 
-            return new Border { Width = 84, Background = Theme.PanelBg, BorderBrush = Theme.Line, BorderThickness = new Thickness(1), Child = col };
+            return new Border { Width = BarWidth, Background = Theme.PanelBg, BorderBrush = Theme.Line, BorderThickness = new Thickness(1), Child = col };
         }
 
         // A tool button (icon over label) appended to the bar. tip/commandId give the tooltip and its shortcut;

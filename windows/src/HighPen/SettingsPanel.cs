@@ -16,11 +16,12 @@ namespace HighPen
         void TogglePressure();
         void ToggleClicks();
         void SetZoomFactor(double f);
+        void SetBreakMinutes(int minutes);
         void SetLanguage(int i);
         void ShowHotkeyEditor();
     }
 
-    // The panel next to the toolbar: monitor, pen, highlighter, spot, zoom, language and shortcuts.
+    // The panel next to the toolbar: monitor, pen, highlighter, spot, zoom, break length, language and shortcuts.
     class SettingsPanel : Border
     {
         readonly Settings cfg;
@@ -28,6 +29,9 @@ namespace HighPen
         readonly ISettingsActions actions;
         readonly List<Border> monitorBtns = new List<Border>();
         readonly List<Border> zoomFactorBtns = new List<Border>();
+        readonly List<Border> breakBtns = new List<Border>();
+        TextBlock breakTitle;
+        Slider breakSlider;
         Panel penSwatches, highlightSwatches;
         Border pressureBtn, clicksBtn;
         TextBlock pressureText, clicksText, hotkeyWarn;
@@ -52,6 +56,14 @@ namespace HighPen
         public void MarkZoomFactor(double f)
         {
             for (int i = 0; i < zoomFactorBtns.Count; i++) Theme.Highlight(zoomFactorBtns[i], Zoomer.Factors[i] == f);
+        }
+
+        // Updates the title, the preset buttons and the slider.
+        public void MarkBreakMinutes(int minutes)
+        {
+            breakTitle.Text = string.Format(Lang.T("BreakLength"), minutes);
+            for (int i = 0; i < breakBtns.Count; i++) Theme.Highlight(breakBtns[i], BreakTimes.Presets[i] == minutes);
+            if ((int)Math.Round(breakSlider.Value) != minutes) breakSlider.Value = minutes;
         }
 
         public void MarkPenColor(string color) { MarkSwatch(penSwatches, color); }
@@ -122,6 +134,31 @@ namespace HighPen
             }
             MarkZoomFactor(cfg.ZoomFactor);
             p.Children.Add(zp);
+            p.Children.Add(Divider());
+
+            breakTitle = Theme.SectionTitle("");
+            p.Children.Add(breakTitle);
+            WrapPanel bp = new WrapPanel();
+            foreach (int m in BreakTimes.Presets)
+            {
+                int mv = m;
+                Border bb = Theme.TextButton(string.Format(Lang.T("Minutes"), m), 41, 26, new Thickness(2));
+                ((TextBlock)bb.Child).FontSize = 11;
+                bb.MouseLeftButtonUp += delegate { actions.SetBreakMinutes(mv); };
+                breakBtns.Add(bb);
+                bp.Children.Add(bb);
+            }
+            p.Children.Add(bp);
+            breakSlider = MakeSlider(BreakTimes.Min, BreakTimes.Max, cfg.BreakMinutes, delegate (double v)
+            {
+                int m = (int)Math.Round(v);
+                if (m != cfg.BreakMinutes) actions.SetBreakMinutes(m);
+            });
+            breakSlider.Margin = new Thickness(0, 4, 0, 0);
+            breakSlider.IsSnapToTickEnabled = true;
+            breakSlider.TickFrequency = 1;
+            p.Children.Add(breakSlider);
+            MarkBreakMinutes(cfg.BreakMinutes);
             p.Children.Add(Divider());
 
             p.Children.Add(Theme.SectionTitle(Lang.T("Language")));

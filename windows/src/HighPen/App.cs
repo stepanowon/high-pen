@@ -23,9 +23,11 @@ namespace HighPen
             Lang.Cur = Lang.FromCode(cfg.Language);
             OverlayWindow overlay = new OverlayWindow();
             SpotWindow spot = new SpotWindow();
-            Controller controller = new Controller(cfg, store, overlay, spot, new Zoomer(), new ClickHook(), new PngScreenCapture());
+            BreakWindow breakWin = new BreakWindow();
+            Controller controller = new Controller(cfg, store, overlay, spot, breakWin, new Zoomer(), new ClickHook(), new PngScreenCapture());
             overlay.Show();
             spot.Show();
+            breakWin.Show();
             controller.Toolbar.Show();
             ThreadPool.RegisterWaitForSingleObject(summon, delegate
             {

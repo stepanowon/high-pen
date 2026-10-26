@@ -20,6 +20,7 @@ namespace HighPen
         public bool Pressure = true;
         public bool ShowClicks = false;
         public double ZoomFactor = 2;
+        public int BreakMinutes = 10; // length of the break timer
         public int BarX = 20, BarY = 20; // offset from the monitor work area, in pixels
         public string Language = ""; // "" = English (the default)
         // Shortcuts changed from their defaults, by command id ("" = no shortcut).
@@ -30,6 +31,7 @@ namespace HighPen
         {
             if (Array.IndexOf(Zoomer.Factors, ZoomFactor) < 0) ZoomFactor = 2;
             HighlightSize = Math.Max(5, Math.Min(60, HighlightSize));
+            BreakMinutes = Math.Max(BreakTimes.Min, Math.Min(BreakTimes.Max, BreakMinutes));
         }
     }
 
@@ -67,6 +69,7 @@ namespace HighPen
             Flag("Pressure", (s, v) => s.Pressure = v, s => s.Pressure),
             Flag("ShowClicks", (s, v) => s.ShowClicks = v, s => s.ShowClicks),
             Number("ZoomFactor", (s, v) => s.ZoomFactor = v, s => s.ZoomFactor),
+            Integer("BreakMinutes", (s, v) => s.BreakMinutes = v, s => s.BreakMinutes),
             Integer("BarX", (s, v) => s.BarX = v, s => s.BarX),
             Integer("BarY", (s, v) => s.BarY = v, s => s.BarY),
             Text("Language", (s, v) => s.Language = v, s => s.Language),
