@@ -1,16 +1,19 @@
+using System;
 using System.Collections.Generic;
 using System.Windows.Controls;
 using System.Windows.Ink;
 
 namespace HighPen
 {
-    // Undo history of each ink page. One step is a pen stroke, or every stroke removed by one eraser drag.
+    // Undo history of each ink page. One step is a pen stroke, every stroke removed by one eraser drag, or a clear all.
     class InkHistory
     {
         class InkEdit
         {
             public StrokeCollection Added = new StrokeCollection();
             public StrokeCollection Removed = new StrokeCollection();
+            // puts back what the step removed besides strokes (the speech bubbles of a clear all)
+            public Action Restore;
         }
 
         readonly StrokeCollection[] pages;
@@ -66,14 +69,19 @@ namespace HighPen
             foreach (Stroke st in last.Added) if (s.Contains(st)) s.Remove(st);
             foreach (Stroke st in last.Removed) if (!s.Contains(st)) s.Add(st);
             undoing = false;
+            if (last.Restore != null) last.Restore();
         }
 
-        // Removes every stroke of the page, together with its history.
-        public void Clear(int page)
+        // Removes every stroke of the page as one step, so undo brings them back and then runs restore.
+        public void Clear(int page, Action restore)
         {
-            history[page].Clear();
+            StrokeCollection s = pages[page];
+            if (s.Count == 0 && restore == null) return;
+            InkEdit edit = new InkEdit { Restore = restore };
+            edit.Removed.Add(s);
+            history[page].Add(edit);
             undoing = true;
-            pages[page].Clear();
+            s.Clear();
             undoing = false;
         }
     }

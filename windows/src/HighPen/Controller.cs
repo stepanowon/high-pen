@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Threading;
 
@@ -291,10 +292,12 @@ namespace HighPen
 
         public void Undo() { history.Undo(tools.Board); }
 
+        // One undo step: undo brings back the strokes and speech bubbles together.
         public void Clear()
         {
-            history.Clear(tools.Board);
-            overlay.ClearBubbles(tools.Board);
+            int page = tools.Board;
+            List<UIElement> removed = overlay.ClearBubbles(page);
+            history.Clear(page, removed.Count == 0 ? null : (Action)delegate { overlay.RestoreBubbles(page, removed); });
         }
 
         // Colour shortcuts change the tool in use: the highlighter while it is on, otherwise the pen.

@@ -83,11 +83,22 @@ namespace HighPen
             Canvas.Children.Add(bubble);
         }
 
-        // Removes the speech bubbles of the page being shown. Its strokes are cleared through InkHistory.
-        public void ClearBubbles(int page)
+        // Removes the speech bubbles of the page being shown and returns them for RestoreBubbles.
+        // Its strokes are cleared through InkHistory.
+        public List<UIElement> ClearBubbles(int page)
         {
+            List<UIElement> removed = new List<UIElement>(bubbles[page]);
             Canvas.Children.Clear();
             bubbles[page].Clear();
+            return removed;
+        }
+
+        // Puts cleared speech bubbles back beneath any added since.
+        public void RestoreBubbles(int page, List<UIElement> removed)
+        {
+            bubbles[page].InsertRange(0, removed);
+            if (shownPage != page) return;
+            for (int i = 0; i < removed.Count; i++) Canvas.Children.Insert(i, removed[i]);
         }
 
         // What the canvas does with input: nothing (speech bubble clicks are handled outside), erase, or ink.
