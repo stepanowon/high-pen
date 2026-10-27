@@ -10,7 +10,7 @@ The macOS version of the pen app for online lectures. It runs on macOS 14 (Sonom
 
 ## Download
 
-**[Download HighPen-1.3.0.dmg](https://github.com/stepanowon/high-pen/releases/download/macos-v1.3.0/HighPen-1.3.0.dmg)** (release [macos-v1.3.0](https://github.com/stepanowon/high-pen/releases/tag/macos-v1.3.0))
+**[Download HighPen-1.3.1.dmg](https://github.com/stepanowon/high-pen/releases/download/macos-v1.3.1/HighPen-1.3.1.dmg)** (release [macos-v1.3.1](https://github.com/stepanowon/high-pen/releases/tag/macos-v1.3.1))
 
 1. Open the DMG and drag HighPen onto the Applications folder.
 2. **Before opening it the first time**, run this in Terminal. HighPen then opens without any warning.
@@ -57,7 +57,7 @@ Distributing without the warning requires joining the Apple Developer Program, t
 | Highlighter | ⌃⌥L | Translucent, drawn beneath pen strokes |
 | Eraser | ⌃⌥E | Erases whole strokes. Press again while erasing to clear everything |
 | Board | ⌃⌥B | White board → black board → off. Kept separately from the screen annotations |
-| Undo | ⌃⌥Z | One stroke, or everything removed by one eraser drag |
+| Undo | ⌃⌥Z | One stroke, everything removed by one eraser drag, or a clear all (its speech bubbles come back too) |
 | Clear | ⌃⌥C | Clears the current page |
 | Note | ⌃⌥T | Text box at the clicked spot. Enter confirms, Shift+Enter adds a line, Esc cancels. Removed only by Clear |
 | Zoom | ⌃⌥X | Live 1.5x / 2x / 2.5x zoom. Turning the pen on freezes the view so you can write on the zoomed screen |

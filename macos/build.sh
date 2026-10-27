@@ -4,7 +4,7 @@
 #   ./build.sh test       build, then run the self-check
 #   ./build.sh dmg        build, then package dist/HighPen-<version>.dmg (drag the app onto Applications)
 set -e
-VERSION=1.3.0
+VERSION=1.3.1
 cd "${0:A:h}"
 APP=dist/HighPen.app
 rm -rf $APP dist/obj

@@ -22,6 +22,13 @@ func selfTest() {
     v.bubbles[0] = [Bubble(text: "a", at: .zero, color: .red, size: 16)]
     v.clear()
     precondition(v.bubbles[0].isEmpty, "clear removes speech bubbles")
+    v.pages[0] = [s]
+    v.history[0] = []
+    v.bubbles[0] = [Bubble(text: "a", at: .zero, color: .red, size: 16)]
+    v.clear()
+    v.bubbles[0].append(Bubble(text: "b", at: .zero, color: .red, size: 16))
+    v.undo()
+    precondition(v.pages[0].count == 1 && v.bubbles[0].map(\.text) == ["a", "b"], "undo brings back a clear all, bubbles beneath newer ones")
     v.zoomScale = 2
     v.zoomOrigin = CGPoint(x: 100, y: 50)
     precondition(v.content(CGPoint(x: 40, y: 20)) == CGPoint(x: 120, y: 60), "zoomed input maps back to content")
