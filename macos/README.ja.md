@@ -10,7 +10,7 @@
 
 ## ダウンロード
 
-**[HighPen-1.3.0.dmg をダウンロード](https://github.com/stepanowon/high-pen/releases/download/macos-v1.3.0/HighPen-1.3.0.dmg)** (リリース [macos-v1.3.0](https://github.com/stepanowon/high-pen/releases/tag/macos-v1.3.0))
+**[HighPen-1.3.1.dmg をダウンロード](https://github.com/stepanowon/high-pen/releases/download/macos-v1.3.1/HighPen-1.3.1.dmg)** (リリース [macos-v1.3.1](https://github.com/stepanowon/high-pen/releases/tag/macos-v1.3.1))
 
 1. DMG を開き、HighPen を Applications フォルダーにドラッグします。
 2. **初めて開く前に**、ターミナルで次のコマンドを実行します。警告なしでそのまま開けます。
@@ -57,7 +57,7 @@ DMG を開き、HighPen を Applications フォルダーにドラッグすると
 | 蛍光ペン | ⌃⌥L | ペンの線の下に半透明で描かれます |
 | 消しゴム | ⌃⌥E | 線単位で消去。消しゴム中にもう一度押すと全消去 |
 | ボード | ⌃⌥B | 白ボード → 黒ボード → オフ。画面への書き込みとは別に保持 |
-| 元に戻す | ⌃⌥Z | 線 1 本、または消しゴムで 1 回なぞって消した分すべて |
+| 元に戻す | ⌃⌥Z | 線 1 本、消しゴムで 1 回なぞって消した分すべて、または全消去 1 回分 (消した吹き出しも戻ります) |
 | 全消去 | ⌃⌥C | 現在のページを消去 |
 | 吹き出し | ⌃⌥T | クリックした位置に文字ボックス。Enter で確定、Shift+Enter で改行、Esc で取り消し。全消去でのみ削除 |
 | 拡大 | ⌃⌥X | 1.5 倍 / 2 倍 / 2.5 倍のリアルタイム拡大。ペンをオンにすると画面が固定され、拡大した画面に書き込めます |

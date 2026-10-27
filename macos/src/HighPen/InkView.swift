@@ -17,10 +17,11 @@ struct Bubble {
     }
 }
 
-// One undo step: a pen stroke, or every stroke removed by one eraser drag.
+// One undo step: a pen stroke, every stroke removed by one eraser drag, or a clear all.
 struct Edit {
     var added: [Stroke] = []
     var removed: [Stroke] = []
+    var bubbles: [Bubble] = [] // the speech bubbles a clear all removed
 }
 
 // Ink for three pages: 0 = screen annotations, 1 = white board, 2 = black board.
@@ -115,17 +116,20 @@ final class InkView: NSView, NSTextViewDelegate {
         guard let e = history[page].popLast() else { return }
         pages[page].removeAll { s in e.added.contains { $0 === s } }
         pages[page] += e.removed
+        bubbles[page].insert(contentsOf: e.bubbles, at: 0) // beneath any added since
         needsDisplay = true
     }
 
+    // Removes every stroke and speech bubble of the page as one step, so undo brings them back.
     func clear() {
+        guard !pages[page].isEmpty || !bubbles[page].isEmpty else { return }
+        history[page].append(Edit(removed: pages[page], bubbles: bubbles[page]))
         pages[page] = []
-        history[page] = []
         bubbles[page] = []
         needsDisplay = true
     }
 
-    // ---------- speech bubbles (not part of undo; only Clear removes them) ----------
+    // ---------- speech bubbles (not undone one by one; Clear removes them, and undoing it brings them back) ----------
 
     func beginBubble(_ v: CGPoint) {
         let (color, size) = bubbleStyle()

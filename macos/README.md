@@ -10,7 +10,7 @@
 
 ## 다운로드
 
-**[HighPen-1.3.0.dmg 받기](https://github.com/stepanowon/high-pen/releases/download/macos-v1.3.0/HighPen-1.3.0.dmg)** (릴리스 [macos-v1.3.0](https://github.com/stepanowon/high-pen/releases/tag/macos-v1.3.0))
+**[HighPen-1.3.1.dmg 받기](https://github.com/stepanowon/high-pen/releases/download/macos-v1.3.1/HighPen-1.3.1.dmg)** (릴리스 [macos-v1.3.1](https://github.com/stepanowon/high-pen/releases/tag/macos-v1.3.1))
 
 1. DMG를 열고 HighPen을 Applications 폴더로 끌어다 놓습니다.
 2. **처음 열기 전에** 터미널에서 다음 명령을 실행합니다. 그러면 경고 없이 바로 열립니다.
@@ -57,7 +57,7 @@ DMG를 열고 HighPen을 Applications 폴더로 끌어다 놓으면 설치됩니
 | 형광펜 | ⌃⌥L | 펜 획 아래에 반투명으로 그려짐 |
 | 지우개 | ⌃⌥E | 획 단위로 지움. 지우개 상태에서 한 번 더 누르면 전체 삭제 |
 | 칠판 | ⌃⌥B | 흰 칠판 → 검은 칠판 → 끄기. 화면 필기와 따로 보관 |
-| 되돌리기 | ⌃⌥Z | 획 하나, 또는 지우개로 한 번 문지른 것 전체 |
+| 되돌리기 | ⌃⌥Z | 획 하나, 지우개로 한 번 문지른 것 전체, 또는 전체 지우기 한 번(지운 말풍선도 함께 돌아옴) |
 | 전체 지우기 | ⌃⌥C | 현재 페이지 지우기 |
 | 말풍선 | ⌃⌥T | 클릭한 위치에 글 상자. Enter 확정, Shift+Enter 줄바꿈, Esc 취소. 전체 지우기로만 삭제 |
 | 확대 | ⌃⌥X | 1.5x / 2x / 2.5x 실시간 확대. 펜을 켜면 화면이 고정되어 확대된 화면 위에 필기 |
