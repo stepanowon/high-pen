@@ -179,7 +179,7 @@ Covers the whole screen with a white or black board to write on. Each press of t
 
 ### Undo / Clear
 
-- **Undo:** cancels the last action on the current page: one pen stroke, or all strokes removed by one eraser drag. Clear all cannot be undone. Notes cannot be undone.
+- **Undo:** cancels the last action on the current page: one pen stroke, or all strokes removed by one eraser drag. Clear all can be undone too, as one step, and brings back the notes it removed. Notes cannot be undone one at a time.
 - **Clear:** removes all ink and notes on the current page. Other pages (screen, white board, black board) are not affected.
 
 ### Notes
