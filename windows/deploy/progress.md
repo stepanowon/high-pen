@@ -1,6 +1,6 @@
 # 배포 진행 상황
 
-마지막 업데이트: 2026-10-27
+마지막 업데이트: 2026-10-30
 
 ## 목표
 
@@ -28,6 +28,7 @@
 | 1.7.4 기능 추가 | 완료 | [#34](https://github.com/stepanowon/high-pen/pull/34) 병합: 전체 지우기를 되돌리기 한 단계로 기록해 지운 필기와 말풍선을 함께 되살림. 전체 지우기 후에도 이전 되돌리기 기록 유지. macOS 앱은 바꾸지 않음 |
 | 1.7.4 버전 변경 | 완료 | [#35](https://github.com/stepanowon/high-pen/pull/35) 병합 (main `677a9fb`) |
 | 1.7.4 릴리스 | 완료 | GitHub 릴리스 [HighPen v1.7.4](https://github.com/stepanowon/high-pen/releases/tag/v1.7.4) (`HighPen-Setup.exe`, `HighPen.exe`, `HighPen.msix`), 한·일·영 변경 내용 포함 |
+| 실행 파일 배포 경로 변경 | 완료 | 보안 검토 후속 조치: `dist/*.exe`를 git에서 빼고 GitHub 릴리스에서만 배포. v1.7.4 릴리스에 `SHA256SUMS.txt` 추가(커밋돼 있던 exe와 릴리스 파일의 해시가 같음을 확인), README 다운로드 링크를 릴리스 주소로 변경, `checksums.ps1` 추가 |
 
 ### winget
 
@@ -86,13 +87,16 @@
 Windows 앱 파일은 모두 `windows/` 아래에 있다. 아래 경로와 명령은 `windows` 디렉토리 기준이다.
 
 1. `src/HighPen/Theme.cs`의 `AppVersion`과 `src/Setup.cs`의 `Version`을 같이 올린다.
-2. `.\build.ps1`로 `dist\HighPen.exe`, `dist\HighPen-Setup.exe`를 빌드한다.
-3. 커밋·푸시한 뒤 릴리스를 만든다.
+2. 실행 파일은 git에 커밋하지 않는다(`.gitignore`). 릴리스에 올리는 파일이 모두 같은 `HighPen.exe`에서 나오도록 이 순서로 빌드한다.
    ```
-   gh release create v1.x.x dist/HighPen-Setup.exe dist/HighPen.exe --title "HighPen v1.x.x" --generate-notes
+   .\packaging\build-msix.ps1      # dist\HighPen.exe, dist\HighPen.msix
+   .\build.ps1 -Target setup        # 방금 만든 HighPen.exe를 넣은 dist\HighPen-Setup.exe
+   .\checksums.ps1                  # dist\SHA256SUMS.txt
    ```
-4. Store 패키지를 만들고 Partner Center에서 **새 제출**의 패키지만 바꿔 제출한다 (자세한 내용: `packaging/STORE.md`). 패키지 페이지에서 **Windows 10/11 Desktop** 체크가 유지되는지 반드시 확인한다.
+   Windows SDK가 없으면 `build-msix.ps1`에 `-MakeAppx <makeappx.exe 경로>`를 붙인다.
+3. 커밋·푸시한 뒤 릴리스를 만든다. 릴리스 노트에 `SHA256SUMS.txt` 내용을 붙여 둔다.
    ```
-   .\packaging\build-msix.ps1
+   gh release create v1.x.x dist/HighPen-Setup.exe dist/HighPen.exe dist/HighPen.msix dist/SHA256SUMS.txt --title "HighPen v1.x.x" --generate-notes
    ```
-   Windows SDK가 없으면 `-MakeAppx <makeappx.exe 경로>`로 지정한다. 스크립트가 `dist\HighPen.exe`를 다시 빌드하므로, 소스가 그대로면 `git checkout -- dist/HighPen.exe`로 커밋된 파일을 되돌린다.
+4. 한·영·일 `README.md`의 다운로드 링크와 `SHA256SUMS.txt` 링크(`releases/download/v1.x.x/...`)를 새 버전으로 바꾼다.
+5. Partner Center에서 **새 제출**의 패키지만 `dist\HighPen.msix`로 바꿔 제출한다 (자세한 내용: `packaging/STORE.md`). 패키지 페이지에서 **Windows 10/11 Desktop** 체크가 유지되는지 반드시 확인한다.

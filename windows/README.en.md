@@ -33,11 +33,11 @@ winget install 9PDG1QN5QSL3 --source msstore
 
 ### Run without installing
 
-Download [HighPen.exe](https://github.com/stepanowon/high-pen/raw/main/windows/dist/HighPen.exe) and run it directly. No installation needed.
+Download [HighPen.exe](https://github.com/stepanowon/high-pen/releases/download/v1.7.4/HighPen.exe) and run it directly. No installation needed.
 
 ### Install with the installer
 
-1. Download [HighPen-Setup.exe](https://github.com/stepanowon/high-pen/raw/main/windows/dist/HighPen-Setup.exe) and run it.
+1. Download [HighPen-Setup.exe](https://github.com/stepanowon/high-pen/releases/download/v1.7.4/HighPen-Setup.exe) and run it.
 2. Confirm the installation and choose whether to create a desktop shortcut.
 3. When the installation finishes, you can start the app right away.
 
@@ -47,6 +47,14 @@ Download [HighPen.exe](https://github.com/stepanowon/high-pen/raw/main/windows/d
 - Uninstall: remove HighPen from **Installed apps** in Windows Settings, or run `Uninstall.exe` in the install folder. Saved settings (`%APPDATA%\HighPen`) are kept.
 - Silent install/uninstall: `HighPen-Setup.exe /S`, `Uninstall.exe /S`
 - The installer messages follow the Windows display language (Korean, Japanese, otherwise English).
+
+### Verify the download
+
+The executables are distributed only through [GitHub Releases](https://github.com/stepanowon/high-pen/releases). They are not code-signed, so you can check that a downloaded file is the one published in the release by comparing it with [SHA256SUMS.txt](https://github.com/stepanowon/high-pen/releases/download/v1.7.4/SHA256SUMS.txt).
+
+```powershell
+Get-FileHash .\HighPen-Setup.exe -Algorithm SHA256
+```
 
 ### Pin to the taskbar
 

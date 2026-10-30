@@ -37,7 +37,7 @@ xattr -dr com.apple.quarantine /Applications/HighPen.app
 
 | 경로 | 내용 |
 |---|---|
-| `windows/` | Windows 앱 (소스, 빌드 스크립트, 실행 파일, Store 패키징, 배포 기록) |
+| `windows/` | Windows 앱 (소스, 빌드 스크립트, Store 패키징, 배포 기록) |
 | `macos/` | macOS 앱 (소스, 빌드·DMG 패키징 스크립트, 문서) |
 | `screen/` | 문서용 스크린샷과 소개 영상 |
 | `PRIVACY.md` | 개인정보 처리방침 |

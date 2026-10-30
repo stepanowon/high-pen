@@ -37,7 +37,7 @@ xattr -dr com.apple.quarantine /Applications/HighPen.app
 
 | パス | 内容 |
 |---|---|
-| `windows/` | Windows アプリ (ソース、ビルドスクリプト、実行ファイル、Store パッケージ、配布記録) |
+| `windows/` | Windows アプリ (ソース、ビルドスクリプト、Store パッケージ、配布記録) |
 | `macos/` | macOS アプリ (ソース、ビルド・DMG パッケージ作成スクリプト、ドキュメント) |
 | `screen/` | ドキュメント用のスクリーンショットと紹介動画 |
 | `PRIVACY.md` | プライバシーポリシー |
