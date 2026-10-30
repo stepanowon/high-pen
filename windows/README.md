@@ -33,11 +33,11 @@ winget install 9PDG1QN5QSL3 --source msstore
 
 ### 설치 없이 실행
 
-[HighPen.exe](https://github.com/stepanowon/high-pen/raw/main/windows/dist/HighPen.exe)를 다운로드해서 바로 실행합니다. 설치 과정이 필요 없습니다.
+[HighPen.exe](https://github.com/stepanowon/high-pen/releases/download/v1.7.4/HighPen.exe)를 다운로드해서 바로 실행합니다. 설치 과정이 필요 없습니다.
 
 ### 설치 파일로 설치
 
-1. [HighPen-Setup.exe](https://github.com/stepanowon/high-pen/raw/main/windows/dist/HighPen-Setup.exe)를 다운로드해서 실행합니다.
+1. [HighPen-Setup.exe](https://github.com/stepanowon/high-pen/releases/download/v1.7.4/HighPen-Setup.exe)를 다운로드해서 실행합니다.
 2. 설치 여부와 바탕화면 바로가기 생성 여부를 선택합니다.
 3. 설치가 끝나면 바로 실행할 수 있습니다.
 
@@ -47,6 +47,14 @@ winget install 9PDG1QN5QSL3 --source msstore
 - 제거: Windows 설정의 **설치된 앱**에서 HighPen을 제거하거나 설치 폴더의 `Uninstall.exe`를 실행합니다. 저장된 설정(`%APPDATA%\HighPen`)은 남습니다.
 - 조용한 설치/제거: `HighPen-Setup.exe /S`, `Uninstall.exe /S`
 - 설치 안내 문구는 Windows 표시 언어를 따릅니다(한국어, 일본어, 그 외에는 영어).
+
+### 받은 파일 확인
+
+실행 파일은 [GitHub 릴리스](https://github.com/stepanowon/high-pen/releases)에서만 배포합니다. 코드 서명이 없으므로, 받은 파일이 릴리스에 올린 파일과 같은지 [SHA256SUMS.txt](https://github.com/stepanowon/high-pen/releases/download/v1.7.4/SHA256SUMS.txt)의 값과 비교해 확인할 수 있습니다.
+
+```powershell
+Get-FileHash .\HighPen-Setup.exe -Algorithm SHA256
+```
 
 ### 작업표시줄에 고정
 

@@ -33,11 +33,11 @@ winget install 9PDG1QN5QSL3 --source msstore
 
 ### インストールせずに実行
 
-[HighPen.exe](https://github.com/stepanowon/high-pen/raw/main/windows/dist/HighPen.exe) をダウンロードしてそのまま実行します。インストールは不要です。
+[HighPen.exe](https://github.com/stepanowon/high-pen/releases/download/v1.7.4/HighPen.exe) をダウンロードしてそのまま実行します。インストールは不要です。
 
 ### インストーラーでインストール
 
-1. [HighPen-Setup.exe](https://github.com/stepanowon/high-pen/raw/main/windows/dist/HighPen-Setup.exe) をダウンロードして実行します。
+1. [HighPen-Setup.exe](https://github.com/stepanowon/high-pen/releases/download/v1.7.4/HighPen-Setup.exe) をダウンロードして実行します。
 2. インストールするかどうかと、デスクトップにショートカットを作成するかどうかを選びます。
 3. インストールが終わるとすぐに起動できます。
 
@@ -47,6 +47,14 @@ winget install 9PDG1QN5QSL3 --source msstore
 - アンインストール: Windows の設定の **インストールされているアプリ** から HighPen を削除するか、インストールフォルダーの `Uninstall.exe` を実行します。保存された設定 (`%APPDATA%\HighPen`) は残ります。
 - サイレントインストール/アンインストール: `HighPen-Setup.exe /S`、`Uninstall.exe /S`
 - インストーラーのメッセージは Windows の表示言語に従います (韓国語、日本語、それ以外は英語)。
+
+### ダウンロードしたファイルの確認
+
+実行ファイルは [GitHub リリース](https://github.com/stepanowon/high-pen/releases) でのみ配布しています。コード署名がないため、ダウンロードしたファイルがリリースのものと同じかどうかを [SHA256SUMS.txt](https://github.com/stepanowon/high-pen/releases/download/v1.7.4/SHA256SUMS.txt) の値と比べて確認できます。
+
+```powershell
+Get-FileHash .\HighPen-Setup.exe -Algorithm SHA256
+```
 
 ### タスクバーにピン留め
 

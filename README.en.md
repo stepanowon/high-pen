@@ -37,7 +37,7 @@ For building, features and shortcuts, and permissions, see the [macOS docs](maco
 
 | Path | Contents |
 |---|---|
-| `windows/` | The Windows app (source, build scripts, executables, Store packaging, release notes) |
+| `windows/` | The Windows app (source, build scripts, Store packaging, release notes) |
 | `macos/` | The macOS app (source, build and DMG packaging script, docs) |
 | `screen/` | Screenshots and the trailer video used in the docs |
 | `PRIVACY.md` | Privacy policy |
