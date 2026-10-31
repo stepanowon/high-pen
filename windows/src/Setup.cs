@@ -9,11 +9,11 @@ namespace HighPenSetup
 {
     // Per-user installer / uninstaller. HighPen.exe is embedded as a resource.
     // Run with /S for silent mode, /uninstall to remove, /run to start HighPen after a silent install
-    // (how HighPen updates itself).
+    // (how HighPen 1.8.0 updates itself; later versions send users to the Microsoft Store instead).
     static class Program
     {
         const string AppName = "HighPen";
-        const string Version = "1.8.0"; // keep in sync with AppVersion in HighPen\Theme.cs
+        const string Version = "1.8.1"; // keep in sync with AppVersion in HighPen\Theme.cs
         const string UninstallKey = @"Software\Microsoft\Windows\CurrentVersion\Uninstall\HighPen";
 
         static bool silent, run;

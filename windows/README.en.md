@@ -263,11 +263,9 @@ Choose the monitor the app works on with **Monitor** in the settings panel (or C
 
 When you use `HighPen.exe` or `HighPen-Setup.exe` from GitHub, HighPen checks for a new version every time it starts. The Microsoft Store version is updated by the Store and does not check.
 
-- When a new version is out, an update window appears in the middle of the active monitor. **Update** downloads and installs it and restarts HighPen. **Later** reminds you at the next start. **What's new** opens the release page.
-- Restarting clears the ink on the screen. Your settings are kept.
-- An installed copy is updated by running the new installer silently; a copy run straight from `HighPen.exe` has that file replaced with the new version.
-- The download is checked against the release's `SHA256SUMS.txt` and is not installed if it does not match.
-- If `HighPen.exe` sits in a folder you cannot write to, it cannot update itself; download the new version from **What's new** instead.
+- When a new version is out, an update window appears in the middle of the active monitor. **Get it from the Store** opens HighPen in the Microsoft Store, where you install it. **Later** reminds you at the next start. **What's new** opens the release page.
+- The new version is installed from the Microsoft Store, not downloaded from GitHub: the executables on GitHub are not code-signed, while the Store package is signed by Microsoft. From then on the Store keeps it up to date.
+- After installing the Store version, quit the HighPen you were using and remove it under **Installed apps** in Windows Settings. If you ran `HighPen.exe` without installing, just delete that file. Your settings carry over to the Store version.
 - To stop checking, click **Check for updates** in the settings panel. Nothing is shown when you are offline.
 
 ### Saved settings

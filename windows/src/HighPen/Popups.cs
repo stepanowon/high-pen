@@ -117,15 +117,10 @@ namespace HighPen
         }
     }
 
-    // Offers a newer version found at start-up. Update asks the app to download and install it (Updating),
-    // Later closes; while downloading the progress is shown and Later cancels.
+    // Offers a newer version found at start-up. The Store button opens HighPen in the Microsoft Store
+    // (where the signed package is installed) and closes; Later just closes.
     class UpdateWindow : PopupWindow
     {
-        public Action Updating;
-        readonly TextBlock status = new TextBlock { Foreground = Brushes.Gray, FontSize = 12, TextWrapping = TextWrapping.Wrap, Margin = new Thickness(0, 8, 0, 0), Visibility = Visibility.Collapsed };
-        readonly Border update;
-        bool busy;
-
         public UpdateWindow(UpdateInfo u, System.Drawing.Rectangle workArea)
         {
             ShowActivated = false; // do not take the keyboard from the presentation
@@ -140,42 +135,23 @@ namespace HighPen
             link.Click += delegate { try { System.Diagnostics.Process.Start(u.PageUrl); } catch { } };
             notes.Inlines.Add(link);
             p.Children.Add(notes);
-            p.Children.Add(status);
 
             Grid btns = new Grid { Margin = new Thickness(0, 14, 0, 0) };
             btns.ColumnDefinitions.Add(new ColumnDefinition());
             btns.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(8) });
             btns.ColumnDefinitions.Add(new ColumnDefinition());
-            update = Theme.TextButton(Lang.T("UpdateNow"), double.NaN, 28, new Thickness(0));
-            update.Background = Theme.Active;
+            Border store = Theme.TextButton(Lang.T("UpdateStore"), double.NaN, 28, new Thickness(0));
+            store.Background = Theme.Active;
             Border later = Theme.TextButton(Lang.T("UpdateLater"), double.NaN, 28, new Thickness(0));
             Grid.SetColumn(later, 2);
-            btns.Children.Add(update);
+            btns.Children.Add(store);
             btns.Children.Add(later);
             p.Children.Add(btns);
             Content = Frame(p);
 
-            update.MouseLeftButtonUp += delegate { if (!busy && Updating != null) Updating(); };
+            store.MouseLeftButtonUp += delegate { Updater.OpenStore(); Close(); };
             later.MouseLeftButtonUp += delegate { Close(); };
             CenterOnLoad(workArea);
-        }
-
-        public void ShowProgress(int percent)
-        {
-            busy = true;
-            update.Opacity = 0.5;
-            status.Foreground = Brushes.Gray;
-            status.Text = string.Format(Lang.T("UpdateDownloading"), percent);
-            status.Visibility = Visibility.Visible;
-        }
-
-        public void ShowError(string text)
-        {
-            busy = false;
-            update.Opacity = 1;
-            status.Foreground = Theme.Warning;
-            status.Text = text;
-            status.Visibility = Visibility.Visible;
         }
     }
 
