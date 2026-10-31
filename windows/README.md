@@ -33,11 +33,11 @@ winget install 9PDG1QN5QSL3 --source msstore
 
 ### 설치 없이 실행
 
-[HighPen.exe](https://github.com/stepanowon/high-pen/releases/download/v1.8.0/HighPen.exe)를 다운로드해서 바로 실행합니다. 설치 과정이 필요 없습니다.
+[HighPen.exe](https://github.com/stepanowon/high-pen/releases/download/v1.8.2/HighPen.exe)를 다운로드해서 바로 실행합니다. 설치 과정이 필요 없습니다.
 
 ### 설치 파일로 설치
 
-1. [HighPen-Setup.exe](https://github.com/stepanowon/high-pen/releases/download/v1.8.0/HighPen-Setup.exe)를 다운로드해서 실행합니다.
+1. [HighPen-Setup.exe](https://github.com/stepanowon/high-pen/releases/download/v1.8.2/HighPen-Setup.exe)를 다운로드해서 실행합니다.
 2. 설치 여부와 바탕화면 바로가기 생성 여부를 선택합니다.
 3. 설치가 끝나면 바로 실행할 수 있습니다.
 
@@ -50,7 +50,7 @@ winget install 9PDG1QN5QSL3 --source msstore
 
 ### 받은 파일 확인
 
-실행 파일은 [GitHub 릴리스](https://github.com/stepanowon/high-pen/releases)에서만 배포합니다. 코드 서명이 없으므로, 받은 파일이 릴리스에 올린 파일과 같은지 [SHA256SUMS.txt](https://github.com/stepanowon/high-pen/releases/download/v1.8.0/SHA256SUMS.txt)의 값과 비교해 확인할 수 있습니다.
+실행 파일은 [GitHub 릴리스](https://github.com/stepanowon/high-pen/releases)에서만 배포합니다. 코드 서명이 없으므로, 받은 파일이 릴리스에 올린 파일과 같은지 [SHA256SUMS.txt](https://github.com/stepanowon/high-pen/releases/download/v1.8.2/SHA256SUMS.txt)의 값과 비교해 확인할 수 있습니다.
 
 ```powershell
 Get-FileHash .\HighPen-Setup.exe -Algorithm SHA256
@@ -114,7 +114,7 @@ Windows 10/11 (.NET Framework 4.8 포함, 별도 설치 불필요)
 | 언어 | | 한국어, 日本語, English 중에서 고르면 바로 바뀝니다. 기본값은 English입니다([언어 바꾸기](#언어-바꾸기) 참고). |
 | 단축키 설정 | | 모든 단축키를 원하는 조합으로 바꾸거나 없앨 수 있습니다([단축키 바꾸기](#단축키-바꾸기) 참고). |
 | 업데이트 확인 | | 누르면 새 버전이 나왔는지 바로 확인합니다. 시작할 때도 자동으로 확인합니다([자동 업데이트](#자동-업데이트) 참고). Microsoft Store 버전에는 이 버튼이 없습니다. |
-| 버전 | | 패널 맨 아래에 현재 버전(`HighPen v1.8.0`)이 표시됩니다. |
+| 버전 | | 패널 맨 아래에 현재 버전(`HighPen v1.8.2`)이 표시됩니다. |
 
 설정은 자동 저장되며 `%APPDATA%\HighPen\settings.txt`에 있습니다.
 

@@ -33,11 +33,11 @@ winget install 9PDG1QN5QSL3 --source msstore
 
 ### Run without installing
 
-Download [HighPen.exe](https://github.com/stepanowon/high-pen/releases/download/v1.8.0/HighPen.exe) and run it directly. No installation needed.
+Download [HighPen.exe](https://github.com/stepanowon/high-pen/releases/download/v1.8.2/HighPen.exe) and run it directly. No installation needed.
 
 ### Install with the installer
 
-1. Download [HighPen-Setup.exe](https://github.com/stepanowon/high-pen/releases/download/v1.8.0/HighPen-Setup.exe) and run it.
+1. Download [HighPen-Setup.exe](https://github.com/stepanowon/high-pen/releases/download/v1.8.2/HighPen-Setup.exe) and run it.
 2. Confirm the installation and choose whether to create a desktop shortcut.
 3. When the installation finishes, you can start the app right away.
 
@@ -50,7 +50,7 @@ Download [HighPen.exe](https://github.com/stepanowon/high-pen/releases/download/
 
 ### Verify the download
 
-The executables are distributed only through [GitHub Releases](https://github.com/stepanowon/high-pen/releases). They are not code-signed, so you can check that a downloaded file is the one published in the release by comparing it with [SHA256SUMS.txt](https://github.com/stepanowon/high-pen/releases/download/v1.8.0/SHA256SUMS.txt).
+The executables are distributed only through [GitHub Releases](https://github.com/stepanowon/high-pen/releases). They are not code-signed, so you can check that a downloaded file is the one published in the release by comparing it with [SHA256SUMS.txt](https://github.com/stepanowon/high-pen/releases/download/v1.8.2/SHA256SUMS.txt).
 
 ```powershell
 Get-FileHash .\HighPen-Setup.exe -Algorithm SHA256
@@ -114,7 +114,7 @@ Shortcuts are global, so they work while you are using other programs. A combina
 | Language | | Choose 한국어, 日本語 or English; the change applies immediately. The default is English (see [Changing the language](#changing-the-language)). |
 | Shortcuts | | Change any shortcut to the combination you want, or remove it (see [Changing shortcuts](#changing-shortcuts)). |
 | Check for updates | | Looks for a new version right away. HighPen also checks automatically at every start-up (see [Automatic updates](#automatic-updates)). Not shown in the Microsoft Store version. |
-| Version | | The current version (`HighPen v1.8.0`) is shown at the bottom of the panel. |
+| Version | | The current version (`HighPen v1.8.2`) is shown at the bottom of the panel. |
 
 Settings are saved automatically to `%APPDATA%\HighPen\settings.txt`.
 
