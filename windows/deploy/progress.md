@@ -1,6 +1,6 @@
 # 배포 진행 상황
 
-마지막 업데이트: 2026-10-30
+마지막 업데이트: 2026-10-31
 
 ## 목표
 
@@ -29,6 +29,8 @@
 | 1.7.4 버전 변경 | 완료 | [#35](https://github.com/stepanowon/high-pen/pull/35) 병합 (main `677a9fb`) |
 | 1.7.4 릴리스 | 완료 | GitHub 릴리스 [HighPen v1.7.4](https://github.com/stepanowon/high-pen/releases/tag/v1.7.4) (`HighPen-Setup.exe`, `HighPen.exe`, `HighPen.msix`), 한·일·영 변경 내용 포함 |
 | 실행 파일 배포 경로 변경 | 완료 | 보안 검토 후속 조치: `dist/*.exe`를 git에서 빼고 GitHub 릴리스에서만 배포. v1.7.4 릴리스에 `SHA256SUMS.txt` 추가(커밋돼 있던 exe와 릴리스 파일의 해시가 같음을 확인), README 다운로드 링크를 릴리스 주소로 변경, `checksums.ps1` 추가 |
+| 1.8.0 기능 추가 | 완료 | 자동 업데이트: 시작할 때 GitHub 릴리스(`v` 태그만, macOS 릴리스 제외)에서 새 버전을 확인하고 업데이트 창에서 설치. 설치본은 새 `HighPen-Setup.exe /S /run`, 단독 exe는 자기 교체 후 재시작. `SHA256SUMS.txt`로 검증. Store(MSIX) 버전은 확인하지 않음. 설정 패널 **업데이트 확인**으로 끌 수 있음. 개인정보 처리방침과 README 갱신 |
+| 1.8.0 릴리스 | 완료 | GitHub 릴리스 [HighPen v1.8.0](https://github.com/stepanowon/high-pen/releases/tag/v1.8.0) (`HighPen-Setup.exe`, `HighPen.exe`, `HighPen.msix`, `SHA256SUMS.txt`). 1.7.4 이하 사용자는 자동 업데이트 기능이 없어 이번 한 번은 직접 받아야 함 |
 
 ### winget
 
@@ -61,6 +63,8 @@
 | 1.7.3 제출 | **할 일** | Partner Center에서 새 제출로 1.7.3.0 패키지 업로드. 새 기능 설명(한·영·일) 준비됨 |
 | 1.7.4 MSIX | 완료 | `dist/HighPen.msix` (1.7.4.0) 빌드. 1.7.3과 같은 `makeappx.exe` 사용. `HighPen-Setup.exe`는 msix와 같은 `HighPen.exe`로 빌드 |
 | 1.7.4 제출 | **할 일** | Partner Center에서 새 제출로 1.7.4.0 패키지 업로드. 1.7.3을 제출하지 않았다면 1.7.4만 올리고, 새 기능 설명에 1.7.3(쉬는 시간 5분 단위)과 1.7.4(전체 지우기 되돌리기) 내용을 함께 적음 |
+| 1.8.0 MSIX | 완료 | `dist/HighPen.msix` (1.8.0.0) 빌드. `makeappx.exe`는 NuGet `Microsoft.Windows.SDK.BuildTools` 10.0.28000.2957을 임시로 받아 사용 |
+| 1.8.0 제출 | **할 일** | Partner Center에서 새 제출로 1.8.0.0 패키지 업로드. 1.7.3·1.7.4를 제출하지 않았다면 1.8.0만 올림. Store 버전은 자동 업데이트 확인을 하지 않으므로 새 기능 설명에 넣지 않음. 개인정보 처리방침 내용이 바뀜(업데이트 확인은 GitHub 배포본만 해당) |
 
 ## Store 정보
 
@@ -94,7 +98,7 @@ Windows 앱 파일은 모두 `windows/` 아래에 있다. 아래 경로와 명�
    .\checksums.ps1                  # dist\SHA256SUMS.txt
    ```
    Windows SDK가 없으면 `build-msix.ps1`에 `-MakeAppx <makeappx.exe 경로>`를 붙인다.
-3. 커밋·푸시한 뒤 릴리스를 만든다. 릴리스 노트에 `SHA256SUMS.txt` 내용을 붙여 둔다.
+3. 커밋·푸시한 뒤 릴리스를 만든다. 릴리스 노트에 `SHA256SUMS.txt` 내용을 붙여 둔다. 태그는 반드시 `v1.x.x` 형식이고 초안·시험판이 아니어야 하며, `HighPen-Setup.exe`, `HighPen.exe`, `SHA256SUMS.txt` 파일 이름을 바꾸면 안 된다. 자동 업데이트가 들어간 버전부터 앱이 시작할 때 이 조건에 맞는 릴리스를 찾아 자동 업데이트한다(`src/HighPen/Updater.cs`). 파일이 빠진 릴리스는 업데이트 대상에서 제외된다.
    ```
    gh release create v1.x.x dist/HighPen-Setup.exe dist/HighPen.exe dist/HighPen.msix dist/SHA256SUMS.txt --title "HighPen v1.x.x" --generate-notes
    ```

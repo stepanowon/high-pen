@@ -29,6 +29,8 @@ namespace HighPen
         AboutWindow aboutWin;
         ToastWindow toastWin;
         HotkeyEditorWindow hotkeyWin;
+        UpdateWindow updateWin;
+        UpdateDownload updateDownload;
         bool capturing;
         readonly DispatcherTimer monitorTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(1) };
         string monitorSignature; // the monitor layout everything was last placed for
@@ -73,6 +75,8 @@ namespace HighPen
                 ApplyClicks();
                 topmost.Reassert();
                 monitorTimer.Start();
+                // look for a newer version once start-up has settled
+                Toolbar.Dispatcher.BeginInvoke(DispatcherPriority.ApplicationIdle, new Action(CheckForUpdate));
             };
 
             // Keep up with monitors being plugged in or removed (and resolution changes) while running.
@@ -360,6 +364,7 @@ namespace HighPen
         public void Quit()
         {
             if (hotkeyWin != null) hotkeyWin.Close();
+            if (updateDownload != null) updateDownload.Cancel();
             zoomer.Stop();
             clickHook.Stop();
             monitorTimer.Stop();
@@ -419,6 +424,13 @@ namespace HighPen
             Toolbar.SettingsPanel.MarkBreakMinutes(cfg.BreakMinutes);
         }
 
+        public void ToggleUpdateCheck()
+        {
+            cfg.CheckUpdates = !cfg.CheckUpdates;
+            Save();
+            Toolbar.SettingsPanel.ShowUpdateCheck(cfg.CheckUpdates);
+        }
+
         // Rebuilds the toolbar in the new language, keeping the current mode.
         public void SetLanguage(int i)
         {
@@ -459,6 +471,39 @@ namespace HighPen
                 if (hotkeys.Failed.Count > 0) ShowToast(hotkeys.WarningText(), null, 8);
             };
             hotkeyWin = w;
+            w.Show();
+        }
+
+        // ---------- updates ----------
+
+        void CheckForUpdate()
+        {
+            if (cfg.CheckUpdates && Updater.Supported) Updater.Check(ShowUpdate);
+        }
+
+        // Offers the new version; once it is downloaded, verified and started, HighPen quits for it.
+        void ShowUpdate(UpdateInfo u)
+        {
+            if (updateWin != null) return;
+            UpdateWindow w = new UpdateWindow(u, Monitors.Get(cfg.Monitor).WorkingArea);
+            topmost.Track(w);
+            w.Updating = delegate
+            {
+                w.ShowProgress(0);
+                updateDownload = new UpdateDownload(u, w.ShowProgress, delegate (string error)
+                {
+                    updateDownload = null;
+                    if (error == null) Quit();
+                    else w.ShowError(error);
+                });
+            };
+            // Later (or closing) while downloading stops the download
+            w.Closed += delegate
+            {
+                updateWin = null;
+                if (updateDownload != null) { updateDownload.Cancel(); updateDownload = null; }
+            };
+            updateWin = w;
             w.Show();
         }
 
