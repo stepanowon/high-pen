@@ -31,6 +31,8 @@
 | 실행 파일 배포 경로 변경 | 완료 | 보안 검토 후속 조치: `dist/*.exe`를 git에서 빼고 GitHub 릴리스에서만 배포. v1.7.4 릴리스에 `SHA256SUMS.txt` 추가(커밋돼 있던 exe와 릴리스 파일의 해시가 같음을 확인), README 다운로드 링크를 릴리스 주소로 변경, `checksums.ps1` 추가 |
 | 1.8.0 기능 추가 | 완료 | 자동 업데이트: 시작할 때 GitHub 릴리스(`v` 태그만, macOS 릴리스 제외)에서 새 버전을 확인하고 업데이트 창에서 설치. 설치본은 새 `HighPen-Setup.exe /S /run`, 단독 exe는 자기 교체 후 재시작. `SHA256SUMS.txt`로 검증. Store(MSIX) 버전은 확인하지 않음. 설정 패널 **업데이트 확인**으로 끌 수 있음. 개인정보 처리방침과 README 갱신 |
 | 1.8.0 릴리스 | 완료 | GitHub 릴리스 [HighPen v1.8.0](https://github.com/stepanowon/high-pen/releases/tag/v1.8.0) (`HighPen-Setup.exe`, `HighPen.exe`, `HighPen.msix`, `SHA256SUMS.txt`). 1.7.4 이하 사용자는 자동 업데이트 기능이 없어 이번 한 번은 직접 받아야 함 |
+| 1.8.1 기능 추가: Store로 업데이트 안내 | 완료 | GitHub 배포본은 새 버전을 GitHub에서 내려받지 않고 업데이트 창의 **Microsoft Store에서 받기**로 Store 페이지(`ms-windows-store://pdp/?ProductId=9PDG1QN5QSL3`)를 열어 서명된 Store 패키지를 설치하게 바꿈. 1.8.0이 남기는 `/waitpid` 재시작과 `.old` 정리는 호환을 위해 유지. 버전 1.8.1 |
+| 1.8.1 GitHub 릴리스 | **할 일** | **Store에 1.8.1이 게시된 뒤에** 만든다. `dist`의 1.8.1 파일(`HighPen-Setup.exe` `727559c6…`, `HighPen.exe` `f5c129b8…`, `HighPen.msix` `22e051af…`)과 `SHA256SUMS.txt`를 올린다(1.8.0이 이 파일들로 스스로 업데이트함). 릴리스 후 한·영·일 Windows README의 다운로드 링크와 버전 표기를 v1.8.1로 바꾼다 |
 
 ### winget
 
@@ -60,11 +62,13 @@
 | 1.4.0 MSIX | 완료 | `dist/HighPen.msix` (1.4.0.0) 빌드. `makeappx.exe`는 Windows SDK 미설치로 이전에 받은 SDK BuildTools를 사용 |
 | 1.4.0 제출 (Submission 2) | 완료 | 2026-10-21 제출, 약 20분 만에 인증 통과 후 게시. 패키지 1.4.0.0, 검색어·짧은 설명·새 기능 설명(한·영·일) 포함. `runFullTrust` 사유에 마우스 훅·화면 캡처 용도 명시. Partner Center "Store 현재 상태"가 Submission 2로 바뀜 |
 | 1.7.3 MSIX | 완료 | `dist/HighPen.msix` (1.7.3.0) 빌드. `makeappx.exe`는 `C:\Users\stepa\.claude\jobs\1e54521f\tmp\sdkbt\x\bin\10.0.28000.0\x64\makeappx.exe` 사용(임시 폴더라 지워질 수 있음) |
-| 1.7.3 제출 | **할 일** | Partner Center에서 새 제출로 1.7.3.0 패키지 업로드. 새 기능 설명(한·영·일) 준비됨 |
+| 1.7.3 제출 | 건너뜀 | 따로 제출하지 않고 1.7.4에 내용을 합침 |
 | 1.7.4 MSIX | 완료 | `dist/HighPen.msix` (1.7.4.0) 빌드. 1.7.3과 같은 `makeappx.exe` 사용. `HighPen-Setup.exe`는 msix와 같은 `HighPen.exe`로 빌드 |
-| 1.7.4 제출 | **할 일** | Partner Center에서 새 제출로 1.7.4.0 패키지 업로드. 1.7.3을 제출하지 않았다면 1.7.4만 올리고, 새 기능 설명에 1.7.3(쉬는 시간 5분 단위)과 1.7.4(전체 지우기 되돌리기) 내용을 함께 적음 |
+| 1.7.4 제출 | 완료 | 1.7.4.0 패키지가 Store에 게시됨(2026-10-31 확인). 현재 Store 버전 |
 | 1.8.0 MSIX | 완료 | `dist/HighPen.msix` (1.8.0.0) 빌드. `makeappx.exe`는 NuGet `Microsoft.Windows.SDK.BuildTools` 10.0.28000.2957을 임시로 받아 사용 |
-| 1.8.0 제출 | **할 일** | Partner Center에서 새 제출로 1.8.0.0 패키지 업로드. 1.7.3·1.7.4를 제출하지 않았다면 1.8.0만 올림. Store 버전은 자동 업데이트 확인을 하지 않으므로 새 기능 설명에 넣지 않음. 개인정보 처리방침 내용이 바뀜(업데이트 확인은 GitHub 배포본만 해당) |
+| 1.8.0 제출 | 불필요 | 1.8.0의 변경(업데이트 확인)은 Store 버전에서 동작하지 않아 Store 사용자에게 바뀌는 것이 없음. Store로 업데이트를 안내하는 다음 버전을 제출할 때 함께 올라감 |
+| 1.8.1 MSIX | 완료 | `dist/HighPen.msix` (1.8.1.0) 빌드. `HighPen-Setup.exe`는 msix와 같은 `HighPen.exe`로 빌드 |
+| 1.8.1 제출 | **할 일** | Partner Center에서 새 제출로 1.8.1.0 패키지 업로드. Store 사용자에게 보이는 변경은 없음(업데이트 확인·Store 안내는 GitHub 배포본에서만 동작). 게시되면 GitHub 릴리스 진행 |
 
 ## Store 정보
 
@@ -98,7 +102,7 @@ Windows 앱 파일은 모두 `windows/` 아래에 있다. 아래 경로와 명�
    .\checksums.ps1                  # dist\SHA256SUMS.txt
    ```
    Windows SDK가 없으면 `build-msix.ps1`에 `-MakeAppx <makeappx.exe 경로>`를 붙인다.
-3. 커밋·푸시한 뒤 릴리스를 만든다. 릴리스 노트에 `SHA256SUMS.txt` 내용을 붙여 둔다. 태그는 반드시 `v1.x.x` 형식이고 초안·시험판이 아니어야 하며, `HighPen-Setup.exe`, `HighPen.exe`, `SHA256SUMS.txt` 파일 이름을 바꾸면 안 된다. 자동 업데이트가 들어간 버전부터 앱이 시작할 때 이 조건에 맞는 릴리스를 찾아 자동 업데이트한다(`src/HighPen/Updater.cs`). 파일이 빠진 릴리스는 업데이트 대상에서 제외된다.
+3. 커밋·푸시한 뒤 릴리스를 만든다. 릴리스 노트에 `SHA256SUMS.txt` 내용을 붙여 둔다. 태그는 반드시 `v1.x.x` 형식이고 초안·시험판이 아니어야 한다. GitHub 배포본(1.8.0 이후)은 시작할 때 이 태그로 새 버전을 알아내고 Microsoft Store 페이지를 열어 설치하게 한다(`src/HighPen/Updater.cs`). **그래서 GitHub 릴리스는 같은 버전이 Store에 게시된 뒤에 만든다.** 먼저 만들면 Store에서 아직 이전 버전이 설치된다. 1.8.0만은 GitHub에서 `HighPen.exe`/`HighPen-Setup.exe`와 `SHA256SUMS.txt`를 받아 스스로 교체하므로, 이 파일 이름은 바꾸지 않는다(1.8.0 사용자가 다음 버전으로 한 번 넘어오는 경로).
    ```
    gh release create v1.x.x dist/HighPen-Setup.exe dist/HighPen.exe dist/HighPen.msix dist/SHA256SUMS.txt --title "HighPen v1.x.x" --generate-notes
    ```

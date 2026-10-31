@@ -30,7 +30,6 @@ namespace HighPen
         ToastWindow toastWin;
         HotkeyEditorWindow hotkeyWin;
         UpdateWindow updateWin;
-        UpdateDownload updateDownload;
         bool capturing;
         readonly DispatcherTimer monitorTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(1) };
         string monitorSignature; // the monitor layout everything was last placed for
@@ -364,7 +363,6 @@ namespace HighPen
         public void Quit()
         {
             if (hotkeyWin != null) hotkeyWin.Close();
-            if (updateDownload != null) updateDownload.Cancel();
             zoomer.Stop();
             clickHook.Stop();
             monitorTimer.Stop();
@@ -481,28 +479,13 @@ namespace HighPen
             if (cfg.CheckUpdates && Updater.Supported) Updater.Check(ShowUpdate);
         }
 
-        // Offers the new version; once it is downloaded, verified and started, HighPen quits for it.
+        // Offers the new version, which is installed from the Microsoft Store.
         void ShowUpdate(UpdateInfo u)
         {
             if (updateWin != null) return;
             UpdateWindow w = new UpdateWindow(u, Monitors.Get(cfg.Monitor).WorkingArea);
             topmost.Track(w);
-            w.Updating = delegate
-            {
-                w.ShowProgress(0);
-                updateDownload = new UpdateDownload(u, w.ShowProgress, delegate (string error)
-                {
-                    updateDownload = null;
-                    if (error == null) Quit();
-                    else w.ShowError(error);
-                });
-            };
-            // Later (or closing) while downloading stops the download
-            w.Closed += delegate
-            {
-                updateWin = null;
-                if (updateDownload != null) { updateDownload.Cancel(); updateDownload = null; }
-            };
+            w.Closed += delegate { updateWin = null; };
             updateWin = w;
             w.Show();
         }
