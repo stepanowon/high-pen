@@ -149,7 +149,7 @@ namespace HighPen
             p.Children.Add(btns);
             Content = Frame(p);
 
-            store.MouseLeftButtonUp += delegate { Updater.OpenStore(); Close(); };
+            store.MouseLeftButtonUp += delegate { Updater.OpenStore(true); Close(); };
             later.MouseLeftButtonUp += delegate { Close(); };
             CenterOnLoad(workArea);
         }
