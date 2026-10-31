@@ -44,9 +44,9 @@ namespace HighPen
             }
         }
 
-        // Asks GitHub for the releases and calls found (on the calling thread) when a newer one is out.
-        // Errors (offline, rate limit) are silent.
-        public static void Check(Action<UpdateInfo> found)
+        // Asks GitHub for the releases and calls done on the calling thread: (newer release, null) when one is
+        // out, (null, null) when this is the newest, (null, message) when the check failed (offline, rate limit).
+        public static void Check(Action<UpdateInfo, string> done)
         {
             ServicePointManager.SecurityProtocol |= SecurityProtocolType.Tls12;
             WebClient wc = new WebClient { Encoding = Encoding.UTF8 };
@@ -55,12 +55,14 @@ namespace HighPen
             wc.DownloadStringCompleted += delegate (object s, DownloadStringCompletedEventArgs e)
             {
                 wc.Dispose();
-                if (e.Error != null || e.Cancelled) return;
-                UpdateInfo u = null;
-                try { u = Pick(e.Result); } catch { }
-                if (u != null) found(u);
+                if (e.Error != null || e.Cancelled) { done(null, Lang.T("UpdateCheckFailed")); return; }
+                UpdateInfo u;
+                try { u = Pick(e.Result); }
+                catch { done(null, Lang.T("UpdateCheckFailed")); return; }
+                done(u, null);
             };
-            try { wc.DownloadStringAsync(new Uri(ReleasesApi)); } catch { wc.Dispose(); }
+            try { wc.DownloadStringAsync(new Uri(ReleasesApi)); }
+            catch { wc.Dispose(); done(null, Lang.T("UpdateCheckFailed")); }
         }
 
         // The newest published Windows release (tags "v1.2.3"; macOS releases are "macos-v…") above this version.

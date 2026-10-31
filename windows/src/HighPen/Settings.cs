@@ -23,7 +23,6 @@ namespace HighPen
         public int BreakMinutes = 10; // length of the break timer
         public int BarX = 20, BarY = 20; // offset from the monitor work area, in pixels
         public string Language = ""; // "" = English (the default)
-        public bool CheckUpdates = true; // look for a newer version at start-up (not in the Store version)
         // Shortcuts changed from their defaults, by command id ("" = no shortcut).
         public Dictionary<string, string> Hotkeys = new Dictionary<string, string>();
 
@@ -74,7 +73,6 @@ namespace HighPen
             Integer("BarX", (s, v) => s.BarX = v, s => s.BarX),
             Integer("BarY", (s, v) => s.BarY = v, s => s.BarY),
             Text("Language", (s, v) => s.Language = v, s => s.Language),
-            Flag("CheckUpdates", (s, v) => s.CheckUpdates = v, s => s.CheckUpdates),
         };
 
         static Field Text(string key, Action<Settings, string> read, Func<Settings, string> write)
