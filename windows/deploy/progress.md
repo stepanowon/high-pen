@@ -29,10 +29,10 @@
 | 1.7.4 버전 변경 | 완료 | [#35](https://github.com/stepanowon/high-pen/pull/35) 병합 (main `677a9fb`) |
 | 1.7.4 릴리스 | 완료 | GitHub 릴리스 [HighPen v1.7.4](https://github.com/stepanowon/high-pen/releases/tag/v1.7.4) (`HighPen-Setup.exe`, `HighPen.exe`, `HighPen.msix`), 한·일·영 변경 내용 포함 |
 | 실행 파일 배포 경로 변경 | 완료 | 보안 검토 후속 조치: `dist/*.exe`를 git에서 빼고 GitHub 릴리스에서만 배포. v1.7.4 릴리스에 `SHA256SUMS.txt` 추가(커밋돼 있던 exe와 릴리스 파일의 해시가 같음을 확인), README 다운로드 링크를 릴리스 주소로 변경, `checksums.ps1` 추가 |
-| 1.8.0 기능 추가 | 완료 | 자동 업데이트: 시작할 때 GitHub 릴리스(`v` 태그만, macOS 릴리스 제외)에서 새 버전을 확인하고 업데이트 창에서 설치. 설치본은 새 `HighPen-Setup.exe /S /run`, 단독 exe는 자기 교체 후 재시작. `SHA256SUMS.txt`로 검증. Store(MSIX) 버전은 확인하지 않음. 설정 패널 **업데이트 확인**으로 끌 수 있음. 개인정보 처리방침과 README 갱신 |
+| 1.8.0 기능 추가 | 완료 | 자동 업데이트: 시작할 때 GitHub 릴리스(`v` 태그만, macOS 릴리스 제외)에서 새 버전을 확인하고 업데이트 창에서 설치. 설치본은 새 `HighPen-Setup.exe /S /run`, 단독 exe는 자기 교체 후 재시작. `SHA256SUMS.txt`로 검증. Store(MSIX) 버전은 확인하지 않음. 설정 패널 **업데이트 확인**으로 끌 수 있음(1.8.1에서 없앰). 개인정보 처리방침과 README 갱신 |
 | 1.8.0 릴리스 | 완료 | GitHub 릴리스 [HighPen v1.8.0](https://github.com/stepanowon/high-pen/releases/tag/v1.8.0) (`HighPen-Setup.exe`, `HighPen.exe`, `HighPen.msix`, `SHA256SUMS.txt`). 1.7.4 이하 사용자는 자동 업데이트 기능이 없어 이번 한 번은 직접 받아야 함 |
-| 1.8.1 기능 추가: Store로 업데이트 안내 | 완료 | GitHub 배포본은 새 버전을 GitHub에서 내려받지 않고 업데이트 창의 **Microsoft Store에서 받기**로 Store 페이지(`ms-windows-store://pdp/?ProductId=9PDG1QN5QSL3`)를 열어 서명된 Store 패키지를 설치하게 바꿈. 1.8.0이 남기는 `/waitpid` 재시작과 `.old` 정리는 호환을 위해 유지. 버전 1.8.1 |
-| 1.8.1 GitHub 릴리스 | **할 일** | **Store에 1.8.1이 게시된 뒤에** 만든다. `dist`의 1.8.1 파일(`HighPen-Setup.exe` `727559c6…`, `HighPen.exe` `f5c129b8…`, `HighPen.msix` `22e051af…`)과 `SHA256SUMS.txt`를 올린다(1.8.0이 이 파일들로 스스로 업데이트함). 릴리스 후 한·영·일 Windows README의 다운로드 링크와 버전 표기를 v1.8.1로 바꾼다 |
+| 1.8.1 기능 추가: Store로 업데이트 안내 | 완료 | GitHub 배포본은 새 버전을 GitHub에서 내려받지 않고 업데이트 창의 **Microsoft Store에서 받기**로 Store 페이지(`ms-windows-store://pdp/?ProductId=9PDG1QN5QSL3`)를 열어 서명된 Store 패키지를 설치하게 바꿈. 1.8.0이 남기는 `/waitpid` 재시작과 `.old` 정리는 호환을 위해 유지. 업데이트 확인 켜기/끄기 설정을 없애고 시작할 때 항상 확인하며, 설정 패널에 **업데이트 확인** 버튼을 둬서 직접 확인(새 버전이면 업데이트 창, 아니면 "최신 버전입니다" 또는 실패 알림). 버전 1.8.1 |
+| 1.8.1 GitHub 릴리스 | **할 일** | **Store에 1.8.1이 게시된 뒤에** 만든다. `dist`의 1.8.1 파일(`HighPen-Setup.exe` `6ce195a7…`, `HighPen.exe` `b72a328f…`, `HighPen.msix` `c16b4f86…`)과 `SHA256SUMS.txt`를 올린다(1.8.0이 이 파일들로 스스로 업데이트함). 릴리스 후 한·영·일 Windows README의 다운로드 링크와 버전 표기를 v1.8.1로 바꾼다 |
 
 ### winget
 

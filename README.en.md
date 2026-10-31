@@ -44,7 +44,7 @@ For building, features and shortcuts, and permissions, see the [macOS docs](maco
 
 ## Privacy
 
-Apart from the Windows version checking GitHub for a new version at start-up (which can be turned off, and which the Microsoft Store version does not do), this program will not transfer any information to other networked systems unless specifically requested by the user or the person installing or operating it. See the [privacy policy](PRIVACY.md#english) for details.
+Apart from the Windows version checking GitHub for a new version at start-up (which the Microsoft Store version does not do), this program will not transfer any information to other networked systems unless specifically requested by the user or the person installing or operating it. See the [privacy policy](PRIVACY.md#english) for details.
 
 ## License
 

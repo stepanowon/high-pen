@@ -30,6 +30,7 @@ namespace HighPen
         ToastWindow toastWin;
         HotkeyEditorWindow hotkeyWin;
         UpdateWindow updateWin;
+        bool checkingUpdate;
         bool capturing;
         readonly DispatcherTimer monitorTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(1) };
         string monitorSignature; // the monitor layout everything was last placed for
@@ -422,13 +423,6 @@ namespace HighPen
             Toolbar.SettingsPanel.MarkBreakMinutes(cfg.BreakMinutes);
         }
 
-        public void ToggleUpdateCheck()
-        {
-            cfg.CheckUpdates = !cfg.CheckUpdates;
-            Save();
-            Toolbar.SettingsPanel.ShowUpdateCheck(cfg.CheckUpdates);
-        }
-
         // Rebuilds the toolbar in the new language, keeping the current mode.
         public void SetLanguage(int i)
         {
@@ -474,15 +468,29 @@ namespace HighPen
 
         // ---------- updates ----------
 
+        // At start-up: only a newer version is worth telling about.
         void CheckForUpdate()
         {
-            if (cfg.CheckUpdates && Updater.Supported) Updater.Check(ShowUpdate);
+            if (Updater.Supported) Updater.Check(delegate (UpdateInfo u, string error) { if (u != null) ShowUpdate(u); });
+        }
+
+        // The Update check button: shows the new version, or says HighPen is up to date or could not check.
+        public void CheckForUpdates()
+        {
+            if (checkingUpdate) return;
+            checkingUpdate = true;
+            Updater.Check(delegate (UpdateInfo u, string error)
+            {
+                checkingUpdate = false;
+                if (u != null) ShowUpdate(u);
+                else ShowToast(error ?? string.Format(Lang.T("UpdateLatest"), AppInfo.AppVersion), null, 4);
+            });
         }
 
         // Offers the new version, which is installed from the Microsoft Store.
         void ShowUpdate(UpdateInfo u)
         {
-            if (updateWin != null) return;
+            if (updateWin != null) { updateWin.BringTopmost(); return; }
             UpdateWindow w = new UpdateWindow(u, Monitors.Get(cfg.Monitor).WorkingArea);
             topmost.Track(w);
             w.Closed += delegate { updateWin = null; };
