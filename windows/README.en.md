@@ -33,11 +33,11 @@ winget install 9PDG1QN5QSL3 --source msstore
 
 ### Run without installing
 
-Download [HighPen.exe](https://github.com/stepanowon/high-pen/releases/download/v1.7.4/HighPen.exe) and run it directly. No installation needed.
+Download [HighPen.exe](https://github.com/stepanowon/high-pen/releases/download/v1.8.0/HighPen.exe) and run it directly. No installation needed.
 
 ### Install with the installer
 
-1. Download [HighPen-Setup.exe](https://github.com/stepanowon/high-pen/releases/download/v1.7.4/HighPen-Setup.exe) and run it.
+1. Download [HighPen-Setup.exe](https://github.com/stepanowon/high-pen/releases/download/v1.8.0/HighPen-Setup.exe) and run it.
 2. Confirm the installation and choose whether to create a desktop shortcut.
 3. When the installation finishes, you can start the app right away.
 
@@ -50,7 +50,7 @@ Download [HighPen.exe](https://github.com/stepanowon/high-pen/releases/download/
 
 ### Verify the download
 
-The executables are distributed only through [GitHub Releases](https://github.com/stepanowon/high-pen/releases). They are not code-signed, so you can check that a downloaded file is the one published in the release by comparing it with [SHA256SUMS.txt](https://github.com/stepanowon/high-pen/releases/download/v1.7.4/SHA256SUMS.txt).
+The executables are distributed only through [GitHub Releases](https://github.com/stepanowon/high-pen/releases). They are not code-signed, so you can check that a downloaded file is the one published in the release by comparing it with [SHA256SUMS.txt](https://github.com/stepanowon/high-pen/releases/download/v1.8.0/SHA256SUMS.txt).
 
 ```powershell
 Get-FileHash .\HighPen-Setup.exe -Algorithm SHA256
@@ -113,7 +113,8 @@ Shortcuts are global, so they work while you are using other programs. A combina
 | Show clicks | Ctrl+Alt+K | Briefly shows an expanding ring where you click. Off by default. |
 | Language | | Choose 한국어, 日本語 or English; the change applies immediately. The default is English (see [Changing the language](#changing-the-language)). |
 | Shortcuts | | Change any shortcut to the combination you want, or remove it (see [Changing shortcuts](#changing-shortcuts)). |
-| Version | | The current version (`HighPen v1.7.4`) is shown at the bottom of the panel. |
+| Check for updates | | Looks for a new version at start-up. On by default (see [Automatic updates](#automatic-updates)). Not shown in the Microsoft Store version. |
+| Version | | The current version (`HighPen v1.8.0`) is shown at the bottom of the panel. |
 
 Settings are saved automatically to `%APPDATA%\HighPen\settings.txt`.
 
@@ -258,9 +259,20 @@ Choose the monitor the app works on with **Monitor** in the settings panel (or C
 - Clicking it does not take focus away from the screen you are presenting.
 - While running, its icon appears on the taskbar and can be pinned.
 
+### Automatic updates
+
+When you use `HighPen.exe` or `HighPen-Setup.exe` from GitHub, HighPen checks for a new version every time it starts. The Microsoft Store version is updated by the Store and does not check.
+
+- When a new version is out, an update window appears in the middle of the active monitor. **Update** downloads and installs it and restarts HighPen. **Later** reminds you at the next start. **What's new** opens the release page.
+- Restarting clears the ink on the screen. Your settings are kept.
+- An installed copy is updated by running the new installer silently; a copy run straight from `HighPen.exe` has that file replaced with the new version.
+- The download is checked against the release's `SHA256SUMS.txt` and is not installed if it does not match.
+- If `HighPen.exe` sits in a folder you cannot write to, it cannot update itself; download the new version from **What's new** instead.
+- To stop checking, click **Check for updates** in the settings panel. Nothing is shown when you are offline.
+
 ### Saved settings
 
-Pen color, width, pressure, highlighter color and width, changed shortcuts, spot color and size, whether the spot is on, show clicks, the zoom level, the break length, the active monitor, the toolbar position and the language are saved automatically to `%APPDATA%\HighPen\settings.txt` and reused on the next launch.
+Pen color, width, pressure, highlighter color and width, changed shortcuts, spot color and size, whether the spot is on, show clicks, the zoom level, the break length, the active monitor, the toolbar position, the language and whether to check for updates are saved automatically to `%APPDATA%\HighPen\settings.txt` and reused on the next launch.
 
 ## Notes / limitations
 
@@ -271,7 +283,7 @@ Pen color, width, pressure, highlighter color and width, changed shortcuts, spot
 
 ## Privacy
 
-This program will not transfer any information to other networked systems unless specifically requested by the user or the person installing or operating it. A browser or mail app opens only when you click a link in the About window. See the [privacy policy](../PRIVACY.md#english) for details.
+Apart from checking GitHub for a new version at start-up ([Automatic updates](#automatic-updates); it can be turned off, and the Microsoft Store version does not do it), this program will not transfer any information to other networked systems unless specifically requested by the user or the person installing or operating it. A browser or mail app opens only when you click a link in the About window or the update window. See the [privacy policy](../PRIVACY.md#english) for details.
 
 ## License
 

@@ -19,6 +19,7 @@ namespace HighPen
         void SetBreakMinutes(int minutes);
         void SetLanguage(int i);
         void ShowHotkeyEditor();
+        void ToggleUpdateCheck();
     }
 
     // The panel next to the toolbar: monitor, pen, highlighter, spot, zoom, break length, language and shortcuts.
@@ -33,8 +34,8 @@ namespace HighPen
         TextBlock breakTitle;
         Slider breakSlider;
         Panel penSwatches, highlightSwatches;
-        Border pressureBtn, clicksBtn;
-        TextBlock pressureText, clicksText, hotkeyWarn;
+        Border pressureBtn, clicksBtn, updateBtn;
+        TextBlock pressureText, clicksText, updateText, hotkeyWarn;
 
         public SettingsPanel(Settings cfg, HotkeyBindings bindings, ISettingsActions actions)
         {
@@ -71,6 +72,8 @@ namespace HighPen
 
         public void ShowPressure(bool on) { ShowSwitch(pressureBtn, pressureText, "Pressure", on); }
         public void ShowClicks(bool on) { ShowSwitch(clicksBtn, clicksText, "ClickShow", on); }
+        // Not shown in the Store version, which the Store updates.
+        public void ShowUpdateCheck(bool on) { if (updateBtn != null) ShowSwitch(updateBtn, updateText, "UpdateCheck", on); }
 
         // null hides the warning.
         public void ShowHotkeyWarning(string text)
@@ -180,6 +183,13 @@ namespace HighPen
             p.Children.Add(hk);
             hotkeyWarn = new TextBlock { Foreground = Theme.Warning, FontSize = 11, TextWrapping = TextWrapping.Wrap, Margin = new Thickness(0, 8, 0, 0), Visibility = Visibility.Collapsed };
             p.Children.Add(hotkeyWarn);
+
+            if (Updater.Supported)
+            {
+                p.Children.Add(Switch("UpdateCheck", "", actions.ToggleUpdateCheck, out updateBtn, out updateText));
+                updateBtn.ToolTip = Lang.T("UpdateCheckTip");
+                ShowUpdateCheck(cfg.CheckUpdates);
+            }
 
             p.Children.Add(Divider());
             p.Children.Add(new TextBlock { Text = "HighPen v" + AppInfo.AppVersion, Foreground = Brushes.Gray, FontSize = 11, HorizontalAlignment = HorizontalAlignment.Center });

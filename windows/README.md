@@ -33,11 +33,11 @@ winget install 9PDG1QN5QSL3 --source msstore
 
 ### 설치 없이 실행
 
-[HighPen.exe](https://github.com/stepanowon/high-pen/releases/download/v1.7.4/HighPen.exe)를 다운로드해서 바로 실행합니다. 설치 과정이 필요 없습니다.
+[HighPen.exe](https://github.com/stepanowon/high-pen/releases/download/v1.8.0/HighPen.exe)를 다운로드해서 바로 실행합니다. 설치 과정이 필요 없습니다.
 
 ### 설치 파일로 설치
 
-1. [HighPen-Setup.exe](https://github.com/stepanowon/high-pen/releases/download/v1.7.4/HighPen-Setup.exe)를 다운로드해서 실행합니다.
+1. [HighPen-Setup.exe](https://github.com/stepanowon/high-pen/releases/download/v1.8.0/HighPen-Setup.exe)를 다운로드해서 실행합니다.
 2. 설치 여부와 바탕화면 바로가기 생성 여부를 선택합니다.
 3. 설치가 끝나면 바로 실행할 수 있습니다.
 
@@ -50,7 +50,7 @@ winget install 9PDG1QN5QSL3 --source msstore
 
 ### 받은 파일 확인
 
-실행 파일은 [GitHub 릴리스](https://github.com/stepanowon/high-pen/releases)에서만 배포합니다. 코드 서명이 없으므로, 받은 파일이 릴리스에 올린 파일과 같은지 [SHA256SUMS.txt](https://github.com/stepanowon/high-pen/releases/download/v1.7.4/SHA256SUMS.txt)의 값과 비교해 확인할 수 있습니다.
+실행 파일은 [GitHub 릴리스](https://github.com/stepanowon/high-pen/releases)에서만 배포합니다. 코드 서명이 없으므로, 받은 파일이 릴리스에 올린 파일과 같은지 [SHA256SUMS.txt](https://github.com/stepanowon/high-pen/releases/download/v1.8.0/SHA256SUMS.txt)의 값과 비교해 확인할 수 있습니다.
 
 ```powershell
 Get-FileHash .\HighPen-Setup.exe -Algorithm SHA256
@@ -113,7 +113,8 @@ Windows 10/11 (.NET Framework 4.8 포함, 별도 설치 불필요)
 | 클릭 표시 | Ctrl+Alt+K | 마우스를 클릭한 자리에 퍼지는 원을 잠깐 보여 줍니다. 기본값은 꺼짐입니다. |
 | 언어 | | 한국어, 日本語, English 중에서 고르면 바로 바뀝니다. 기본값은 English입니다([언어 바꾸기](#언어-바꾸기) 참고). |
 | 단축키 설정 | | 모든 단축키를 원하는 조합으로 바꾸거나 없앨 수 있습니다([단축키 바꾸기](#단축키-바꾸기) 참고). |
-| 버전 | | 패널 맨 아래에 현재 버전(`HighPen v1.7.4`)이 표시됩니다. |
+| 업데이트 확인 | | 시작할 때 새 버전이 나왔는지 확인합니다. 기본값은 켜짐입니다([자동 업데이트](#자동-업데이트) 참고). Microsoft Store 버전에는 이 항목이 없습니다. |
+| 버전 | | 패널 맨 아래에 현재 버전(`HighPen v1.8.0`)이 표시됩니다. |
 
 설정은 자동 저장되며 `%APPDATA%\HighPen\settings.txt`에 있습니다.
 
@@ -258,9 +259,20 @@ Windows 10/11 (.NET Framework 4.8 포함, 별도 설치 불필요)
 - 클릭해도 발표 중인 화면의 포커스를 가져가지 않습니다.
 - 실행 중에는 작업표시줄에 아이콘이 나타나고, 고정해 둘 수 있습니다.
 
+### 자동 업데이트
+
+GitHub에서 받은 `HighPen.exe`나 `HighPen-Setup.exe`로 쓰는 경우, HighPen을 시작할 때마다 새 버전이 나왔는지 확인합니다. Microsoft Store 버전은 Store가 자동으로 업데이트하므로 확인하지 않습니다.
+
+- 새 버전이 있으면 작동 모니터 가운데에 업데이트 창이 뜹니다. **업데이트**를 누르면 새 버전을 내려받아 설치하고 HighPen을 다시 시작합니다. **나중에**를 누르면 다음에 시작할 때 다시 알려 줍니다. **변경 내용 보기**를 누르면 릴리스 페이지가 열립니다.
+- 다시 시작하면 화면의 필기는 지워집니다. 설정은 그대로 남습니다.
+- 설치 파일로 설치했다면 새 설치 파일을 조용히 실행해 업데이트하고, 설치 없이 `HighPen.exe`만 쓴다면 그 파일을 새 버전으로 바꿉니다.
+- 내려받은 파일은 릴리스의 `SHA256SUMS.txt` 값과 비교해서, 다르면 설치하지 않습니다.
+- `HighPen.exe`를 쓰기 권한이 없는 폴더에 두었다면 업데이트하지 못합니다. 이때는 **변경 내용 보기**에서 직접 받으세요.
+- 확인을 끄려면 설정 패널의 **업데이트 확인**을 누릅니다. 인터넷에 연결되어 있지 않으면 아무것도 표시하지 않습니다.
+
 ### 설정 저장
 
-펜 색상, 두께, 필압 반영, 형광펜 색상과 두께, 바꾼 단축키, 스팟 색상과 크기, 스팟 켜짐 여부, 클릭 표시, 확대 배율, 쉬는 시간 길이, 작동 모니터, 설정바 위치, 언어가 `%APPDATA%\HighPen\settings.txt`에 자동 저장되어 다음 실행 때 그대로 쓰입니다.
+펜 색상, 두께, 필압 반영, 형광펜 색상과 두께, 바꾼 단축키, 스팟 색상과 크기, 스팟 켜짐 여부, 클릭 표시, 확대 배율, 쉬는 시간 길이, 작동 모니터, 설정바 위치, 언어, 업데이트 확인 여부가 `%APPDATA%\HighPen\settings.txt`에 자동 저장되어 다음 실행 때 그대로 쓰입니다.
 
 ## 참고 / 제한 사항
 
@@ -271,7 +283,7 @@ Windows 10/11 (.NET Framework 4.8 포함, 별도 설치 불필요)
 
 ## 개인정보
 
-이 프로그램은 사용자나 설치·운영하는 사람이 명시적으로 요청하지 않는 한 어떤 정보도 다른 네트워크 시스템으로 전송하지 않습니다. 정보 창의 링크를 누를 때만 브라우저나 메일 앱이 열립니다. 자세한 내용은 [개인정보 처리방침](../PRIVACY.md#한국어)을 참고하세요.
+이 프로그램은 시작할 때 GitHub에 새 버전을 확인하는 것([자동 업데이트](#자동-업데이트), 설정에서 끌 수 있고 Microsoft Store 버전은 하지 않음) 외에는, 사용자나 설치·운영하는 사람이 명시적으로 요청하지 않는 한 어떤 정보도 다른 네트워크 시스템으로 전송하지 않습니다. 정보 창과 업데이트 창의 링크를 누를 때만 브라우저나 메일 앱이 열립니다. 자세한 내용은 [개인정보 처리방침](../PRIVACY.md#한국어)을 참고하세요.
 
 ## 라이선스
 

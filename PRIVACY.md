@@ -2,14 +2,14 @@
 
 [English](#english) | [한국어](#한국어) | [日本語](#日本語)
 
-Last updated: 2026-10-21
+Last updated: 2026-10-31
 
 ## English
 
 HighPen does not collect, store, or transfer any personal information.
 
-- **No network communication.** HighPen does not connect to the internet or to any other networked system. It has no telemetry, analytics, crash reporting, update checks, or advertising.
-- **Links you click.** The About window contains an email address and links to the GitHub repository and license. Your mail app or web browser opens only when you click one of them. HighPen sends nothing by itself.
+- **Network communication: update checks only.** HighPen has no telemetry, analytics, crash reporting, or advertising. The only connection it makes on its own is the update check of the Windows version downloaded from GitHub (`HighPen.exe` or `HighPen-Setup.exe`): at start-up it asks GitHub (`api.github.com`) for the list of HighPen releases. The request carries nothing about you or your PC beyond what every web request carries (your IP address, and the HighPen version in the User-Agent). A new version is downloaded from GitHub only when you choose **Update**. You can turn the check off with **Check for updates** in the settings panel. The Microsoft Store version and the macOS version never check; the Store updates its version itself.
+- **Links you click.** The About window and the update window contain an email address and links to the GitHub repository, license, and release notes. Your mail app or web browser opens only when you click one of them.
 - **Data stored on your PC.** Everything below stays on your computer and is never sent anywhere.
   - Settings (pen color and width, spot, zoom level, monitor, toolbar position, language): `%APPDATA%\HighPen\settings.txt`
   - Installed program files: `%LOCALAPPDATA%\Programs\HighPen`
@@ -25,8 +25,8 @@ Questions: stepanowon@gmail.com
 
 HighPen은 어떤 개인정보도 수집, 저장, 전송하지 않습니다.
 
-- **네트워크 통신 없음.** HighPen은 인터넷이나 다른 네트워크 시스템에 연결하지 않습니다. 사용 통계, 분석, 오류 보고, 업데이트 확인, 광고 기능이 없습니다.
-- **사용자가 누르는 링크.** 정보 창에 이메일 주소와 GitHub 저장소·라이선스 링크가 있습니다. 사용자가 누를 때만 메일 앱이나 웹 브라우저가 열리며, HighPen이 스스로 무언가를 보내지는 않습니다.
+- **네트워크 통신은 업데이트 확인뿐.** 사용 통계, 분석, 오류 보고, 광고 기능이 없습니다. HighPen이 스스로 하는 연결은 GitHub에서 받은 Windows 버전(`HighPen.exe` 또는 `HighPen-Setup.exe`)의 업데이트 확인뿐입니다. 시작할 때 GitHub(`api.github.com`)에 HighPen 릴리스 목록을 요청하며, 이 요청에는 모든 웹 요청에 들어가는 정보(IP 주소, User-Agent의 HighPen 버전) 외에 사용자나 PC에 관한 정보가 없습니다. 새 버전은 사용자가 **업데이트**를 누를 때만 GitHub에서 내려받습니다. 설정 패널의 **업데이트 확인**으로 끌 수 있습니다. Microsoft Store 버전과 macOS 버전은 확인하지 않으며, Store 버전은 Store가 업데이트합니다.
+- **사용자가 누르는 링크.** 정보 창과 업데이트 창에 이메일 주소와 GitHub 저장소·라이선스·변경 내용 링크가 있습니다. 사용자가 누를 때만 메일 앱이나 웹 브라우저가 열립니다.
 - **PC에 저장되는 데이터.** 아래 항목은 모두 사용자의 컴퓨터에만 있고 어디로도 전송되지 않습니다.
   - 설정(펜 색상·두께, 스팟, 확대 배율, 작동 모니터, 설정바 위치, 언어): `%APPDATA%\HighPen\settings.txt`
   - 설치된 프로그램 파일: `%LOCALAPPDATA%\Programs\HighPen`
@@ -42,8 +42,8 @@ HighPen은 어떤 개인정보도 수집, 저장, 전송하지 않습니다.
 
 HighPen は個人情報を一切収集・保存・送信しません。
 
-- **ネットワーク通信なし。** HighPen はインターネットやほかのネットワークシステムに接続しません。利用統計、分析、エラー報告、更新確認、広告の機能はありません。
-- **ユーザーが押すリンク。** 情報ウィンドウにはメールアドレスと GitHub リポジトリ・ライセンスへのリンクがあります。ユーザーが押したときにのみメールアプリや Web ブラウザーが開き、HighPen が自ら何かを送信することはありません。
+- **ネットワーク通信は更新確認のみ。** 利用統計、分析、エラー報告、広告の機能はありません。HighPen が自ら行う接続は、GitHub から入手した Windows 版 (`HighPen.exe` または `HighPen-Setup.exe`) の更新確認だけです。起動時に GitHub (`api.github.com`) に HighPen のリリース一覧を問い合わせます。この要求には、すべての Web 要求に含まれる情報 (IP アドレス、User-Agent の HighPen バージョン) 以外に、ユーザーや PC に関する情報は含まれません。新しいバージョンは、ユーザーが **更新する** を押したときにのみ GitHub からダウンロードします。設定パネルの **更新の確認** でオフにできます。Microsoft Store 版と macOS 版は確認せず、Store 版は Store が更新します。
+- **ユーザーが押すリンク。** 情報ウィンドウと更新ウィンドウには、メールアドレスと GitHub リポジトリ・ライセンス・変更内容へのリンクがあります。ユーザーが押したときにのみメールアプリや Web ブラウザーが開きます。
 - **PC に保存されるデータ。** 以下はすべてユーザーのコンピューター内にのみあり、どこにも送信されません。
   - 設定 (ペンの色・太さ、スポット、拡大倍率、使用モニター、ツールバーの位置、言語): `%APPDATA%\HighPen\settings.txt`
   - インストールされたプログラムファイル: `%LOCALAPPDATA%\Programs\HighPen`

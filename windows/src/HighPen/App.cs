@@ -8,13 +8,15 @@ namespace HighPen
     {
         // Composition root: builds the concrete services and windows and hands them to the controller.
         [STAThread]
-        static void Main()
+        static void Main(string[] args)
         {
+            Updater.WaitForPrevious(args);
             // One instance per user session: a second launch asks the running one to show its toolbar and exits.
             bool first;
             Mutex single = new Mutex(true, @"Local\HighPen.SingleInstance", out first);
             EventWaitHandle summon = new EventWaitHandle(false, EventResetMode.AutoReset, @"Local\HighPen.Summon");
             if (!first) { summon.Set(); return; }
+            Updater.CleanUp();
 
             App app = new App();
             app.ShutdownMode = ShutdownMode.OnExplicitShutdown;

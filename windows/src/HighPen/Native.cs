@@ -18,6 +18,11 @@ namespace HighPen
         public const int WM_LBUTTONDOWN = 0x0201, WM_RBUTTONDOWN = 0x0204;
         public const int WM_HOTKEY = 0x0312, WM_MOVING = 0x0216;
         public const uint MOD_NOREPEAT = 0x4000;
+        public const int APPMODEL_ERROR_NO_PACKAGE = 15700;
+
+        // Tells whether HighPen runs from an MSIX package (the Store version).
+        [DllImport("kernel32.dll", CharSet = CharSet.Unicode)]
+        public static extern int GetCurrentPackageFullName(ref int packageFullNameLength, System.Text.StringBuilder packageFullName);
 
         [StructLayout(LayoutKind.Sequential)]
         public struct POINT { public int X, Y; }

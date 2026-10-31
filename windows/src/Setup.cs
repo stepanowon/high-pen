@@ -8,14 +8,15 @@ using Microsoft.Win32;
 namespace HighPenSetup
 {
     // Per-user installer / uninstaller. HighPen.exe is embedded as a resource.
-    // Run with /S for silent mode, /uninstall to remove.
+    // Run with /S for silent mode, /uninstall to remove, /run to start HighPen after a silent install
+    // (how HighPen updates itself).
     static class Program
     {
         const string AppName = "HighPen";
-        const string Version = "1.7.4"; // keep in sync with AppVersion in HighPen\Theme.cs
+        const string Version = "1.8.0"; // keep in sync with AppVersion in HighPen\Theme.cs
         const string UninstallKey = @"Software\Microsoft\Windows\CurrentVersion\Uninstall\HighPen";
 
-        static bool silent;
+        static bool silent, run;
 
         // Installer text follows the Windows display language (Korean / Japanese / otherwise English).
         static readonly string Ui = System.Globalization.CultureInfo.CurrentUICulture.TwoLetterISOLanguageName;
@@ -42,6 +43,7 @@ namespace HighPenSetup
             {
                 if (a.Equals("/S", StringComparison.OrdinalIgnoreCase)) silent = true;
                 else if (a.Equals("/uninstall", StringComparison.OrdinalIgnoreCase)) uninstall = true;
+                else if (a.Equals("/run", StringComparison.OrdinalIgnoreCase)) run = true;
             }
             try
             {
@@ -71,7 +73,8 @@ namespace HighPenSetup
         {
             foreach (Process p in Process.GetProcessesByName(AppName))
             {
-                try { p.Kill(); p.WaitForExit(3000); } catch { }
+                // when HighPen started this update it is already quitting; give it a moment to save
+                try { if (!p.WaitForExit(run ? 5000 : 0)) { p.Kill(); p.WaitForExit(3000); } } catch { }
             }
         }
 
@@ -118,7 +121,12 @@ namespace HighPenSetup
                 k.SetValue("NoRepair", 1, RegistryValueKind.DWord);
             }
 
-            if (!silent && MessageBox.Show(L(
+            if (silent)
+            {
+                if (run) Process.Start(exe);
+                return 0;
+            }
+            if (MessageBox.Show(L(
                 "설치가 완료되었습니다.\n\n작업표시줄에 고정하려면 앱을 실행한 뒤 작업표시줄의 HighPen 아이콘을 우클릭하고 '작업 표시줄에 고정'을 선택하세요.\n\n지금 실행할까요?",
                 "インストールが完了しました。\n\nタスクバーにピン留めするには、アプリを起動してタスクバーの HighPen アイコンを右クリックし、「タスクバーにピン留めする」を選んでください。\n\n今すぐ起動しますか？",
                 "Installation complete.\n\nTo pin it to the taskbar, start the app, right-click the HighPen icon on the taskbar and choose 'Pin to taskbar'.\n\nStart it now?"), AppName, MessageBoxButtons.YesNo, MessageBoxIcon.Information) == DialogResult.Yes)
