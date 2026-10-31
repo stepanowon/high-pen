@@ -96,9 +96,11 @@ namespace HighPen
         }
 
         // Opens HighPen's page in the Microsoft Store app, or on the web when the Store app is not available.
-        public static void OpenStore()
+        // mini: the compact install window (to install the Store version over a GitHub copy); otherwise the
+        // full page, which offers Update when the installed Store version is behind.
+        public static void OpenStore(bool mini)
         {
-            try { Process.Start("ms-windows-store://pdp/?ProductId=" + StoreProductId + "&mode=mini"); }
+            try { Process.Start("ms-windows-store://pdp/?ProductId=" + StoreProductId + (mini ? "&mode=mini" : "")); }
             catch
             {
                 try { Process.Start("https://apps.microsoft.com/detail/" + StoreProductId); } catch { }

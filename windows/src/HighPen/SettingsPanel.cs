@@ -181,14 +181,11 @@ namespace HighPen
             hotkeyWarn = new TextBlock { Foreground = Theme.Warning, FontSize = 11, TextWrapping = TextWrapping.Wrap, Margin = new Thickness(0, 8, 0, 0), Visibility = Visibility.Collapsed };
             p.Children.Add(hotkeyWarn);
 
-            // not in the Store version, which the Store updates
-            if (Updater.Supported)
-            {
-                Border up = Theme.TextButton(Lang.T("UpdateCheck"), double.NaN, 26, new Thickness(0, 6, 0, 0));
-                up.ToolTip = Lang.T("UpdateCheckTip");
-                up.MouseLeftButtonUp += delegate { actions.CheckForUpdates(); };
-                p.Children.Add(up);
-            }
+            // the Store version opens its Store page instead of checking GitHub
+            Border up = Theme.TextButton(Lang.T("UpdateCheck"), double.NaN, 26, new Thickness(0, 6, 0, 0));
+            up.ToolTip = Lang.T(Updater.Supported ? "UpdateCheckTip" : "UpdateCheckStoreTip");
+            up.MouseLeftButtonUp += delegate { actions.CheckForUpdates(); };
+            p.Children.Add(up);
 
             p.Children.Add(Divider());
             p.Children.Add(new TextBlock { Text = "HighPen v" + AppInfo.AppVersion, Foreground = Brushes.Gray, FontSize = 11, HorizontalAlignment = HorizontalAlignment.Center });

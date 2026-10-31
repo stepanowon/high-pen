@@ -82,6 +82,7 @@ namespace HighPen
             { "Language",      new[] { "언어", "言語", "Language" } },
             { "UpdateCheck",   new[] { "업데이트 확인", "更新の確認", "Check for updates" } },
             { "UpdateCheckTip", new[] { "지금 새 버전이 있는지 확인 (시작할 때도 자동으로 확인합니다)", "今すぐ新しいバージョンを確認 (起動時にも自動で確認します)", "Look for a new version now (also checked at every start-up)" } },
+            { "UpdateCheckStoreTip", new[] { "Microsoft Store에서 업데이트 확인 (Store 버전은 Store가 자동으로 업데이트합니다)", "Microsoft Store で更新を確認 (Store 版は Store が自動で更新します)", "Check for updates in the Microsoft Store (the Store keeps this version up to date)" } },
             { "UpdateLatest",  new[] { "최신 버전입니다 (v{0})", "最新バージョンです (v{0})", "HighPen is up to date (v{0})" } },
             { "UpdateCheckFailed", new[] { "업데이트를 확인하지 못했습니다. 인터넷 연결을 확인하세요.", "更新を確認できませんでした。インターネット接続を確認してください。", "Could not check for updates. Check your internet connection." } },
             { "UpdateTitle",   new[] { "새 버전이 있습니다", "新しいバージョンがあります", "A new version is available" } },

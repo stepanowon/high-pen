@@ -33,6 +33,8 @@
 | 1.8.0 릴리스 | 완료 | GitHub 릴리스 [HighPen v1.8.0](https://github.com/stepanowon/high-pen/releases/tag/v1.8.0) (`HighPen-Setup.exe`, `HighPen.exe`, `HighPen.msix`, `SHA256SUMS.txt`). 1.7.4 이하 사용자는 자동 업데이트 기능이 없어 이번 한 번은 직접 받아야 함 |
 | 1.8.2 기능 추가: Store로 업데이트 안내 | 완료 | GitHub 배포본은 새 버전을 GitHub에서 내려받지 않고 업데이트 창의 **Microsoft Store에서 받기**로 Store 페이지(`ms-windows-store://pdp/?ProductId=9PDG1QN5QSL3`)를 열어 서명된 Store 패키지를 설치하게 바꿈. 1.8.0이 남기는 `/waitpid` 재시작과 `.old` 정리는 호환을 위해 유지. 업데이트 확인 켜기/끄기 설정을 없애고 시작할 때 항상 확인하며, 설정 패널에 **업데이트 확인** 버튼을 둬서 직접 확인(새 버전이면 업데이트 창, 아니면 "최신 버전입니다" 또는 실패 알림). 버전 1.8.2 (1.8.1은 Partner Center에 먼저 올린 패키지와 버전이 겹쳐 건너뜀) |
 | 1.8.2 GitHub 릴리스 | 완료 | Store 게시 확인 후 GitHub 릴리스 [HighPen v1.8.2](https://github.com/stepanowon/high-pen/releases/tag/v1.8.2) (`HighPen-Setup.exe` `f0d496c9…`, `HighPen.exe` `b98c5e8d…`, `HighPen.msix` `9b189f60…`, `SHA256SUMS.txt`), 한·일·영 변경 내용 포함. 1.8.0 코드와 1.8.2 코드 모두 v1.8.2를 새 버전으로 찾는 것 확인. 한·영·일 Windows README의 다운로드 링크와 버전 표기를 v1.8.2로 변경 |
+| 1.8.3 기능 추가: Store 버전에도 업데이트 확인 버튼 | 완료 | 1.8.2까지 Store 버전에서는 **업데이트 확인** 버튼을 숨겼음. 1.8.3부터 Store 버전에도 보이고, 누르면 GitHub에 연결하지 않고 Store의 HighPen 전체 페이지를 열어 Store가 업데이트를 제공하게 함. GitHub 배포본의 동작은 그대로(업데이트 창의 Store 버튼은 간단 설치 창 `mode=mini`) |
+| 1.8.3 GitHub 릴리스 | **할 일** | **Store에 1.8.3이 게시된 뒤에** 만든다. `dist`의 1.8.3 파일(`HighPen-Setup.exe` `dacf6c33…`, `HighPen.exe` `837ff692…`, `HighPen.msix` `16d26c5c…`)과 `SHA256SUMS.txt`를 올린다. 릴리스 후 한·영·일 Windows README의 다운로드 링크와 버전 표기를 v1.8.3으로 바꾼다 |
 
 ### winget
 
@@ -70,6 +72,8 @@
 | 1.8.1 MSIX | 건너뜀 | 1.8.1.0을 두 번 빌드함(업데이트 확인 버튼 전 `22e051af…`, 후 `c16b4f86…`). 앞의 것이 Partner Center에 올라가 있어 같은 버전을 다시 올릴 수 없어 1.8.2로 올림 |
 | 1.8.2 MSIX | 완료 | `dist/HighPen.msix` (1.8.2.0) 빌드. `HighPen-Setup.exe`는 msix와 같은 `HighPen.exe`로 빌드 |
 | 1.8.2 제출 | 완료 | 1.8.2.0 패키지가 Store에 게시됨(2026-10-31 확인). 현재 Store 버전 |
+| 1.8.3 MSIX | 완료 | `dist/HighPen.msix` (1.8.3.0) 빌드. MSIX 안의 `HighPen.exe`가 `dist/HighPen.exe`와 같음(`837ff692…`) 확인 |
+| 1.8.3 제출 | **할 일** | Partner Center에서 새 제출로 1.8.3.0 패키지 업로드. Store 사용자에게 보이는 변경: 설정 패널에 **업데이트 확인** 버튼(누르면 Store 페이지가 열림). 게시되면 GitHub 릴리스 진행 |
 
 ## Store 정보
 

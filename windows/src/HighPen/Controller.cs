@@ -475,8 +475,10 @@ namespace HighPen
         }
 
         // The Update check button: shows the new version, or says HighPen is up to date or could not check.
+        // The Store version opens its Store page, where the Store offers the update (no GitHub check).
         public void CheckForUpdates()
         {
+            if (!Updater.Supported) { Updater.OpenStore(false); return; }
             if (checkingUpdate) return;
             checkingUpdate = true;
             Updater.Check(delegate (UpdateInfo u, string error)
