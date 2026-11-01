@@ -77,7 +77,7 @@
 | 1.8.3 MSIX | 완료 | `dist/HighPen.msix` (1.8.3.0) 빌드. MSIX 안의 `HighPen.exe`가 `dist/HighPen.exe`와 같음(`837ff692…`) 확인 |
 | 1.8.3 제출 | 완료 | 1.8.3.0 패키지가 Store에 게시됨(2026-10-31 확인). 현재 Store 버전. Store 사용자에게 보이는 변경: 설정 패널에 **업데이트 확인** 버튼(누르면 Store 페이지가 열림). Store 패키지 안에서 버튼 동작 실기 확인 필요 |
 | 1.8.4 MSIX | 완료 | `dist/HighPen.msix` (1.8.4.0) `e36cb75b…` 빌드. MSIX 안의 `HighPen.exe`가 `dist/HighPen.exe`와 같음(`5b399be5…`) 확인. `HighPen-Setup.exe` `177af7be…`는 같은 exe로 빌드 |
-| 1.8.4 제출 | **할 일** | Partner Center에 1.8.4.0 패키지 제출. GitHub 릴리스가 먼저 나갔으므로 빨리 제출할 것 |
+| 1.8.4 제출 | 완료 | 1.8.4.0 패키지를 Partner Center에 제출함(2026-11-01 확인). Store 게시 후 현재 Store 버전이 1.8.4가 됨 |
 
 ## Store 정보
 
