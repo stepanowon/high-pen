@@ -10,7 +10,7 @@ The macOS version of the pen app for online lectures. It runs on macOS 14 (Sonom
 
 ## Download
 
-**[Download HighPen-1.3.1.dmg](https://github.com/stepanowon/high-pen/releases/download/macos-v1.3.1/HighPen-1.3.1.dmg)** (release [macos-v1.3.1](https://github.com/stepanowon/high-pen/releases/tag/macos-v1.3.1))
+**[Download HighPen-1.4.0.dmg](https://github.com/stepanowon/high-pen/releases/download/macos-v1.4.0/HighPen-1.4.0.dmg)** (release [macos-v1.4.0](https://github.com/stepanowon/high-pen/releases/tag/macos-v1.4.0))
 
 1. Open the DMG and drag HighPen onto the Applications folder.
 2. **Before opening it the first time**, run this in Terminal. HighPen then opens without any warning.
@@ -53,6 +53,7 @@ Distributing without the warning requires joining the Apple Developer Program, t
 | Feature | Shortcut | Description |
 |---|---|---|
 | Mouse spot | ⌃⌥S | A translucent circle that follows the pointer |
+| Show clicks | ⌃⌥K | A ring spreads out and fades where you click: solid for the left button, dashed for the right, in the spot color. Only on the selected monitor, and not while drawing with the pen (also **Show clicks** in Settings) |
 | Pen | ⌃⌥P | Write on the screen. Uses pen tablet pressure (toggle with ⌃⌥R) |
 | Highlighter | ⌃⌥L | Translucent, drawn beneath pen strokes |
 | Eraser | ⌃⌥E | Erases whole strokes. Press again while erasing to clear everything |
@@ -60,7 +61,7 @@ Distributing without the warning requires joining the Apple Developer Program, t
 | Undo | ⌃⌥Z | One stroke, everything removed by one eraser drag, or a clear all (its speech bubbles come back too) |
 | Clear | ⌃⌥C | Clears the current page |
 | Note | ⌃⌥T | Text box at the clicked spot. Enter confirms, Shift+Enter adds a line, Esc cancels. Removed only by Clear |
-| Zoom | ⌃⌥X | Live 1.5x / 2x / 2.5x zoom. Turning the pen on freezes the view so you can write on the zoomed screen |
+| Zoom | ⌃⌥X | Live 1.5x / 2x / 2.5x zoom. Turning the pen on freezes the view so you can write on the zoomed screen. After the pointer touches a side, top or bottom edge of the monitor, the view holds at that edge until the pointer passes the middle of the screen (meanwhile what you see is not where you click) |
 | Zoom lock | ⌃⇧X | While zoomed, locks the zoomed view in place (or unlocks it). Locked, the view stays put as the pointer moves and the Zoom button reads "Locked". What you see then is not where you click, so unlock to click. Turning zoom off also unlocks |
 | Capture | ⌃⌥F | Saves the screen with ink as a PNG in `~/Pictures/HighPen` and copies it to the clipboard |
 | Break | ⌃⌥W | Shows the time left and when class resumes, large, over the whole selected monitor. The last minute is orange; when time is up a red 00:00 stays until you press it again. Clicks pass through and the toolbar stays on top |
@@ -69,6 +70,7 @@ Distributing without the warning requires joining the Apple Developer Program, t
 | Cycle monitor | ⌃⌥M | Changes the monitor HighPen works on, with several monitors |
 | Pen color | ⌃⌥1 – ⌃⌥8 | Red, orange, yellow, green, blue, purple, black, white (the highlighter color while the highlighter is on) |
 | About | | Version, author, contact, license |
+| Update check | | At start-up, looks for a new macOS version among the GitHub releases and, if there is one, offers to open its release page. **Check for updates** in the settings panel checks right away |
 | Quit | ⌃⌥Q | |
 
 ### Changing shortcuts
@@ -90,13 +92,12 @@ The app is signed against its bundle id (`com.stepanowon.HighPen`) so the permis
 ## Differences from the Windows version
 
 - Shortcuts use `⌃⌥` (Control+Option) instead of `Ctrl+Alt`. Pen colors moved to `⌃⌥1–8` so they do not clash with other apps.
-- Not available yet: speech bubbles, click display.
 - Zoom does not confine the pointer to the monitor (macOS has no such feature).
 
 ## Layout
 
 | Path | Contents |
 |---|---|
-| `src/HighPen/` | App sources (AppKit, ScreenCaptureKit, Carbon hotkeys), one file per responsibility: `main.swift` (entry point), `Controller.swift` (wiring), `ToolState.swift` (tool rules), `InkView.swift` / `Stroke.swift` (ink, speech bubbles), `Toolbar.swift`, `SettingsPanel.swift`, `Hints.swift`, `Popups.swift` (toast, about), `HotkeyEditor.swift`, `Hotkeys.swift` / `Hotkey.swift` (shortcuts), `Zoomer.swift`, `BreakTimer.swift` (break timer), `ScreenCapture.swift`, `Spot.swift`, `FocusKeeper.swift`, `Settings.swift`, `Monitors.swift`, `Lang.swift`, `Theme.swift` / `Controls.swift`, `SelfTest.swift` |
+| `src/HighPen/` | App sources (AppKit, ScreenCaptureKit, Carbon hotkeys), one file per responsibility: `main.swift` (entry point), `Controller.swift` (wiring), `ToolState.swift` (tool rules), `InkView.swift` / `Stroke.swift` (ink, speech bubbles), `Toolbar.swift`, `SettingsPanel.swift`, `Hints.swift`, `Popups.swift` (toast, about, update window), `Updater.swift` (update check), `Clicks.swift` (show clicks), `HotkeyEditor.swift`, `Hotkeys.swift` / `Hotkey.swift` (shortcuts), `Zoomer.swift`, `BreakTimer.swift` (break timer), `ScreenCapture.swift`, `Spot.swift`, `FocusKeeper.swift`, `Settings.swift`, `Monitors.swift`, `Lang.swift`, `Theme.swift` / `Controls.swift`, `SelfTest.swift` |
 | `src/make-icon.swift` | Draws the app icon at every size (the Windows icon's design on the macOS icon grid) |
 | `build.sh` | Builds arm64 and x86_64 with `swiftc` → `lipo` → `.app` bundle, icon, ad-hoc signing, DMG packaging |

@@ -10,11 +10,13 @@ final class Controller: NSObject, NSApplicationDelegate, SettingsPanelDelegate {
     let ink = InkView()
     let zoomer = Zoomer()
     let spot = Spot()
+    let clicks = Clicks()
     let breakTimer = BreakTimer()
     let hints = Hints()
     let focus = FocusKeeper()
     let toast = Toast()
     let about = AboutBox()
+    let update = UpdateBox()
     lazy var hotkeys = Hotkeys(makeActions())
     lazy var toolbar = Toolbar(hints: hints)
     lazy var settings = SettingsPanel(hints: hints, hotkeys: hotkeys, delegate: self)
@@ -22,13 +24,14 @@ final class Controller: NSObject, NSApplicationDelegate, SettingsPanelDelegate {
     let penCursor = symbolCursor("pencil"), highlightCursor = symbolCursor("highlighter"), eraserCursor = ringCursor(16), textCursor = NSCursor.iBeam
 
     var tools = ToolState()
-    var settingsOpen = false, collapsed = false
+    var settingsOpen = false, collapsed = false, checkingUpdate = false
 
     // Every action that can have a shortcut, in the order the shortcut editor lists them.
     func makeActions() -> [HotkeyAction] {
         let ctrlOpt = controlKey | optionKey
         var a: [HotkeyAction] = [
             HotkeyAction(id: "Spot", def: Hotkey(mods: ctrlOpt, key: kVK_ANSI_S, name: "S"), title: { Lang.t("MouseSpot") }, run: { [unowned self] in self.toggleSpot() }),
+            HotkeyAction(id: "Clicks", def: Hotkey(mods: ctrlOpt, key: kVK_ANSI_K, name: "K"), title: { Lang.t("ClickShow") }, run: { [unowned self] in self.toggleClicks() }),
             HotkeyAction(id: "Pen", def: Hotkey(mods: ctrlOpt, key: kVK_ANSI_P, name: "P"), title: { Lang.t("Pen") }, run: { [unowned self] in self.togglePen() }),
             HotkeyAction(id: "Highlighter", def: Hotkey(mods: ctrlOpt, key: kVK_ANSI_L, name: "L"), title: { Lang.t("Highlighter") }, run: { [unowned self] in self.toggleHighlighter() }),
             HotkeyAction(id: "Eraser", def: Hotkey(mods: ctrlOpt, key: kVK_ANSI_E, name: "E"), title: { Lang.t("Eraser") }, run: { [unowned self] in self.eraserHotkey() }),
@@ -89,6 +92,7 @@ final class Controller: NSObject, NSApplicationDelegate, SettingsPanelDelegate {
                 : Stroke(color: Cfg.palette[Cfg.penColor], width: Cfg.penSize, highlighter: false, pressure: Cfg.pressure)
         }
         zoomer.onChange = { [unowned self] in self.applyZoomTransform() }
+        clicks.allowed = { [unowned self] in !self.tools.penMode } // while drawing every pen stroke would be a click
         hints.avoid = { [unowned self] w in w === self.toolbar.window && self.settings.window.isVisible ? self.settings.window.frame : nil }
         toolbar.onMove = { [unowned self] in self.placeSettings() }
         editor.onOpen = { [unowned self] in self.updateFocus() }
@@ -119,6 +123,8 @@ final class Controller: NSObject, NSApplicationDelegate, SettingsPanelDelegate {
             }
         }
         reportFailedHotkeys()
+        clicks.apply()
+        if Updater.version(appVersion) != nil { Updater.check { [unowned self] u, _ in if let u = u { self.update.show(u) } } }
     }
 
     // Launching again or clicking the Dock icon brings the toolbar back.
@@ -149,6 +155,7 @@ final class Controller: NSObject, NSApplicationDelegate, SettingsPanelDelegate {
     func handleKey(_ e: NSEvent) -> Bool {
         if editor.isOpen { editor.key(e); return true }
         if about.isOpen && (e.keyCode == kVK_Escape || e.keyCode == kVK_Return) { about.toggle(); return true }
+        if update.isOpen && e.keyCode == kVK_Escape { update.close(); return true }
         return false
     }
 
@@ -157,6 +164,7 @@ final class Controller: NSObject, NSApplicationDelegate, SettingsPanelDelegate {
     func placeWindows() {
         overlay.setFrame(screen(Cfg.monitor).frame, display: true)
         breakTimer.window.setFrame(screen(Cfg.monitor).frame, display: true)
+        clicks.place(screen(Cfg.monitor).frame)
         placeBar()
     }
 
@@ -186,6 +194,7 @@ final class Controller: NSObject, NSApplicationDelegate, SettingsPanelDelegate {
     func eraserHotkey() { if tools.erasing { ink.clear() } else { toggleEraser() } }
     func toggleSettings() { settingsOpen.toggle(); applyMode() }
     func toggleCollapse() { collapsed.toggle(); hints.hide(); applyMode() }
+    func toggleClicks() { Cfg.showClicks.toggle(); clicksChanged(); settings.rebuild(); placeSettings() }
     func togglePressure() { Cfg.pressure.toggle(); settings.rebuild(); placeSettings() }
 
     func cycleBoard() {
@@ -222,6 +231,18 @@ final class Controller: NSObject, NSApplicationDelegate, SettingsPanelDelegate {
     func spotChanged() { applySpot() }
     func zoomChanged() { zoomer.setFactor(Cfg.zoomFactors[Cfg.zoomIndex]) }
     func showHotkeyEditor() { editor.show() }
+    func clicksChanged() { clicks.apply() }
+
+    // The Update check button: shows the new version, or says HighPen is up to date or could not check.
+    func checkForUpdates() {
+        guard !checkingUpdate else { return }
+        checkingUpdate = true
+        Updater.check { [unowned self] u, error in
+            self.checkingUpdate = false
+            if let u = u { self.update.show(u) }
+            else { self.toast.show(error ?? String(format: Lang.t("UpdateLatest"), appVersion), seconds: 4) }
+        }
+    }
 
     func toggleZoom() {
         if zoomer.active { zoomer.stop(); applyMode(); return }

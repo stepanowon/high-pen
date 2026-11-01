@@ -10,6 +10,8 @@ protocol SettingsPanelDelegate: AnyObject {
     func spotChanged()
     func zoomChanged()
     func showHotkeyEditor()
+    func clicksChanged()
+    func checkForUpdates()
 }
 
 @MainActor
@@ -101,6 +103,11 @@ final class SettingsPanel {
         col.addArrangedSubview(swatches(Cfg.spotColor) { [unowned self] in Cfg.spotColor = $0; self.delegate?.spotChanged() })
         title("SpotSize")
         col.addArrangedSubview(slider(20, 200, Cfg.spotSize) { [unowned self] in Cfg.spotSize = $0; self.delegate?.spotChanged() })
+        let cl = NSButton(checkboxWithTitle: Lang.t("ClickShow"), target: nil, action: nil)
+        cl.state = Cfg.showClicks ? .on : .off
+        hints.attach(cl, hotkeys.tip(Lang.t("ClickShow"), "Clicks"))
+        cl.on { [unowned self] c in Cfg.showClicks = (c as! NSButton).state == .on; self.delegate?.clicksChanged() }
+        col.addArrangedSubview(cl)
         sep()
 
         title("ZoomFactor")
@@ -150,6 +157,10 @@ final class SettingsPanel {
             fixedSize(w, 190, nil)
             col.addArrangedSubview(w)
         }
+        let up = NSButton(title: Lang.t("UpdateCheck"), target: nil, action: nil)
+        hints.attach(up, Lang.t("UpdateCheckTip"))
+        up.on { [unowned self] _ in self.delegate?.checkForUpdates() }
+        col.addArrangedSubview(up)
         sep()
 
         col.addArrangedSubview(label("HighPen v" + appVersion, size: 11, color: .gray))
