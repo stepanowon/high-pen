@@ -10,7 +10,7 @@
 
 ## ダウンロード
 
-**[HighPen-1.3.1.dmg をダウンロード](https://github.com/stepanowon/high-pen/releases/download/macos-v1.3.1/HighPen-1.3.1.dmg)** (リリース [macos-v1.3.1](https://github.com/stepanowon/high-pen/releases/tag/macos-v1.3.1))
+**[HighPen-1.4.0.dmg をダウンロード](https://github.com/stepanowon/high-pen/releases/download/macos-v1.4.0/HighPen-1.4.0.dmg)** (リリース [macos-v1.4.0](https://github.com/stepanowon/high-pen/releases/tag/macos-v1.4.0))
 
 1. DMG を開き、HighPen を Applications フォルダーにドラッグします。
 2. **初めて開く前に**、ターミナルで次のコマンドを実行します。警告なしでそのまま開けます。
@@ -53,6 +53,7 @@ DMG を開き、HighPen を Applications フォルダーにドラッグすると
 | 機能 | ショートカット | 説明 |
 |---|---|---|
 | マウススポット | ⌃⌥S | ポインターに付いて動く半透明の円 |
+| クリック表示 | ⌃⌥K | クリックした場所に円が広がって消えます。左クリックは実線、右クリックは点線、色はスポットの色。使用モニターのみ、ペンで書いている間は表示しません (設定の **クリック表示** でもオン/オフ) |
 | ペン | ⌃⌥P | 画面に書き込み。ペンタブレットの筆圧に対応 (⌃⌥R でオン/オフ) |
 | 蛍光ペン | ⌃⌥L | ペンの線の下に半透明で描かれます |
 | 消しゴム | ⌃⌥E | 線単位で消去。消しゴム中にもう一度押すと全消去 |
@@ -60,7 +61,7 @@ DMG を開き、HighPen を Applications フォルダーにドラッグすると
 | 元に戻す | ⌃⌥Z | 線 1 本、消しゴムで 1 回なぞって消した分すべて、または全消去 1 回分 (消した吹き出しも戻ります) |
 | 全消去 | ⌃⌥C | 現在のページを消去 |
 | 吹き出し | ⌃⌥T | クリックした位置に文字ボックス。Enter で確定、Shift+Enter で改行、Esc で取り消し。全消去でのみ削除 |
-| 拡大 | ⌃⌥X | 1.5 倍 / 2 倍 / 2.5 倍のリアルタイム拡大。ペンをオンにすると画面が固定され、拡大した画面に書き込めます |
+| 拡大 | ⌃⌥X | 1.5 倍 / 2 倍 / 2.5 倍のリアルタイム拡大。ペンをオンにすると画面が固定され、拡大した画面に書き込めます。ポインターがモニターの左右・上下の端に触れた後に戻ると、ポインターが画面中央を過ぎるまで拡大画面はその端に留まります (その間は見えている画面と実際のクリック位置が異なります) |
 | 拡大画面の固定 | ⌃⇧X | 拡大中に拡大画面をその場で固定/解除。固定するとポインターを動かしても画面が動かず、拡大ボタンに「拡大固定」と表示されます。固定中は見えている画面と実際のクリック位置が異なるため、クリックするときは固定を解除してください。拡大をオフにすると固定も解除されます |
 | キャプチャ | ⌃⌥F | 画面と書き込みを `~/Pictures/HighPen` に PNG で保存し、クリップボードにコピー |
 | 休憩 | ⌃⌥W | 使用モニター全体に残り時間と再開時刻を大きく表示。最後の 1 分はオレンジ色、終了後は赤い 00:00 が残り、もう一度押すと閉じます。クリックは透過し、ツールバーはその上に表示されます |
@@ -68,6 +69,7 @@ DMG を開き、HighPen を Applications フォルダーにドラッグすると
 | 折りたたみ/展開 | ⌃⌥H | ツールバーを折りたたみ (上部左側の `<` ボタンでも可)。折りたたむと `>` ボタンだけが残ります |
 | モニター切替 | ⌃⌥M | 複数モニターで使用するモニターを変更 |
 | ペンの色 | ⌃⌥1 ~ ⌃⌥8 | 赤、オレンジ、黄、緑、青、紫、黒、白 (蛍光ペン使用中は蛍光ペンの色) |
+| 更新の確認 | | 起動時に GitHub のリリースで新しい macOS 版を確認し、新しいバージョンがあればリリースページを開けるウィンドウを表示。設定パネルの **更新の確認** ボタンですぐに確認 |
 | 情報 | | バージョン、作者、連絡先、ライセンス |
 | 終了 | ⌃⌥Q | |
 
@@ -90,13 +92,12 @@ DMG を開き、HighPen を Applications フォルダーにドラッグすると
 ## Windows 版との違い
 
 - ショートカットは `Ctrl+Alt` の代わりに `⌃⌥` (Control+Option) を使います。ペンの色はほかのアプリと重ならないよう `⌃⌥1~8` に変更しました。
-- まだない機能: 吹き出し、クリック表示。
 - 拡大中にポインターをモニター内に閉じ込めません (macOS に該当する機能がないため)。
 
 ## 構成
 
 | パス | 内容 |
 |---|---|
-| `src/HighPen/` | アプリのソース (AppKit、ScreenCaptureKit、Carbon ショートカット)。責務ごとのファイル: `main.swift` (エントリポイント)、`Controller.swift` (組み立て・調整)、`ToolState.swift` (ツール状態のルール)、`InkView.swift`・`Stroke.swift` (書き込み・吹き出し)、`Toolbar.swift`、`SettingsPanel.swift`、`Hints.swift`、`Popups.swift` (トースト・情報)、`HotkeyEditor.swift`、`Hotkeys.swift`・`Hotkey.swift` (ショートカット)、`Zoomer.swift`、`BreakTimer.swift` (休憩タイマー)、`ScreenCapture.swift`、`Spot.swift`、`FocusKeeper.swift`、`Settings.swift`、`Monitors.swift`、`Lang.swift`、`Theme.swift`・`Controls.swift`、`SelfTest.swift` |
+| `src/HighPen/` | アプリのソース (AppKit、ScreenCaptureKit、Carbon ショートカット)。責務ごとのファイル: `main.swift` (エントリポイント)、`Controller.swift` (組み立て・調整)、`ToolState.swift` (ツール状態のルール)、`InkView.swift`・`Stroke.swift` (書き込み・吹き出し)、`Toolbar.swift`、`SettingsPanel.swift`、`Hints.swift`、`Popups.swift` (トースト・情報・更新ウィンドウ)、`Updater.swift` (更新の確認)、`Clicks.swift` (クリック表示)、`HotkeyEditor.swift`、`Hotkeys.swift`・`Hotkey.swift` (ショートカット)、`Zoomer.swift`、`BreakTimer.swift` (休憩タイマー)、`ScreenCapture.swift`、`Spot.swift`、`FocusKeeper.swift`、`Settings.swift`、`Monitors.swift`、`Lang.swift`、`Theme.swift`・`Controls.swift`、`SelfTest.swift` |
 | `src/make-icon.swift` | アプリアイコンの生成 (Windows のアイコンと同じデザインを macOS のアイコン規格に合わせてサイズごとに描画) |
 | `build.sh` | `swiftc` で arm64・x86_64 をビルド → `lipo` → `.app` バンドル作成、アイコン生成、ad-hoc 署名、DMG パッケージ作成 |

@@ -123,3 +123,39 @@ final class AboutBox {
         w.makeKeyAndOrderFront(nil)
     }
 }
+
+// Tells about a newer version and opens its release page.
+@MainActor
+final class UpdateBox {
+    private var window: Panel?
+    var isOpen: Bool { window != nil }
+
+    func show(_ u: UpdateInfo) {
+        if let w = window { w.orderFrontRegardless(); return }
+        func wrap(_ t: String, _ color: NSColor) -> NSTextField {
+            let l = NSTextField(wrappingLabelWithString: t)
+            l.textColor = color
+            l.font = .systemFont(ofSize: 12)
+            fixedSize(l, 360, nil)
+            return l
+        }
+        let open = NSButton(title: Lang.t("UpdateDownload"), target: nil, action: nil)
+        open.keyEquivalent = "\r"
+        open.on { [unowned self] _ in NSWorkspace.shared.open(u.page); self.close() }
+        let later = NSButton(title: Lang.t("UpdateLater"), target: nil, action: nil)
+        later.on { [unowned self] _ in self.close() }
+        let hint = wrap(Lang.t("UpdateHint"), .gray)
+        let col = vstack([heading(Lang.t("UpdateTitle")),
+                          wrap(String(format: Lang.t("UpdateText"), u.version, appVersion), .white),
+                          hint, NSStackView(views: [open, later])])
+        col.setCustomSpacing(14, after: hint)
+        let w = dialog(col, keyable: true)
+        window = w
+        w.makeKeyAndOrderFront(nil)
+    }
+
+    func close() {
+        window?.orderOut(nil)
+        window = nil
+    }
+}
