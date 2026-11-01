@@ -5,7 +5,9 @@ namespace HighPen
 {
     // Live zoom (1.5x / 2x / 2.5x) of the monitor under the mouse pointer, using the Windows Magnification API.
     // The view is positioned so the content under the pointer stays under the pointer,
-    // so clicks (the host window is click-through) land exactly where they appear.
+    // so clicks (the host window is click-through) land exactly where they appear —
+    // except after the pointer touches a monitor edge, when the view holds at that edge until
+    // the pointer passes the middle of the screen again (see Offset).
     class Zoomer : ITopmost
     {
         public static readonly double[] Factors = { 1.5, 2, 2.5 };
@@ -68,6 +70,7 @@ namespace HighPen
             exclude.CopyTo(list, 1);
             Native.MagSetWindowFilterList(mag, 0, list.Length, list);
             current = System.Drawing.Rectangle.Empty;
+            edgeX = edgeY = 0;
             Update();
             Native.SetWindowPos(host, Native.HWND_TOPMOST, 0, 0, 0, 0, Native.SWP_NOSIZE | Native.SWP_NOMOVE | Native.SWP_NOACTIVATE | Native.SWP_SHOWWINDOW);
             timer.Start();
@@ -114,14 +117,33 @@ namespace HighPen
                 Native.SetWindowPos(host, Native.HWND_TOPMOST, b.X, b.Y, b.Width, b.Height, Native.SWP_NOACTIVATE | Native.SWP_SHOWWINDOW);
                 Native.MoveWindow(mag, 0, 0, b.Width, b.Height, true);
             }
-            float k = 1f - 1f / factor;
+            double k = 1.0 - 1.0 / factor;
             Native.RECT r;
-            r.Left = b.X + (int)Math.Round((p.X - b.X) * k);
-            r.Top = b.Y + (int)Math.Round((p.Y - b.Y) * k);
+            r.Left = b.X + (int)Math.Round(Offset(p.X - b.X, b.Width, k, ref edgeX));
+            r.Top = b.Y + (int)Math.Round(Offset(p.Y - b.Y, b.Height, k, ref edgeY));
             r.Right = r.Left + (int)(b.Width / factor);
             r.Bottom = r.Top + (int)(b.Height / factor);
             Native.MagSetWindowSource(mag, r);
             if (ViewChanged != null) ViewChanged(b, r);
+        }
+
+        // Which edge of the monitor the pointer last touched on each axis (-1 = start/left/top, 1 = end/right/bottom, 0 = none yet).
+        int edgeX, edgeY;
+
+        // Offset of the shown area along one axis, for pointer position t in [0, size-1].
+        // Until an edge is touched the content under the pointer stays under the pointer.
+        // After the pointer touches an edge the view stays at that edge until the pointer passes
+        // the middle of the screen; from there it pans to the opposite edge, reaching it together with the pointer.
+        static double Offset(int t, int size, double k, ref int edge)
+        {
+            int last = size - 1;
+            if (last <= 0) return 0;
+            if (t <= 0) edge = -1;
+            else if (t >= last) edge = 1;
+            double max = last * k, mid = last / 2.0;
+            if (edge < 0) return t <= mid ? 0 : max * (t - mid) / (last - mid);
+            if (edge > 0) return t >= mid ? max : max * t / mid;
+            return t * k;
         }
     }
 }
