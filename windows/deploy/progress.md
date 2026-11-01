@@ -1,6 +1,6 @@
 # 배포 진행 상황
 
-마지막 업데이트: 2026-10-31
+마지막 업데이트: 2026-11-01
 
 ## 목표
 
@@ -35,6 +35,8 @@
 | 1.8.2 GitHub 릴리스 | 완료 | Store 게시 확인 후 GitHub 릴리스 [HighPen v1.8.2](https://github.com/stepanowon/high-pen/releases/tag/v1.8.2) (`HighPen-Setup.exe` `f0d496c9…`, `HighPen.exe` `b98c5e8d…`, `HighPen.msix` `9b189f60…`, `SHA256SUMS.txt`), 한·일·영 변경 내용 포함. 1.8.0 코드와 1.8.2 코드 모두 v1.8.2를 새 버전으로 찾는 것 확인. 한·영·일 Windows README의 다운로드 링크와 버전 표기를 v1.8.2로 변경 |
 | 1.8.3 기능 추가: Store 버전에도 업데이트 확인 버튼 | 완료 | 1.8.2까지 Store 버전에서는 **업데이트 확인** 버튼을 숨겼음. 1.8.3부터 Store 버전에도 보이고, 누르면 GitHub에 연결하지 않고 Store의 HighPen 전체 페이지를 열어 Store가 업데이트를 제공하게 함. GitHub 배포본의 동작은 그대로(업데이트 창의 Store 버튼은 간단 설치 창 `mode=mini`) |
 | 1.8.3 GitHub 릴리스 | 완료 | Store 게시 확인 후 GitHub 릴리스 [HighPen v1.8.3](https://github.com/stepanowon/high-pen/releases/tag/v1.8.3) (`HighPen-Setup.exe` `dacf6c33…`, `HighPen.exe` `837ff692…`, `HighPen.msix` `16d26c5c…`, `SHA256SUMS.txt`), 한·일·영 변경 내용 포함. 한·영·일 Windows README의 다운로드 링크와 버전 표기를 v1.8.3으로 변경 |
+| 1.8.4 기능 추가: 확대 화면 모서리 고정 | 완료 | 확대 중 포인터가 모니터의 가로·세로 끝에 닿은 뒤 중앙 쪽으로 돌아오면, 포인터가 화면 중앙을 지날 때까지 확대 화면이 그 끝에 머무름. 중앙을 지나면 포인터가 반대쪽 끝에 닿을 때 확대 화면도 함께 닿도록 이동. 멈춰 있는 동안에는 클릭이 보이는 내용이 아니라 실제 위치에 들어감(확대 잠금과 같음). macOS 앱은 바꾸지 않음 |
+| 1.8.4 GitHub 릴리스 | 완료 | 사용자 요청으로 Store 게시 **전에** GitHub 릴리스 [HighPen v1.8.4](https://github.com/stepanowon/high-pen/releases/tag/v1.8.4) (`HighPen-Setup.exe` `177af7be…`, `HighPen.exe` `5b399be5…`, `HighPen.msix` `e36cb75b…`, `SHA256SUMS.txt`), 한·일·영 변경 내용 포함. Store 게시 전까지 GitHub 배포본은 업데이트 창에서 Store를 열어도 1.8.3만 받을 수 있음. 한·영·일 Windows README의 다운로드 링크와 버전 표기를 v1.8.4로 변경 |
 
 ### winget
 
@@ -74,6 +76,8 @@
 | 1.8.2 제출 | 완료 | 1.8.2.0 패키지가 Store에 게시됨(2026-10-31 확인) |
 | 1.8.3 MSIX | 완료 | `dist/HighPen.msix` (1.8.3.0) 빌드. MSIX 안의 `HighPen.exe`가 `dist/HighPen.exe`와 같음(`837ff692…`) 확인 |
 | 1.8.3 제출 | 완료 | 1.8.3.0 패키지가 Store에 게시됨(2026-10-31 확인). 현재 Store 버전. Store 사용자에게 보이는 변경: 설정 패널에 **업데이트 확인** 버튼(누르면 Store 페이지가 열림). Store 패키지 안에서 버튼 동작 실기 확인 필요 |
+| 1.8.4 MSIX | 완료 | `dist/HighPen.msix` (1.8.4.0) `e36cb75b…` 빌드. MSIX 안의 `HighPen.exe`가 `dist/HighPen.exe`와 같음(`5b399be5…`) 확인. `HighPen-Setup.exe` `177af7be…`는 같은 exe로 빌드 |
+| 1.8.4 제출 | **할 일** | Partner Center에 1.8.4.0 패키지 제출. GitHub 릴리스가 먼저 나갔으므로 빨리 제출할 것 |
 
 ## Store 정보
 
