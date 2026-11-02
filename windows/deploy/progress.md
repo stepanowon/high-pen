@@ -38,6 +38,7 @@
 | 1.8.4 기능 추가: 확대 화면 모서리 고정 | 완료 | 확대 중 포인터가 모니터의 가로·세로 끝에 닿은 뒤 중앙 쪽으로 돌아오면, 포인터가 화면 중앙을 지날 때까지 확대 화면이 그 끝에 머무름. 중앙을 지나면 포인터가 반대쪽 끝에 닿을 때 확대 화면도 함께 닿도록 이동. 멈춰 있는 동안에는 클릭이 보이는 내용이 아니라 실제 위치에 들어감(확대 잠금과 같음). macOS 앱은 바꾸지 않음 |
 | 1.8.4 GitHub 릴리스 | 완료 | 사용자 요청으로 Store 게시 **전에** GitHub 릴리스 [HighPen v1.8.4](https://github.com/stepanowon/high-pen/releases/tag/v1.8.4) (`HighPen-Setup.exe` `177af7be…`, `HighPen.exe` `5b399be5…`, `HighPen.msix` `e36cb75b…`, `SHA256SUMS.txt`), 한·일·영 변경 내용 포함. Store 게시 전까지 GitHub 배포본은 업데이트 창에서 Store를 열어도 1.8.3만 받을 수 있음. 한·영·일 Windows README의 다운로드 링크와 버전 표기를 v1.8.4로 변경 |
 | 1.8.5 버그 수정: 배율이 다른 모니터에서 확대 위치 어긋남 | 완료 | HighPen은 시스템 DPI 인식 프로세스라, 화면 배율이 시스템 DPI와 다른 모니터에서는 커서·모니터 좌표가 가상화되는데 Magnification API는 물리 픽셀로 해석해 확대 화면이 다른 영역(아래·오른쪽 또는 위·왼쪽)으로 치우쳤음. 확대 창 생성과 위치 계산만 스레드 DPI 컨텍스트를 Per-Monitor V2로 바꿔 물리 픽셀로 처리하고, 필기 오버레이에는 프로세스 좌표로 바꿔 전달. 확대 창이 흐릿하게 늘어나던 것도 사라짐. 테스트: 좌표 패턴을 확대해 화면 픽셀로 확인하는 하네스로 모니터 3대 100%, DISPLAY1·DISPLAY3 125/150/175%에서 통과(수정 전 코드는 150%에서 실패 재현). 시스템 DPI가 모니터보다 높은 경우는 이 PC에서 재현 불가 |
+| 1.8.5 GitHub 릴리스 | 완료 | 1.8.5.0 Partner Center 제출 후 Store 게시 전에 GitHub 릴리스 [HighPen v1.8.5](https://github.com/stepanowon/high-pen/releases/tag/v1.8.5) (`HighPen-Setup.exe` `48449869…`, `HighPen.exe` `5a23f64a…`, `HighPen.msix` `007e1d75…`, `SHA256SUMS.txt`), 한·일·영 변경 내용 포함. 받은 파일의 해시가 SHA256SUMS.txt와 같음 확인. 한·영·일 Windows README의 다운로드 링크와 버전 표기를 v1.8.5로 변경 |
 
 ### winget
 
@@ -80,7 +81,7 @@
 | 1.8.4 MSIX | 완료 | `dist/HighPen.msix` (1.8.4.0) `e36cb75b…` 빌드. MSIX 안의 `HighPen.exe`가 `dist/HighPen.exe`와 같음(`5b399be5…`) 확인. `HighPen-Setup.exe` `177af7be…`는 같은 exe로 빌드 |
 | 1.8.4 제출 | 완료 | 1.8.4.0 패키지를 Partner Center에 제출함(2026-11-01 확인). Store 게시 후 현재 Store 버전이 1.8.4가 됨 |
 | 1.8.5 MSIX | 완료 | `dist/HighPen.msix` (1.8.5.0) `007e1d75…` 빌드. MSIX 안의 `HighPen.exe`가 `dist/HighPen.exe`와 같음(`5a23f64a…`) 확인. `HighPen-Setup.exe` `48449869…`는 같은 exe로 빌드. `SHA256SUMS.txt` 작성 |
-| 1.8.5 제출 | **할 일** | Partner Center에 1.8.5.0 패키지 제출. 1.8.4.0 심사 중이면 그 제출이 끝난 뒤 새로 제출. Store 게시 후 GitHub 릴리스 |
+| 1.8.5 제출 | 완료 | 1.8.5.0 패키지를 Partner Center에 제출함(2026-11-02, 사용자 확인). 인증·게시 확인 필요 |
 
 ## Store 정보
 
