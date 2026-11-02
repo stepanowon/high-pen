@@ -48,6 +48,11 @@ namespace HighPen
 
         [DllImport("user32.dll")] public static extern bool EnumDisplayMonitors(IntPtr dc, IntPtr clip, MonitorEnumProc proc, IntPtr data);
         [DllImport("user32.dll", CharSet = CharSet.Unicode)] public static extern bool GetMonitorInfo(IntPtr monitor, ref MONITORINFOEX mi);
+        [DllImport("user32.dll")] public static extern IntPtr MonitorFromPoint(POINT p, uint flags);
+        public const uint MONITOR_DEFAULTTONEAREST = 2;
+        // Windows 10 1607+. Returns the previous context, or IntPtr.Zero on failure.
+        [DllImport("user32.dll")] public static extern IntPtr SetThreadDpiAwarenessContext(IntPtr context);
+        public static readonly IntPtr DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2 = new IntPtr(-4);
 
         [DllImport("user32.dll")] public static extern int GetWindowLong(IntPtr h, int i);
         [DllImport("user32.dll")] public static extern int SetWindowLong(IntPtr h, int i, int v);

@@ -1,6 +1,6 @@
 # 배포 진행 상황
 
-마지막 업데이트: 2026-11-01
+마지막 업데이트: 2026-11-02
 
 ## 목표
 
@@ -37,6 +37,7 @@
 | 1.8.3 GitHub 릴리스 | 완료 | Store 게시 확인 후 GitHub 릴리스 [HighPen v1.8.3](https://github.com/stepanowon/high-pen/releases/tag/v1.8.3) (`HighPen-Setup.exe` `dacf6c33…`, `HighPen.exe` `837ff692…`, `HighPen.msix` `16d26c5c…`, `SHA256SUMS.txt`), 한·일·영 변경 내용 포함. 한·영·일 Windows README의 다운로드 링크와 버전 표기를 v1.8.3으로 변경 |
 | 1.8.4 기능 추가: 확대 화면 모서리 고정 | 완료 | 확대 중 포인터가 모니터의 가로·세로 끝에 닿은 뒤 중앙 쪽으로 돌아오면, 포인터가 화면 중앙을 지날 때까지 확대 화면이 그 끝에 머무름. 중앙을 지나면 포인터가 반대쪽 끝에 닿을 때 확대 화면도 함께 닿도록 이동. 멈춰 있는 동안에는 클릭이 보이는 내용이 아니라 실제 위치에 들어감(확대 잠금과 같음). macOS 앱은 바꾸지 않음 |
 | 1.8.4 GitHub 릴리스 | 완료 | 사용자 요청으로 Store 게시 **전에** GitHub 릴리스 [HighPen v1.8.4](https://github.com/stepanowon/high-pen/releases/tag/v1.8.4) (`HighPen-Setup.exe` `177af7be…`, `HighPen.exe` `5b399be5…`, `HighPen.msix` `e36cb75b…`, `SHA256SUMS.txt`), 한·일·영 변경 내용 포함. Store 게시 전까지 GitHub 배포본은 업데이트 창에서 Store를 열어도 1.8.3만 받을 수 있음. 한·영·일 Windows README의 다운로드 링크와 버전 표기를 v1.8.4로 변경 |
+| 1.8.5 버그 수정: 배율이 다른 모니터에서 확대 위치 어긋남 | 완료 | HighPen은 시스템 DPI 인식 프로세스라, 화면 배율이 시스템 DPI와 다른 모니터에서는 커서·모니터 좌표가 가상화되는데 Magnification API는 물리 픽셀로 해석해 확대 화면이 다른 영역(아래·오른쪽 또는 위·왼쪽)으로 치우쳤음. 확대 창 생성과 위치 계산만 스레드 DPI 컨텍스트를 Per-Monitor V2로 바꿔 물리 픽셀로 처리하고, 필기 오버레이에는 프로세스 좌표로 바꿔 전달. 확대 창이 흐릿하게 늘어나던 것도 사라짐. 테스트: 좌표 패턴을 확대해 화면 픽셀로 확인하는 하네스로 모니터 3대 100%, DISPLAY1·DISPLAY3 125/150/175%에서 통과(수정 전 코드는 150%에서 실패 재현). 시스템 DPI가 모니터보다 높은 경우는 이 PC에서 재현 불가 |
 
 ### winget
 
