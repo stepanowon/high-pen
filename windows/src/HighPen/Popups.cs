@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Threading;
@@ -34,13 +35,49 @@ namespace HighPen
             return new Border { Background = Theme.PanelBg, BorderBrush = Theme.Active, BorderThickness = new Thickness(1), Child = child };
         }
 
-        protected void CenterOnLoad(System.Drawing.Rectangle workArea)
+        // A dialog's content column, starting with its title; the caller adds the rest and wraps it in Frame.
+        protected static StackPanel Dialog(double width, string title)
+        {
+            StackPanel p = new StackPanel { Margin = new Thickness(20, 16, 20, 16), Width = width };
+            p.Children.Add(new TextBlock { Text = title, Foreground = Brushes.White, FontSize = 18, FontWeight = FontWeights.SemiBold });
+            return p;
+        }
+
+        // Once the window has its size (physical pixels), moves it to where place puts its top-left corner.
+        protected void PlaceOnLoad(Func<System.Drawing.Size, System.Drawing.Point> place)
         {
             Loaded += delegate
             {
-                System.Drawing.Size s = WindowUtil.PixelSize(this);
-                WindowUtil.PlaceRect(this, workArea.Left + (workArea.Width - s.Width) / 2, workArea.Top + (workArea.Height - s.Height) / 2, 0, 0, false);
+                System.Drawing.Point p = place(WindowUtil.PixelSize(this));
+                WindowUtil.PlaceRect(this, p.X, p.Y, 0, 0, false);
             };
+        }
+
+        protected void CenterOnLoad(System.Drawing.Rectangle workArea)
+        {
+            PlaceOnLoad(s => new System.Drawing.Point(workArea.Left + (workArea.Width - s.Width) / 2, workArea.Top + (workArea.Height - s.Height) / 2));
+        }
+
+        // A link that opens url.
+        protected static Hyperlink Link(string text, string url)
+        {
+            Hyperlink link = new Hyperlink(new Run(text));
+            link.Foreground = Theme.Link;
+            link.Click += delegate { Shell.Open(url); };
+            return link;
+        }
+
+        // Two equally wide buttons side by side.
+        protected static Grid ButtonPair(Border left, Border right, Thickness margin)
+        {
+            Grid g = new Grid { Margin = margin };
+            g.ColumnDefinitions.Add(new ColumnDefinition());
+            g.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(8) });
+            g.ColumnDefinitions.Add(new ColumnDefinition());
+            Grid.SetColumn(right, 2);
+            g.Children.Add(left);
+            g.Children.Add(right);
+            return g;
         }
     }
 
@@ -49,8 +86,7 @@ namespace HighPen
     {
         public AboutWindow(System.Drawing.Rectangle workArea)
         {
-            StackPanel p = new StackPanel { Margin = new Thickness(20, 16, 20, 16), Width = 300 };
-            p.Children.Add(new TextBlock { Text = "HighPen v" + AppInfo.AppVersion, Foreground = Brushes.White, FontSize = 18, FontWeight = FontWeights.SemiBold });
+            StackPanel p = Dialog(300, "HighPen v" + AppInfo.AppVersion);
             p.Children.Add(new TextBlock { Text = Lang.T("Tagline"), Foreground = Brushes.Gray, FontSize = 12, Margin = new Thickness(0, 2, 0, 12), TextWrapping = TextWrapping.Wrap });
             p.Children.Add(Row(Lang.T("Author"), AppInfo.AuthorName, null));
             p.Children.Add(Row(Lang.T("Email"), AppInfo.AuthorEmail, "mailto:" + AppInfo.AuthorEmail));
@@ -75,13 +111,7 @@ namespace HighPen
             g.Children.Add(new TextBlock { Text = label, Foreground = Brushes.Gray, FontSize = 12 });
             TextBlock v = new TextBlock { Foreground = Brushes.White, FontSize = 12, TextWrapping = TextWrapping.Wrap };
             if (url == null) v.Text = value;
-            else
-            {
-                System.Windows.Documents.Hyperlink link = new System.Windows.Documents.Hyperlink(new System.Windows.Documents.Run(value));
-                link.Foreground = Theme.Link;
-                link.Click += delegate { try { System.Diagnostics.Process.Start(url); } catch { } };
-                v.Inlines.Add(link);
-            }
+            else v.Inlines.Add(Link(value, url));
             Grid.SetColumn(v, 1);
             g.Children.Add(v);
             return g;
@@ -95,21 +125,18 @@ namespace HighPen
         public ToastWindow(string text, string selectPath, double seconds, System.Drawing.Rectangle workArea)
         {
             ShowActivated = false;
-            Border box = new Border { Background = Theme.PanelBg, BorderBrush = Theme.Active, BorderThickness = new Thickness(1), Padding = new Thickness(14, 10, 14, 10), Cursor = Cursors.Hand };
-            box.Child = new TextBlock { Text = text, Foreground = Brushes.White, FontSize = 13, TextWrapping = TextWrapping.Wrap, MaxWidth = 560 };
+            Border box = Frame(new TextBlock { Text = text, Foreground = Brushes.White, FontSize = 13, TextWrapping = TextWrapping.Wrap, MaxWidth = 560 });
+            box.Padding = new Thickness(14, 10, 14, 10);
+            box.Cursor = Cursors.Hand;
             Content = box;
 
             SourceInitialized += delegate { WindowUtil.AddExStyle(this, Native.WS_EX_NOACTIVATE | Native.WS_EX_TOOLWINDOW); };
             box.MouseLeftButtonUp += delegate
             {
-                if (selectPath != null) try { System.Diagnostics.Process.Start("explorer.exe", "/select,\"" + selectPath + "\""); } catch { }
+                if (selectPath != null) Shell.Open("explorer.exe", "/select,\"" + selectPath + "\"");
                 Close();
             };
-            Loaded += delegate
-            {
-                System.Drawing.Size s = WindowUtil.PixelSize(this);
-                WindowUtil.PlaceRect(this, workArea.Left + (workArea.Width - s.Width) / 2, workArea.Bottom - s.Height - 40, 0, 0, false);
-            };
+            PlaceOnLoad(s => new System.Drawing.Point(workArea.Left + (workArea.Width - s.Width) / 2, workArea.Bottom - s.Height - 40));
             DispatcherTimer t = new DispatcherTimer { Interval = TimeSpan.FromSeconds(seconds) };
             t.Tick += delegate { t.Stop(); Close(); };
             Closed += delegate { t.Stop(); };
@@ -124,29 +151,18 @@ namespace HighPen
         public UpdateWindow(UpdateInfo u, System.Drawing.Rectangle workArea)
         {
             ShowActivated = false; // do not take the keyboard from the presentation
-            StackPanel p = new StackPanel { Margin = new Thickness(20, 16, 20, 16), Width = 320 };
-            p.Children.Add(new TextBlock { Text = Lang.T("UpdateTitle"), Foreground = Brushes.White, FontSize = 18, FontWeight = FontWeights.SemiBold });
+            StackPanel p = Dialog(320, Lang.T("UpdateTitle"));
             p.Children.Add(new TextBlock { Text = string.Format(Lang.T("UpdateText"), u.Version, AppInfo.AppVersion), Foreground = Brushes.White, FontSize = 12, Margin = new Thickness(0, 8, 0, 0), TextWrapping = TextWrapping.Wrap });
             p.Children.Add(new TextBlock { Text = Lang.T("UpdateHint"), Foreground = Brushes.Gray, FontSize = 12, Margin = new Thickness(0, 4, 0, 0), TextWrapping = TextWrapping.Wrap });
 
             TextBlock notes = new TextBlock { FontSize = 12, Margin = new Thickness(0, 8, 0, 0) };
-            System.Windows.Documents.Hyperlink link = new System.Windows.Documents.Hyperlink(new System.Windows.Documents.Run(Lang.T("UpdateNotes")));
-            link.Foreground = Theme.Link;
-            link.Click += delegate { try { System.Diagnostics.Process.Start(u.PageUrl); } catch { } };
-            notes.Inlines.Add(link);
+            notes.Inlines.Add(Link(Lang.T("UpdateNotes"), u.PageUrl));
             p.Children.Add(notes);
 
-            Grid btns = new Grid { Margin = new Thickness(0, 14, 0, 0) };
-            btns.ColumnDefinitions.Add(new ColumnDefinition());
-            btns.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(8) });
-            btns.ColumnDefinitions.Add(new ColumnDefinition());
             Border store = Theme.TextButton(Lang.T("UpdateStore"), double.NaN, 28, new Thickness(0));
             store.Background = Theme.Active;
             Border later = Theme.TextButton(Lang.T("UpdateLater"), double.NaN, 28, new Thickness(0));
-            Grid.SetColumn(later, 2);
-            btns.Children.Add(store);
-            btns.Children.Add(later);
-            p.Children.Add(btns);
+            p.Children.Add(ButtonPair(store, later, new Thickness(0, 14, 0, 0)));
             Content = Frame(p);
 
             store.MouseLeftButtonUp += delegate { Updater.OpenStore(true); Close(); };
@@ -171,24 +187,16 @@ namespace HighPen
             this.bindings = bindings;
             this.probe = probe;
 
-            StackPanel p = new StackPanel { Margin = new Thickness(20, 16, 20, 16), Width = 360 };
-            p.Children.Add(new TextBlock { Text = Lang.T("Hotkeys"), Foreground = Brushes.White, FontSize = 18, FontWeight = FontWeights.SemiBold });
+            StackPanel p = Dialog(360, Lang.T("Hotkeys"));
             p.Children.Add(new TextBlock { Text = Lang.T("HotkeyHint"), Foreground = Brushes.Gray, FontSize = 12, Margin = new Thickness(0, 4, 0, 10), TextWrapping = TextWrapping.Wrap });
 
             StackPanel rows = new StackPanel();
             p.Children.Add(new ScrollViewer { Content = rows, MaxHeight = 440, VerticalScrollBarVisibility = ScrollBarVisibility.Auto });
             p.Children.Add(status);
 
-            Grid btns = new Grid { Margin = new Thickness(0, 12, 0, 0) };
-            btns.ColumnDefinitions.Add(new ColumnDefinition());
-            btns.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(8) });
-            btns.ColumnDefinitions.Add(new ColumnDefinition());
             Border reset = Theme.TextButton(Lang.T("ResetDefaults"), double.NaN, 28, new Thickness(0));
             Border close = Theme.TextButton(Lang.T("Close"), double.NaN, 28, new Thickness(0));
-            Grid.SetColumn(close, 2);
-            btns.Children.Add(reset);
-            btns.Children.Add(close);
-            p.Children.Add(btns);
+            p.Children.Add(ButtonPair(reset, close, new Thickness(0, 12, 0, 0)));
             Content = Frame(p);
 
             foreach (AppCommand a in bindings.Commands)

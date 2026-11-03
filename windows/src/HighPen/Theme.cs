@@ -38,7 +38,12 @@ namespace HighPen
 
         public static Brush Frozen(byte r, byte g, byte b)
         {
-            SolidColorBrush brush = new SolidColorBrush(Color.FromRgb(r, g, b));
+            return Frozen(Color.FromRgb(r, g, b));
+        }
+
+        public static Brush Frozen(Color c)
+        {
+            SolidColorBrush brush = new SolidColorBrush(c);
             brush.Freeze();
             return brush;
         }

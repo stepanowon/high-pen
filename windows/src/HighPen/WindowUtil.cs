@@ -58,6 +58,21 @@ namespace HighPen
         }
     }
 
+    // Opens a file, folder or URL with the shell.
+    static class Shell
+    {
+        // False when Windows could not open it.
+        public static bool Open(string target, string args = null)
+        {
+            try
+            {
+                using (System.Diagnostics.Process p = args == null ? System.Diagnostics.Process.Start(target) : System.Diagnostics.Process.Start(target, args)) { }
+                return true;
+            }
+            catch { return false; }
+        }
+    }
+
     // One connected display, in physical pixels.
     class MonitorInfo
     {
@@ -117,9 +132,8 @@ namespace HighPen
             List<MonitorInfo> list = new List<MonitorInfo>();
             Native.MonitorEnumProc proc = delegate (IntPtr hm, IntPtr dc, ref Native.RECT r, IntPtr data)
             {
-                Native.MONITORINFOEX mi = new Native.MONITORINFOEX();
-                mi.cbSize = System.Runtime.InteropServices.Marshal.SizeOf(mi);
-                if (Native.GetMonitorInfo(hm, ref mi))
+                Native.MONITORINFOEX mi;
+                if (TryGetInfo(hm, out mi))
                     list.Add(new MonitorInfo { DeviceName = mi.szDevice, Bounds = ToRectangle(mi.rcMonitor), WorkingArea = ToRectangle(mi.rcWork), Primary = (mi.dwFlags & Native.MONITORINFOF_PRIMARY) != 0 });
                 return true;
             };
@@ -131,6 +145,20 @@ namespace HighPen
                 list.Add(new MonitorInfo { DeviceName = s.DeviceName, Bounds = s.Bounds, WorkingArea = s.WorkingArea, Primary = true });
             }
             return list;
+        }
+
+        // The bounds of a monitor handle in the calling thread's coordinates (empty when it is gone).
+        public static System.Drawing.Rectangle BoundsOf(IntPtr monitor)
+        {
+            Native.MONITORINFOEX mi;
+            return TryGetInfo(monitor, out mi) ? ToRectangle(mi.rcMonitor) : System.Drawing.Rectangle.Empty;
+        }
+
+        static bool TryGetInfo(IntPtr monitor, out Native.MONITORINFOEX mi)
+        {
+            mi = new Native.MONITORINFOEX();
+            mi.cbSize = System.Runtime.InteropServices.Marshal.SizeOf(mi);
+            return monitor != IntPtr.Zero && Native.GetMonitorInfo(monitor, ref mi);
         }
 
         static System.Drawing.Rectangle ToRectangle(Native.RECT r)

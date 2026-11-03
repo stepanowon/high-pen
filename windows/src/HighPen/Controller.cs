@@ -458,17 +458,14 @@ namespace HighPen
         {
             if (hotkeyWin != null) { hotkeyWin.Activate(); return; }
             hotkeys.UnregisterAll();
-            HotkeyEditorWindow w = new HotkeyEditorWindow(bindings, hotkeys, Monitors.Get(cfg.Monitor).WorkingArea);
-            topmost.Track(w);
-            w.Closed += delegate
+            hotkeyWin = new HotkeyEditorWindow(bindings, hotkeys, WorkArea);
+            Open(hotkeyWin, delegate
             {
                 hotkeyWin = null;
                 RegisterHotkeys(false);
                 RebuildContent(); // tooltips show the new shortcuts
                 if (hotkeys.Failed.Count > 0) ShowToast(hotkeys.WarningText(), null, 8);
-            };
-            hotkeyWin = w;
-            w.Show();
+            });
         }
 
         // ---------- updates ----------
@@ -498,33 +495,36 @@ namespace HighPen
         void ShowUpdate(UpdateInfo u)
         {
             if (updateWin != null) { updateWin.BringTopmost(); return; }
-            UpdateWindow w = new UpdateWindow(u, Monitors.Get(cfg.Monitor).WorkingArea);
-            topmost.Track(w);
-            w.Closed += delegate { updateWin = null; };
-            updateWin = w;
-            w.Show();
+            updateWin = new UpdateWindow(u, WorkArea);
+            Open(updateWin, delegate { updateWin = null; });
         }
 
         // ---------- popups ----------
 
+        // The working area of the selected monitor, where popups are placed.
+        System.Drawing.Rectangle WorkArea { get { return Monitors.Get(cfg.Monitor).WorkingArea; } }
+
+        // Shows a popup, kept above other topmost windows until it closes; closed runs then.
+        void Open(PopupWindow w, Action closed)
+        {
+            topmost.Track(w);
+            w.Closed += delegate { closed(); };
+            w.Show();
+        }
+
         public void ShowAbout()
         {
             if (aboutWin != null) { aboutWin.Close(); return; }
-            AboutWindow w = new AboutWindow(Monitors.Get(cfg.Monitor).WorkingArea);
-            topmost.Track(w);
-            w.Closed += delegate { aboutWin = null; };
-            aboutWin = w;
-            w.Show();
+            aboutWin = new AboutWindow(WorkArea);
+            Open(aboutWin, delegate { aboutWin = null; });
         }
 
         void ShowToast(string text, string selectPath, double seconds)
         {
             if (toastWin != null) toastWin.Close();
-            ToastWindow w = new ToastWindow(text, selectPath, seconds, Monitors.Get(cfg.Monitor).WorkingArea);
-            topmost.Track(w);
-            w.Closed += delegate { if (toastWin == w) toastWin = null; };
+            ToastWindow w = new ToastWindow(text, selectPath, seconds, WorkArea);
             toastWin = w;
-            w.Show();
+            Open(w, delegate { if (toastWin == w) toastWin = null; });
         }
 
         // Captures the selected monitor as shown (screen, board, ink, notes, zoom) without the toolbar and spot.
