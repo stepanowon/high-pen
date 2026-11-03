@@ -38,6 +38,8 @@ namespace HighPen
         // The zoomed monitor and the part of it being shown (empty bounds = zoom off).
         System.Drawing.Rectangle zoomBounds = System.Drawing.Rectangle.Empty;
         Native.RECT zoomSource;
+        // Bounds of the selected monitor, kept so the zoom (every 12 ms) does not enumerate the monitors each time.
+        System.Drawing.Rectangle monitorBounds;
 
         public Controller(Settings cfg, ISettingsStore store, OverlayWindow overlay, SpotWindow spotWin,
             BreakWindow breakWin, Zoomer zoomer, ClickHook clickHook, IScreenCapture screenCapture)
@@ -180,6 +182,7 @@ namespace HighPen
         {
             ResolveMonitor();
             monitorSignature = Monitors.Signature();
+            monitorBounds = Monitors.Get(cfg.Monitor).Bounds;
             overlay.MoveToScreen(cfg.Monitor);
             spotWin.MoveToScreen(cfg.Monitor);
             breakWin.MoveToScreen(cfg.Monitor);
@@ -205,6 +208,8 @@ namespace HighPen
 
         void OnZoomView(System.Drawing.Rectangle b, Native.RECT r)
         {
+            // the zoom reports its view every 12 ms; most of the time nothing has moved
+            if (b == zoomBounds && r.Left == zoomSource.Left && r.Top == zoomSource.Top && r.Right == zoomSource.Right && r.Bottom == zoomSource.Bottom) return;
             zoomBounds = b;
             zoomSource = r;
             ApplyZoomTransform();
@@ -213,7 +218,7 @@ namespace HighPen
         // Ink only follows the zoom on the screen page of the monitor being zoomed.
         void ApplyZoomTransform()
         {
-            if (zoomBounds.IsEmpty || tools.Board != ToolState.NoBoard || Monitors.Get(cfg.Monitor).Bounds != zoomBounds) overlay.ResetZoom();
+            if (zoomBounds.IsEmpty || tools.Board != ToolState.NoBoard || monitorBounds != zoomBounds) overlay.ResetZoom();
             else overlay.MatchZoom(zoomBounds, zoomSource, zoomer.Factor);
         }
 
