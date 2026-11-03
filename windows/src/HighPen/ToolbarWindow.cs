@@ -39,6 +39,8 @@ namespace HighPen
         const string GlyphCollapse = "", GlyphExpand = "";
         // the bar, and what is left of it when collapsed: the arrow and the border
         const double BarWidth = 84, ArrowWidth = 28, CollapsedWidth = ArrowWidth + 2;
+        static readonly Brush GripBg = Theme.Frozen(0x4A, 0x52, 0x2A);
+        static readonly Brush CloseRed = Theme.Frozen(0xD9, 0x30, 0x25);
 
         readonly Settings cfg;
         readonly HotkeyBindings bindings;
@@ -57,6 +59,8 @@ namespace HighPen
         // The settings panel opens to the right of the bar, or to its left when it would run past
         // the right edge of the monitor. The window moves so the bar itself stays where it is.
         bool settingsLeft;
+        // The working area read once when a drag starts: Windows asks where to move the bar many times a second.
+        System.Drawing.Rectangle? dragArea;
 
         public ToolbarWindow(Settings cfg, HotkeyBindings bindings, IToolbarActions actions, ISettingsActions settingsActions)
         {
@@ -145,10 +149,12 @@ namespace HighPen
 
         // ---------- placement: the toolbar stays inside the working area of the selected monitor ----------
 
+        System.Drawing.Rectangle WorkArea { get { return Monitors.Get(cfg.Monitor).WorkingArea; } }
+
         // Puts the bar at its saved offset on the selected monitor.
         public void PlaceOnMonitor()
         {
-            System.Drawing.Rectangle wa = Monitors.Get(cfg.Monitor).WorkingArea;
+            System.Drawing.Rectangle wa = WorkArea;
             int bx = cfg.BarX, by = cfg.BarY;
             if (bx < 0 || by < 0 || bx > wa.Width - 40 || by > wa.Height - 40) { bx = 20; by = 20; }
             ShowSettingsPanel(false);
@@ -164,7 +170,7 @@ namespace HighPen
             x = y = 0;
             Native.RECT r;
             if (!WindowUtil.GetRect(this, out r)) return false;
-            System.Drawing.Rectangle wa = Monitors.Get(cfg.Monitor).WorkingArea;
+            System.Drawing.Rectangle wa = WorkArea;
             x = r.Left - wa.Left + (settingsLeft ? SettingsPanelPx() : 0);
             y = r.Top - wa.Top;
             return true;
@@ -172,7 +178,7 @@ namespace HighPen
 
         void ClampToMonitor(ref Native.RECT r)
         {
-            System.Drawing.Rectangle wa = Monitors.Get(cfg.Monitor).WorkingArea;
+            System.Drawing.Rectangle wa = dragArea ?? WorkArea;
             int w = r.Right - r.Left, h = r.Bottom - r.Top;
             int x = Math.Max(wa.Left, Math.Min(wa.Right - w, r.Left));
             int y = Math.Max(wa.Top, Math.Min(wa.Bottom - h, r.Top));
@@ -223,7 +229,7 @@ namespace HighPen
             UpdateLayout();
             int pw = SettingsPanelPx();
             // the window rect may not have caught up with the layout yet, so use the bar's own width
-            if (r.Left + ToPx(mainPanel.ActualWidth) + pw <= Monitors.Get(cfg.Monitor).WorkingArea.Right) return;
+            if (r.Left + ToPx(mainPanel.ActualWidth) + pw <= WorkArea.Right) return;
             SetSettingsSide(true);
             WindowUtil.PlaceRect(this, r.Left - pw, r.Top, 0, 0, false);
         }
@@ -261,11 +267,14 @@ namespace HighPen
             header.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
             header.ColumnDefinitions.Add(new ColumnDefinition());
             grip = new Border();
-            grip.Background = new SolidColorBrush(Color.FromRgb(0x4A, 0x52, 0x2A));
+            grip.Background = GripBg;
             grip.Cursor = Cursors.SizeAll;
             grip.MouseLeftButtonDown += delegate
             {
+                // DragMove returns once the drag is over
+                dragArea = WorkArea;
                 try { DragMove(); } catch { }
+                finally { dragArea = null; }
                 actions.BarMoved();
             };
             grip.Child = new TextBlock { Text = "HighPen", Foreground = Brushes.White, FontSize = 11, FontWeight = FontWeights.SemiBold, VerticalAlignment = VerticalAlignment.Center, Margin = new Thickness(6, 0, 0, 0), IsHitTestVisible = false, TextWrapping = TextWrapping.NoWrap };
@@ -283,13 +292,11 @@ namespace HighPen
             highlightBtn = AddButton("", true, Lang.T("Highlighter"), Lang.T("Highlighter"), "Highlighter", actions.ToggleHighlighter);
             eraserBtn = AddButton("", true, Lang.T("Eraser"), null, null, actions.ToggleEraser);
             eraserBtn.ToolTip = Lang.T("Eraser") + bindings.KeySuffix("Eraser") + "\n" + Lang.T("EraserTip");
-            boardBtn = AddButton("▭", false, Lang.T("Board"), Lang.T("BoardTip"), "Board", actions.CycleBoard);
-            boardLabel = (TextBlock)((StackPanel)boardBtn.Child).Children[1];
+            boardBtn = AddButton("▭", false, Lang.T("Board"), Lang.T("BoardTip"), "Board", actions.CycleBoard, out boardLabel);
             AddButton("", true, Lang.T("Undo"), Lang.T("Undo"), "Undo", actions.Undo);
             AddButton("", true, Lang.T("Clear"), Lang.T("ClearTip"), "Clear", actions.Clear);
             bubbleBtn = AddButton("", true, Lang.T("Bubble"), Lang.T("Bubble"), "Bubble", actions.ToggleText);
-            zoomBtn = AddButton("", true, Lang.T("Zoom"), null, null, actions.ToggleZoom);
-            zoomLabel = (TextBlock)((StackPanel)zoomBtn.Child).Children[1];
+            zoomBtn = AddButton("", true, Lang.T("Zoom"), null, null, actions.ToggleZoom, out zoomLabel);
             UpdateZoomTip();
             AddButton("", true, Lang.T("Capture"), Lang.T("CaptureTip"), "Capture", actions.Capture);
             breakBtn = AddButton("", true, Lang.T("Break"), Lang.T("BreakTip"), "Break", actions.ToggleBreak);
@@ -301,7 +308,7 @@ namespace HighPen
             // red close button
             Border close = new Border { Height = 52, Background = Theme.Idle, Cursor = Cursors.Hand, Margin = new Thickness(0, 1, 0, 0) };
             Grid cg = new Grid { Width = 30, Height = 30, HorizontalAlignment = HorizontalAlignment.Center, VerticalAlignment = VerticalAlignment.Center };
-            cg.Children.Add(new Ellipse { Fill = new SolidColorBrush(Color.FromRgb(0xD9, 0x30, 0x25)), Stroke = Brushes.White, StrokeThickness = 2 });
+            cg.Children.Add(new Ellipse { Fill = CloseRed, Stroke = Brushes.White, StrokeThickness = 2 });
             cg.Children.Add(new TextBlock { Text = "", FontFamily = Theme.Icons, Foreground = Brushes.White, FontSize = 14, FontWeight = FontWeights.Bold, HorizontalAlignment = HorizontalAlignment.Center, VerticalAlignment = VerticalAlignment.Center });
             close.Child = cg;
             Tip(close, Lang.T("Quit"), "Quit");
@@ -317,9 +324,17 @@ namespace HighPen
         // pass null to set the tooltip yourself.
         Border AddButton(string glyph, bool segoe, string label, string tip, string commandId, Action click)
         {
+            TextBlock labelText;
+            return AddButton(glyph, segoe, label, tip, commandId, click, out labelText);
+        }
+
+        // labelText: the label, for buttons whose label changes with their state.
+        Border AddButton(string glyph, bool segoe, string label, string tip, string commandId, Action click, out TextBlock labelText)
+        {
             StackPanel sp = new StackPanel { VerticalAlignment = VerticalAlignment.Center };
             sp.Children.Add(new TextBlock { Text = glyph, Foreground = Brushes.White, FontSize = 20, HorizontalAlignment = HorizontalAlignment.Center, FontFamily = segoe ? Theme.Icons : Theme.Symbols });
-            sp.Children.Add(new TextBlock { Text = label, Foreground = Brushes.White, FontSize = 10, HorizontalAlignment = HorizontalAlignment.Center });
+            labelText = new TextBlock { Text = label, Foreground = Brushes.White, FontSize = 10, HorizontalAlignment = HorizontalAlignment.Center };
+            sp.Children.Add(labelText);
             Border b = new Border { Height = 52, Background = Theme.Idle, Cursor = Cursors.Hand, Margin = new Thickness(0, 1, 0, 0), Child = sp };
             b.MouseLeftButtonUp += delegate { click(); };
             if (tip != null) Tip(b, tip, commandId);

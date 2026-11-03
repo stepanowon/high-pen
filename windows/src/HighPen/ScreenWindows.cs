@@ -53,6 +53,8 @@ namespace HighPen
     class OverlayWindow : ScreenWindow
     {
         public const int PageCount = 3;
+        // Nearly invisible, but it lets the canvas catch pen input everywhere.
+        static readonly Brush CatchInput = Theme.Frozen(Color.FromArgb(1, 0, 0, 0));
         public readonly InkCanvas Canvas = new InkCanvas();
         public readonly StrokeCollection[] Pages = { new StrokeCollection(), new StrokeCollection(), new StrokeCollection() };
         readonly List<UIElement>[] bubbles = { new List<UIElement>(), new List<UIElement>(), new List<UIElement>() };
@@ -127,7 +129,7 @@ namespace HighPen
         {
             if (board == ToolState.WhiteBoard) Background = Brushes.White;
             else if (board == ToolState.BlackBoard) Background = Brushes.Black;
-            else Background = penMode ? new SolidColorBrush(Color.FromArgb(1, 0, 0, 0)) : Brushes.Transparent;
+            else Background = penMode ? CatchInput : Brushes.Transparent;
         }
 
         // Ink lives in screen coordinates of the unzoomed desktop. While zoomed, scale the canvas
@@ -150,20 +152,21 @@ namespace HighPen
     // Click-through window that draws the spot following the mouse pointer, and the click ripples.
     class SpotWindow : ScreenWindow
     {
-        Ellipse spot = new Ellipse();
-        Canvas root = new Canvas();
-        DispatcherTimer timer = new DispatcherTimer();
+        readonly Ellipse spot = new Ellipse();
+        readonly Canvas root = new Canvas();
+        // Follows the pointer; runs only while the spot is shown (the ripples are animations of their own).
+        readonly DispatcherTimer timer = new DispatcherTimer();
 
         public SpotWindow() : base(Native.WS_EX_TRANSPARENT | Native.WS_EX_NOACTIVATE | Native.WS_EX_TOOLWINDOW)
         {
             IsHitTestVisible = false;
             spot.IsHitTestVisible = false;
+            spot.Visibility = Visibility.Collapsed;
             root.Children.Add(spot);
             Content = root;
 
             timer.Interval = TimeSpan.FromMilliseconds(12);
             timer.Tick += delegate { UpdatePosition(); };
-            timer.Start();
         }
 
         public void SetStyle(Color c, double size)
@@ -178,6 +181,9 @@ namespace HighPen
         public void SetSpotVisible(bool on)
         {
             spot.Visibility = on ? Visibility.Visible : Visibility.Collapsed;
+            if (!on) { timer.Stop(); return; }
+            UpdatePosition(); // in place before it is drawn, not where the pointer was when it was hidden
+            timer.Start();
         }
 
         // Expanding ring at a click (physical screen pixels): solid for the left button, dashed for the right.

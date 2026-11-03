@@ -20,8 +20,14 @@ namespace HighPen
         public bool Locked;
         // Reports the zoomed monitor bounds and the source rect being shown (empty bounds = zoom off).
         public Action<System.Drawing.Rectangle, Native.RECT> ViewChanged;
-        System.Drawing.Rectangle current, locked;
-        DispatcherTimer timer = new DispatcherTimer();
+        // The magnifier window's current placement (empty = place it on the next update).
+        System.Drawing.Rectangle current;
+        // The zoomed monitor, fixed when zoom starts: locked in physical pixels, lockedView in the process' own coordinates.
+        IntPtr lockedMonitor;
+        System.Drawing.Rectangle locked, lockedView;
+        // Which edge of the monitor the pointer last touched on each axis (-1 = start/left/top, 1 = end/right/bottom, 0 = none yet).
+        int edgeX, edgeY;
+        readonly DispatcherTimer timer = new DispatcherTimer();
         public bool Active { get { return host != IntPtr.Zero; } }
 
         // Can be changed while zoomed; the view updates on the spot.
@@ -33,8 +39,9 @@ namespace HighPen
                 factor = (float)value;
                 if (!Active) return;
                 ApplyTransform();
+                // an empty placement makes Update redraw even while frozen or locked
                 current = System.Drawing.Rectangle.Empty;
-                bool f = Frozen, l = Locked; Frozen = Locked = false; Update(); Frozen = f; Locked = l;
+                Update();
             }
         }
 
@@ -112,7 +119,7 @@ namespace HighPen
             finally { Leave(dpi); }
             // the rest of HighPen (the ink overlay) works in the process' own coordinates, which Windows scales
             // on a monitor whose scaling differs from the system DPI; hand the view over in those
-            if (lockedView.IsEmpty) lockedView = MonitorBounds(lockedMonitor);
+            if (lockedView.IsEmpty) lockedView = Monitors.BoundsOf(lockedMonitor);
             if (lockedView.IsEmpty) lockedView = locked;
             if (ViewChanged != null) ViewChanged(lockedView, ToView(r));
         }
@@ -129,7 +136,7 @@ namespace HighPen
             if (locked.IsEmpty)
             {
                 lockedMonitor = Native.MonitorFromPoint(p, Native.MONITOR_DEFAULTTONEAREST);
-                locked = MonitorBounds(lockedMonitor);
+                locked = Monitors.BoundsOf(lockedMonitor);
                 if (locked.IsEmpty) return false;
                 Native.RECT clip;
                 clip.Left = locked.Left; clip.Top = locked.Top; clip.Right = locked.Right; clip.Bottom = locked.Bottom;
@@ -153,10 +160,6 @@ namespace HighPen
             return true;
         }
 
-        // The zoomed monitor: locked in physical pixels, lockedView in the process' own coordinates.
-        IntPtr lockedMonitor;
-        System.Drawing.Rectangle lockedView;
-
         // A physical source rect on the zoomed monitor in the process' own coordinates.
         Native.RECT ToView(Native.RECT r)
         {
@@ -171,14 +174,6 @@ namespace HighPen
             return o;
         }
 
-        static System.Drawing.Rectangle MonitorBounds(IntPtr monitor)
-        {
-            Native.MONITORINFOEX mi = new Native.MONITORINFOEX();
-            mi.cbSize = System.Runtime.InteropServices.Marshal.SizeOf(mi);
-            if (monitor == IntPtr.Zero || !Native.GetMonitorInfo(monitor, ref mi)) return System.Drawing.Rectangle.Empty;
-            return System.Drawing.Rectangle.FromLTRB(mi.rcMonitor.Left, mi.rcMonitor.Top, mi.rcMonitor.Right, mi.rcMonitor.Bottom);
-        }
-
         // Switches this thread to per-monitor DPI awareness (physical pixels) and returns the previous context;
         // IntPtr.Zero when Windows is older than 10 1607, where the coordinates stay as they were.
         static IntPtr EnterPhysical()
@@ -191,9 +186,6 @@ namespace HighPen
         {
             if (previous != IntPtr.Zero) Native.SetThreadDpiAwarenessContext(previous);
         }
-
-        // Which edge of the monitor the pointer last touched on each axis (-1 = start/left/top, 1 = end/right/bottom, 0 = none yet).
-        int edgeX, edgeY;
 
         // Offset of the shown area along one axis, for pointer position t in [0, size-1].
         // Until an edge is touched the content under the pointer stays under the pointer.

@@ -7,7 +7,7 @@ namespace HighPen
 {
     static class AppInfo
     {
-        public const string AppVersion = "1.8.5"; // keep in sync with Version in Setup.cs
+        public const string AppVersion = "1.8.6"; // keep in sync with Version in Setup.cs
         public const string AuthorName = "StephenWon";
         public const string AuthorEmail = "stepanowon@gmail.com";
         public const string RepoUrl = "https://github.com/stepanowon/high-pen";
@@ -25,14 +25,28 @@ namespace HighPen
     // Colours, fonts and small building blocks shared by the toolbar, the settings panel and the popups.
     static class Theme
     {
-        public static readonly Brush PanelBg = new SolidColorBrush(Color.FromRgb(0x2B, 0x2E, 0x33));
-        public static readonly Brush Active = new SolidColorBrush(Color.FromRgb(0x3E, 0x6F, 0xB0));
-        public static readonly Brush Idle = new SolidColorBrush(Color.FromRgb(0x3A, 0x3D, 0x42));
-        public static readonly Brush Line = new SolidColorBrush(Color.FromRgb(0x14, 0x15, 0x17));
-        public static readonly Brush Warning = new SolidColorBrush(Color.FromRgb(0xFF, 0x9F, 0x0A));
-        public static readonly Brush Link = new SolidColorBrush(Color.FromRgb(0x7F, 0xB2, 0xFF));
+        // Shared by every window, so they are frozen: an unfrozen brush keeps track of each element that uses it,
+        // and the toolbar, settings panel and popups are rebuilt over and over.
+        public static readonly Brush PanelBg = Frozen(0x2B, 0x2E, 0x33);
+        public static readonly Brush Active = Frozen(0x3E, 0x6F, 0xB0);
+        public static readonly Brush Idle = Frozen(0x3A, 0x3D, 0x42);
+        public static readonly Brush Line = Frozen(0x14, 0x15, 0x17);
+        public static readonly Brush Warning = Frozen(0xFF, 0x9F, 0x0A);
+        public static readonly Brush Link = Frozen(0x7F, 0xB2, 0xFF);
         public static readonly FontFamily Icons = new FontFamily("Segoe MDL2 Assets");
         public static readonly FontFamily Symbols = new FontFamily("Segoe UI Symbol");
+
+        public static Brush Frozen(byte r, byte g, byte b)
+        {
+            return Frozen(Color.FromRgb(r, g, b));
+        }
+
+        public static Brush Frozen(Color c)
+        {
+            SolidColorBrush brush = new SolidColorBrush(c);
+            brush.Freeze();
+            return brush;
+        }
 
         public static Color ParseColor(string s)
         {

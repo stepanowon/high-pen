@@ -33,7 +33,7 @@ namespace HighPen
     class BreakWindow : ScreenWindow
     {
         static readonly Brush TimeBrush = Brushes.White;
-        static readonly Brush OverBrush = new SolidColorBrush(Color.FromRgb(0xFF, 0x45, 0x3A));
+        static readonly Brush OverBrush = Theme.Frozen(0xFF, 0x45, 0x3A);
         // the last minute is shown in this colour
         static readonly TimeSpan Warn = TimeSpan.FromMinutes(1);
 

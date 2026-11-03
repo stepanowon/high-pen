@@ -100,11 +100,8 @@ namespace HighPen
         // full page, which offers Update when the installed Store version is behind.
         public static void OpenStore(bool mini)
         {
-            try { Process.Start("ms-windows-store://pdp/?ProductId=" + StoreProductId + (mini ? "&mode=mini" : "")); }
-            catch
-            {
-                try { Process.Start("https://apps.microsoft.com/detail/" + StoreProductId); } catch { }
-            }
+            if (!Shell.Open("ms-windows-store://pdp/?ProductId=" + StoreProductId + (mini ? "&mode=mini" : "")))
+                Shell.Open("https://apps.microsoft.com/detail/" + StoreProductId);
         }
 
         // At start-up, before taking the single-instance lock: when 1.8.0 replaced itself with this copy and

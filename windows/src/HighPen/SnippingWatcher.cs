@@ -42,7 +42,8 @@ namespace HighPen
                 {
                     uint pid;
                     Native.GetWindowThreadProcessId(h, out pid);
-                    string n = System.Diagnostics.Process.GetProcessById((int)pid).ProcessName;
+                    string n;
+                    using (System.Diagnostics.Process p = System.Diagnostics.Process.GetProcessById((int)pid)) n = p.ProcessName;
                     lastFgIsSnip = n.Equals("SnippingTool", StringComparison.OrdinalIgnoreCase) || n.Equals("ScreenClippingHost", StringComparison.OrdinalIgnoreCase);
                 }
                 catch { }

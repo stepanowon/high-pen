@@ -16,6 +16,10 @@ namespace HighPen
             public Action Restore;
         }
 
+        // Steps kept per page. Older ones are dropped, so strokes erased long ago (and the speech bubbles of an
+        // old clear all) do not stay in memory for the whole session.
+        const int MaxSteps = 200;
+
         readonly StrokeCollection[] pages;
         readonly List<InkEdit>[] history;
         bool undoing, pressed, newEdit;
@@ -48,7 +52,7 @@ namespace HighPen
         {
             if (undoing) return;
             List<InkEdit> h = history[page];
-            if (newEdit || !pressed || h.Count == 0) { h.Add(new InkEdit()); newEdit = false; }
+            if (newEdit || !pressed || h.Count == 0) { Push(h, new InkEdit()); newEdit = false; }
             InkEdit top = h[h.Count - 1];
             foreach (Stroke st in e.Added) top.Added.Add(st);
             foreach (Stroke st in e.Removed)
@@ -79,10 +83,16 @@ namespace HighPen
             if (s.Count == 0 && restore == null) return;
             InkEdit edit = new InkEdit { Restore = restore };
             edit.Removed.Add(s);
-            history[page].Add(edit);
+            Push(history[page], edit);
             undoing = true;
             s.Clear();
             undoing = false;
+        }
+
+        static void Push(List<InkEdit> h, InkEdit edit)
+        {
+            h.Add(edit);
+            if (h.Count > MaxSteps) h.RemoveRange(0, h.Count - MaxSteps);
         }
     }
 }
