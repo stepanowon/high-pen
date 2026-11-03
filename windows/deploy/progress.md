@@ -1,6 +1,6 @@
 # 배포 진행 상황
 
-마지막 업데이트: 2026-11-02
+마지막 업데이트: 2026-11-04
 
 ## 목표
 
@@ -39,6 +39,8 @@
 | 1.8.4 GitHub 릴리스 | 완료 | 사용자 요청으로 Store 게시 **전에** GitHub 릴리스 [HighPen v1.8.4](https://github.com/stepanowon/high-pen/releases/tag/v1.8.4) (`HighPen-Setup.exe` `177af7be…`, `HighPen.exe` `5b399be5…`, `HighPen.msix` `e36cb75b…`, `SHA256SUMS.txt`), 한·일·영 변경 내용 포함. Store 게시 전까지 GitHub 배포본은 업데이트 창에서 Store를 열어도 1.8.3만 받을 수 있음. 한·영·일 Windows README의 다운로드 링크와 버전 표기를 v1.8.4로 변경 |
 | 1.8.5 버그 수정: 배율이 다른 모니터에서 확대 위치 어긋남 | 완료 | HighPen은 시스템 DPI 인식 프로세스라, 화면 배율이 시스템 DPI와 다른 모니터에서는 커서·모니터 좌표가 가상화되는데 Magnification API는 물리 픽셀로 해석해 확대 화면이 다른 영역(아래·오른쪽 또는 위·왼쪽)으로 치우쳤음. 확대 창 생성과 위치 계산만 스레드 DPI 컨텍스트를 Per-Monitor V2로 바꿔 물리 픽셀로 처리하고, 필기 오버레이에는 프로세스 좌표로 바꿔 전달. 확대 창이 흐릿하게 늘어나던 것도 사라짐. 테스트: 좌표 패턴을 확대해 화면 픽셀로 확인하는 하네스로 모니터 3대 100%, DISPLAY1·DISPLAY3 125/150/175%에서 통과(수정 전 코드는 150%에서 실패 재현). 시스템 DPI가 모니터보다 높은 경우는 이 PC에서 재현 불가 |
 | 1.8.5 GitHub 릴리스 | 완료 | 1.8.5.0 Partner Center 제출 후 Store 게시 전에 GitHub 릴리스 [HighPen v1.8.5](https://github.com/stepanowon/high-pen/releases/tag/v1.8.5) (`HighPen-Setup.exe` `48449869…`, `HighPen.exe` `5a23f64a…`, `HighPen.msix` `007e1d75…`, `SHA256SUMS.txt`), 한·일·영 변경 내용 포함. 받은 파일의 해시가 SHA256SUMS.txt와 같음 확인. 한·영·일 Windows README의 다운로드 링크와 버전 표기를 v1.8.5로 변경 |
+| 1.8.6 개선: 메모리·CPU 사용 | 완료 | [#52](https://github.com/stepanowon/high-pen/pull/52) 병합(main `282e23d`). 되돌리기 기록을 페이지마다 최근 200단계로 제한, 공용 브러시 Freeze, 스냅 감시의 Process 해제, 확대 중 같은 뷰는 다시 처리하지 않음. 마우스 스폿을 끄면 포인터 추적 타이머도 멈춤(대기 중 5초 CPU 109~141ms → 31ms). 중복 코드 정리(팝업·셸 실행·모니터 정보). macOS 리팩토링 후보는 `macos/REFACTORING.md`에 기록만 함. 테스트: 실제 앱을 단축키·클릭·스크린샷으로 조작해 확인(되돌리기 205획/210회, 확대·고정 중 배율 변경, 언어 20회 전환 시 메모리·핸들, 팝업·토스트, 툴바 드래그 제한) |
+| 1.8.6 GitHub 릴리스 | 완료 | 사용자 요청으로 Store 제출 **전에** GitHub 릴리스 [HighPen v1.8.6](https://github.com/stepanowon/high-pen/releases/tag/v1.8.6) (`HighPen-Setup.exe` `bfa6749e…`, `HighPen.exe` `6590ae5c…`, `HighPen.msix` `7dbd8ba6…`, `SHA256SUMS.txt`), 한·일·영 변경 내용 포함. 받은 파일의 해시가 SHA256SUMS.txt와 같음 확인. 한·영·일 Windows README의 다운로드 링크와 버전 표기를 v1.8.6으로 변경 |
 
 ### winget
 
@@ -82,6 +84,8 @@
 | 1.8.4 제출 | 완료 | 1.8.4.0 패키지를 Partner Center에 제출함(2026-11-01 확인). Store 게시 후 현재 Store 버전이 1.8.4가 됨 |
 | 1.8.5 MSIX | 완료 | `dist/HighPen.msix` (1.8.5.0) `007e1d75…` 빌드. MSIX 안의 `HighPen.exe`가 `dist/HighPen.exe`와 같음(`5a23f64a…`) 확인. `HighPen-Setup.exe` `48449869…`는 같은 exe로 빌드. `SHA256SUMS.txt` 작성 |
 | 1.8.5 제출 | 완료 | 1.8.5.0 패키지를 Partner Center에 제출함(2026-11-02, 사용자 확인). 인증·게시 확인 필요 |
+| 1.8.6 MSIX | 완료 | `dist/HighPen.msix` (1.8.6.0) `7dbd8ba6…` 빌드. MSIX 안의 `HighPen.exe`가 `dist/HighPen.exe`와 같음(`6590ae5c…`) 확인. `HighPen-Setup.exe` `bfa6749e…`는 같은 exe로 빌드. `SHA256SUMS.txt` 작성 |
+| 1.8.6 제출 | 대기 | 1.8.6.0 패키지를 Partner Center에 제출해야 함 |
 
 ## Store 정보
 
