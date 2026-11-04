@@ -7,6 +7,7 @@ enum Cfg {
     static let palette = [0xFF3B30, 0xFF9500, 0xFFD60A, 0x34C759, 0x0A84FF, 0xBF5AF2, 0x000000, 0xFFFFFF].map(rgb)
     static let colorNames = ["Red", "Orange", "Yellow", "Green", "Blue", "Purple", "Black", "White"] // Lang keys
     static let black = 6, white = 7
+    static let colors = 0...palette.count - 1
     static let zoomFactors: [CGFloat] = [1.5, 2, 2.5]
 
     static func int(_ k: String, _ def: Int, _ r: ClosedRange<Int>) -> Int {
@@ -17,12 +18,12 @@ enum Cfg {
     }
     static func flag(_ k: String, _ def: Bool) -> Bool { d.object(forKey: k) == nil ? def : d.bool(forKey: k) }
 
-    static var penColor: Int { get { int("PenColor", 0, 0...7) } set { d.set(newValue, forKey: "PenColor") } }
+    static var penColor: Int { get { int("PenColor", 0, colors) } set { d.set(newValue, forKey: "PenColor") } }
     static var penSize: Double { get { num("PenSize", 4, 1...30) } set { d.set(newValue, forKey: "PenSize") } }
     static var pressure: Bool { get { flag("Pressure", true) } set { d.set(newValue, forKey: "Pressure") } }
-    static var highlightColor: Int { get { int("HighlightColor", 2, 0...7) } set { d.set(newValue, forKey: "HighlightColor") } }
+    static var highlightColor: Int { get { int("HighlightColor", 2, colors) } set { d.set(newValue, forKey: "HighlightColor") } }
     static var highlightSize: Double { get { num("HighlightSize", 20, 5...60) } set { d.set(newValue, forKey: "HighlightSize") } }
-    static var spotColor: Int { get { int("SpotColor", 2, 0...7) } set { d.set(newValue, forKey: "SpotColor") } }
+    static var spotColor: Int { get { int("SpotColor", 2, colors) } set { d.set(newValue, forKey: "SpotColor") } }
     static var spotSize: Double { get { num("SpotSize", 70, 20...200) } set { d.set(newValue, forKey: "SpotSize") } }
     static var showClicks: Bool { get { flag("ShowClicks", false) } set { d.set(newValue, forKey: "ShowClicks") } }
     static var spotOn: Bool { get { flag("SpotOn", true) } set { d.set(newValue, forKey: "SpotOn") } }

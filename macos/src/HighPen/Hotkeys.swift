@@ -27,9 +27,11 @@ final class Hotkeys {
         register()
     }
 
+    func action(_ id: String) -> HotkeyAction? { actions.first { $0.id == id } }
+
     // The action's current shortcut (nil = none).
     func current(_ id: String) -> Hotkey? {
-        let def = actions.first { $0.id == id }?.def
+        let def = action(id)?.def
         guard let s = Cfg.hotkeys[id] else { return def }
         return s.isEmpty ? nil : Hotkey(saved: s) ?? def
     }

@@ -5,29 +5,17 @@ import Cocoa
 @MainActor
 final class Hints {
     private let win = Panel(level: 4, clickThrough: true)
-    private let text = NSTextField(wrappingLabelWithString: "")
+    private let text = wrapLabel("")
     private weak var owner: NSView?
     // The area a hint beside window w must not cover (the settings panel next to the toolbar).
     var avoid: (NSWindow) -> NSRect? = { _ in nil }
 
     init() {
         let box = NSView()
-        box.wantsLayer = true
-        box.layer?.backgroundColor = panelBg.cgColor
-        box.layer?.borderColor = activeBg.cgColor
-        box.layer?.borderWidth = 1
+        bordered(box)
         box.layer?.cornerRadius = 4
-        text.textColor = .white
-        text.font = .systemFont(ofSize: 12)
         text.preferredMaxLayoutWidth = 320
-        text.translatesAutoresizingMaskIntoConstraints = false
-        box.addSubview(text)
-        NSLayoutConstraint.activate([
-            text.leadingAnchor.constraint(equalTo: box.leadingAnchor, constant: 8),
-            text.trailingAnchor.constraint(equalTo: box.trailingAnchor, constant: -8),
-            text.topAnchor.constraint(equalTo: box.topAnchor, constant: 5),
-            text.bottomAnchor.constraint(equalTo: box.bottomAnchor, constant: -5),
-        ])
+        pad(text, in: box, dx: 8, dy: 5)
         win.contentView = box
     }
 

@@ -29,6 +29,9 @@ func selfTest() {
     v.bubbles[0].append(Bubble(text: "b", at: .zero, color: .red, size: 16))
     v.undo()
     precondition(v.pages[0].count == 1 && v.bubbles[0].map(\.text) == ["a", "b"], "undo brings back a clear all, bubbles beneath newer ones")
+    v.history[0] = []
+    for _ in 0..<InkView.maxSteps + 5 { v.pages[0] = [s]; v.clear() }
+    precondition(v.history[0].count == InkView.maxSteps, "undo keeps only the newest steps")
     v.zoomScale = 2
     v.zoomOrigin = CGPoint(x: 100, y: 50)
     precondition(v.content(CGPoint(x: 40, y: 20)) == CGPoint(x: 120, y: 60), "zoomed input maps back to content")
@@ -44,11 +47,11 @@ func selfTest() {
     t.togglePen()
     precondition(t.penMode && t.tool == .pen, "pen from the eraser")
     t.cycleBoard()
-    precondition(t.board == 1 && t.visiblePenColor(Cfg.white) == Cfg.black && t.visiblePenColor(0) == 0, "white board keeps the pen visible")
+    precondition(t.board == .white && t.visiblePenColor(Cfg.white) == Cfg.black && t.visiblePenColor(0) == 0, "white board keeps the pen visible")
     t.cycleBoard()
-    precondition(t.board == 2 && t.visiblePenColor(Cfg.black) == Cfg.white, "black board keeps the pen visible")
+    precondition(t.board == .black && t.visiblePenColor(Cfg.black) == Cfg.white, "black board keeps the pen visible")
     t.togglePen()
-    precondition(!t.penMode && t.board == 0, "pen off leaves the board")
+    precondition(!t.penMode && t.board == .screen, "pen off leaves the board")
     precondition(BreakTimes.clamp(7) == 5 && BreakTimes.clamp(8) == 10 && BreakTimes.clamp(0) == 5 && BreakTimes.clamp(999) == 120, "break length steps and range")
     precondition(BreakTimes.clock(599) == "09:59" && BreakTimes.clock(3600) == "1:00:00" && BreakTimes.clock(0) == "00:00", "break clock")
     var e = 0
