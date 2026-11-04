@@ -13,6 +13,8 @@ final class Zoomer: NSObject, SCStreamOutput {
     let window = Panel(level: 0, clickThrough: true)
     let view = NSView()
     private var stream: SCStream?
+    // between start being called and the stream running, so a second start does not open a second stream
+    private var starting = false
     private var timer: Timer?
     private var frame = NSRect.zero
     private(set) var factor: CGFloat = 2
@@ -33,15 +35,13 @@ final class Zoomer: NSObject, SCStreamOutput {
     }
 
     func start(_ screen: NSScreen, factor: CGFloat) async throws {
-        let content = try await SCShareableContent.excludingDesktopWindows(false, onScreenWindowsOnly: true)
-        guard !active, let display = content.displays.first(where: { $0.displayID == displayID(screen) }) else { return }
+        guard !active, !starting else { return }
+        starting = true
+        defer { starting = false }
+        guard let (content, display, conf) = try await ScreenCapture.setup(screen) else { return }
         let me = content.applications.filter { $0.processID == getpid() }
         let filter = SCContentFilter(display: display, excludingApplications: me, exceptingWindows: [])
-        let conf = SCStreamConfiguration()
-        conf.width = Int(screen.frame.width * screen.backingScaleFactor)
-        conf.height = Int(screen.frame.height * screen.backingScaleFactor)
         conf.minimumFrameInterval = CMTime(value: 1, timescale: 60)
-        conf.showsCursor = false
         conf.queueDepth = 4
         let s = SCStream(filter: filter, configuration: conf, delegate: nil)
         try s.addStreamOutput(self, type: .screen, sampleHandlerQueue: .main)
@@ -53,11 +53,7 @@ final class Zoomer: NSObject, SCStreamOutput {
         window.setFrame(frame, display: false)
         window.orderFrontRegardless()
         update(force: true)
-        let t = Timer(timeInterval: 1.0 / 60, repeats: true) { [weak self] _ in
-            MainActor.assumeIsolated { self?.update(force: false) }
-        }
-        RunLoop.main.add(t, forMode: .common)
-        timer = t
+        timer = repeatingTimer(1.0 / 60) { [weak self] in self?.update(force: false) }
     }
 
     func stop() {
@@ -118,6 +114,8 @@ final class Zoomer: NSObject, SCStreamOutput {
         guard type == .screen, let pb = CMSampleBufferGetImageBuffer(sb),
               let surface = CVPixelBufferGetIOSurface(pb)?.takeUnretainedValue() else { return }
         MainActor.assumeIsolated {
+            // frames already queued when zoom stopped would put the (full-size) screen image back on the hidden layer
+            guard s === stream else { return }
             CATransaction.begin()
             CATransaction.setDisableActions(true)
             view.layer?.contents = surface

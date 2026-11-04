@@ -65,6 +65,7 @@ final class BreakTimer {
     private let view = BreakView()
     private var timer: Timer?
     private var end = Date()
+    private let hhmm: DateFormatter = { let f = DateFormatter(); f.dateFormat = "HH:mm"; return f }()
     var running: Bool { timer != nil }
 
     init() { window.contentView = view }
@@ -73,9 +74,7 @@ final class BreakTimer {
         end = Date().addingTimeInterval(TimeInterval(minutes * 60))
         refresh()
         window.orderFrontRegardless()
-        let t = Timer(timeInterval: 0.2, repeats: true) { [weak self] _ in MainActor.assumeIsolated { self?.refresh() } }
-        RunLoop.main.add(t, forMode: .common)
-        timer = t
+        timer = repeatingTimer(0.2) { [weak self] in self?.refresh() }
     }
 
     func stop() {
@@ -90,14 +89,15 @@ final class BreakTimer {
         let over = left <= 0
         // round up, so the display reaches 00:00 exactly when the break ends
         let secs = over ? 0 : Int(left.rounded(.up))
-        let color = over ? rgb(0xFF453A) : left <= 60 ? rgb(0xFF9F0A) : .white
-        let f = DateFormatter()
-        f.dateFormat = "HH:mm"
+        let color = over ? alertRed : left <= 60 ? warnColor : .white
         // the resume line stays (blank) once over, so the time does not jump
-        let resume = over ? " " : String(format: Lang.t("BreakEnds"), f.string(from: end))
-        view.lines = [(Lang.t(over ? "BreakOver" : "BreakTitle"), 40, .regular, .white),
-                      (BreakTimes.clock(secs), 200, .semibold, color),
-                      (resume, 30, .regular, .gray)]
+        let resume = over ? " " : String(format: Lang.t("BreakEnds"), hhmm.string(from: end))
+        let lines: [(String, CGFloat, NSFont.Weight, NSColor)] = [(Lang.t(over ? "BreakOver" : "BreakTitle"), 40, .regular, .white),
+                                                                (BreakTimes.clock(secs), 200, .semibold, color),
+                                                                (resume, 30, .regular, .gray)]
+        // checked 5 times a second, but the time only changes once: redraw the whole monitor only then
+        guard lines.map(\.0) != view.lines.map(\.0) || color != view.lines[1].3 else { return }
+        view.lines = lines
         view.needsDisplay = true
     }
 }

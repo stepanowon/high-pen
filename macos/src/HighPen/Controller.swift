@@ -25,6 +25,7 @@ final class Controller: NSObject, NSApplicationDelegate, SettingsPanelDelegate {
 
     var tools = ToolState()
     var settingsOpen = false, collapsed = false, checkingUpdate = false
+    private var keyMonitor: Any? // kept: AppKit holds event monitors only as long as the app does
 
     // Every action that can have a shortcut, in the order the shortcut editor lists them.
     func makeActions() -> [HotkeyAction] {
@@ -49,32 +50,37 @@ final class Controller: NSObject, NSApplicationDelegate, SettingsPanelDelegate {
             HotkeyAction(id: "Pressure", def: Hotkey(mods: ctrlOpt, key: kVK_ANSI_R, name: "R"), title: { Lang.t("Pressure") }, run: { [unowned self] in self.togglePressure() }),
             HotkeyAction(id: "Quit", def: Hotkey(mods: ctrlOpt, key: kVK_ANSI_Q, name: "Q"), title: { Lang.t("Quit") }, run: { NSApp.terminate(nil) }),
         ]
-        let digits = [kVK_ANSI_1, kVK_ANSI_2, kVK_ANSI_3, kVK_ANSI_4, kVK_ANSI_5, kVK_ANSI_6, kVK_ANSI_7, kVK_ANSI_8]
-        for i in 0..<Cfg.palette.count {
-            a.append(HotkeyAction(id: "Color" + String(i), def: Hotkey(mods: ctrlOpt, key: digits[i], name: String(i + 1)),
+        let digits = [kVK_ANSI_1, kVK_ANSI_2, kVK_ANSI_3, kVK_ANSI_4, kVK_ANSI_5, kVK_ANSI_6, kVK_ANSI_7, kVK_ANSI_8, kVK_ANSI_9]
+        for (i, key) in zip(Cfg.palette.indices, digits) {
+            a.append(HotkeyAction(id: "Color" + String(i), def: Hotkey(mods: ctrlOpt, key: key, name: String(i + 1)),
                                   title: { Lang.t("PenColor") + ": " + Lang.t(Cfg.colorNames[i]) },
                                   run: { [unowned self] in self.setPenColor(i) }))
         }
         return a
     }
 
+    // A button runs the same action as its shortcut (id), unless run is given: the eraser button only toggles
+    // the eraser (its shortcut, pressed again, clears the page), and About has no shortcut.
     func toolbarButtons() -> [ToolbarButton] {
-        let tip = hotkeys.tip
+        func button(_ id: String, _ symbol: String, _ title: String, tip: String? = nil, more: String = "", tint: NSColor = .white,
+                    run: (() -> Void)? = nil) -> ToolbarButton {
+            ToolbarButton(id, symbol, Lang.t(title), hotkeys.tip(Lang.t(tip ?? title), id) + more, tint: tint, run ?? hotkeys.action(id)!.run)
+        }
         return [
-            ToolbarButton("Spot", "smallcircle.filled.circle", Lang.t("Spot"), tip(Lang.t("MouseSpot"), "Spot")) { [unowned self] in self.toggleSpot() },
-            ToolbarButton("Pen", "pencil.tip", Lang.t("Pen"), tip(Lang.t("Pen"), "Pen")) { [unowned self] in self.togglePen() },
-            ToolbarButton("Highlighter", "highlighter", Lang.t("Highlighter"), tip(Lang.t("Highlighter"), "Highlighter")) { [unowned self] in self.toggleHighlighter() },
-            ToolbarButton("Eraser", "eraser", Lang.t("Eraser"), tip(Lang.t("Eraser"), "Eraser") + "\n" + Lang.t("EraserTip")) { [unowned self] in self.toggleEraser() },
-            ToolbarButton("Board", "rectangle.inset.filled", Lang.t("Board"), tip(Lang.t("BoardTip"), "Board")) { [unowned self] in self.cycleBoard() },
-            ToolbarButton("Undo", "arrow.uturn.backward", Lang.t("Undo"), tip(Lang.t("Undo"), "Undo")) { [unowned self] in self.ink.undo() },
-            ToolbarButton("Clear", "trash", Lang.t("Clear"), tip(Lang.t("ClearTip"), "Clear")) { [unowned self] in self.ink.clear() },
-            ToolbarButton("Bubble", "text.bubble", Lang.t("Bubble"), tip(Lang.t("Bubble"), "Bubble") + "\n" + Lang.t("BubbleTip")) { [unowned self] in self.toggleBubble() },
-            ToolbarButton("Zoom", "plus.magnifyingglass", Lang.t("Zoom"), tip(Lang.t("Zoom"), "Zoom") + "\n" + tip(Lang.t("ZoomLock"), "ZoomLock")) { [unowned self] in self.toggleZoom() },
-            ToolbarButton("Capture", "camera", Lang.t("Capture"), tip(Lang.t("CaptureTip"), "Capture")) { [unowned self] in self.capture() },
-            ToolbarButton("Break", "stopwatch", Lang.t("Break"), tip(Lang.t("BreakTip"), "Break")) { [unowned self] in self.toggleBreak() },
-            ToolbarButton("Settings", "gearshape", Lang.t("Settings"), tip(Lang.t("Settings"), "Settings")) { [unowned self] in self.toggleSettings() },
-            ToolbarButton("About", "info.circle", Lang.t("About"), Lang.t("AboutTip")) { [unowned self] in self.about.toggle() },
-            ToolbarButton("Quit", "xmark.circle.fill", Lang.t("Quit"), tip(Lang.t("Quit"), "Quit"), tint: rgb(0xFF453A)) { NSApp.terminate(nil) },
+            button("Spot", "smallcircle.filled.circle", "Spot", tip: "MouseSpot"),
+            button("Pen", "pencil.tip", "Pen"),
+            button("Highlighter", "highlighter", "Highlighter"),
+            button("Eraser", "eraser", "Eraser", more: "\n" + Lang.t("EraserTip")) { [unowned self] in self.toggleEraser() },
+            button("Board", "rectangle.inset.filled", "Board", tip: "BoardTip"),
+            button("Undo", "arrow.uturn.backward", "Undo"),
+            button("Clear", "trash", "Clear", tip: "ClearTip"),
+            button("Bubble", "text.bubble", "Bubble", more: "\n" + Lang.t("BubbleTip")),
+            button("Zoom", "plus.magnifyingglass", "Zoom", more: "\n" + hotkeys.tip(Lang.t("ZoomLock"), "ZoomLock")),
+            button("Capture", "camera", "Capture", tip: "CaptureTip"),
+            button("Break", "stopwatch", "Break", tip: "BreakTip"),
+            button("Settings", "gearshape", "Settings"),
+            button("About", "info.circle", "About", tip: "AboutTip") { [unowned self] in self.about.toggle() },
+            button("Quit", "xmark.circle.fill", "Quit", tint: alertRed),
         ]
     }
 
@@ -104,7 +110,7 @@ final class Controller: NSObject, NSApplicationDelegate, SettingsPanelDelegate {
         }
 
         hotkeys.start()
-        NSEvent.addLocalMonitorForEvents(matching: .keyDown) { [unowned self] e in
+        keyMonitor = NSEvent.addLocalMonitorForEvents(matching: .keyDown) { [unowned self] e in
             MainActor.assumeIsolated { self.handleKey(e) } ? nil : e
         }
 
@@ -192,10 +198,10 @@ final class Controller: NSObject, NSApplicationDelegate, SettingsPanelDelegate {
     func toggleBubble() { tools.toggleBubble(); applyMode() }
     // First press enters eraser mode; pressing again while erasing wipes the page.
     func eraserHotkey() { if tools.erasing { ink.clear() } else { toggleEraser() } }
-    func toggleSettings() { settingsOpen.toggle(); applyMode() }
-    func toggleCollapse() { collapsed.toggle(); hints.hide(); applyMode() }
-    func toggleClicks() { Cfg.showClicks.toggle(); clicksChanged(); settings.rebuild(); placeSettings() }
-    func togglePressure() { Cfg.pressure.toggle(); settings.rebuild(); placeSettings() }
+    func toggleSettings() { settingsOpen.toggle(); syncToolbar() }
+    func toggleCollapse() { collapsed.toggle(); hints.hide(); syncToolbar() }
+    func toggleClicks() { Cfg.showClicks.toggle(); clicksChanged(); settings.showSwitches() }
+    func togglePressure() { Cfg.pressure.toggle(); settings.showSwitches() }
 
     func cycleBoard() {
         tools.cycleBoard()
@@ -245,12 +251,12 @@ final class Controller: NSObject, NSApplicationDelegate, SettingsPanelDelegate {
     }
 
     func toggleZoom() {
-        if zoomer.active { zoomer.stop(); applyMode(); return }
+        if zoomer.active { zoomer.stop(); syncToolbar(); return }
         guard CGPreflightScreenCaptureAccess() else { askPermission(); return }
         Task { @MainActor in
             do { try await zoomer.start(screen(Cfg.monitor), factor: Cfg.zoomFactors[Cfg.zoomIndex]) }
             catch { askPermission() }
-            applyMode()
+            syncToolbar()
         }
     }
 
@@ -258,16 +264,16 @@ final class Controller: NSObject, NSApplicationDelegate, SettingsPanelDelegate {
     func toggleZoomLock() {
         guard zoomer.active else { return }
         zoomer.locked.toggle()
-        applyMode()
+        syncToolbar()
     }
 
     func toggleBreak() {
         if breakTimer.running { breakTimer.stop() } else { breakTimer.start(Cfg.breakMinutes) }
-        applyMode()
+        syncToolbar()
     }
 
     func applyZoomTransform() {
-        if let o = zoomer.origin, tools.board == 0 {
+        if let o = zoomer.origin, tools.board == .screen {
             ink.zoomScale = zoomer.factor
             ink.zoomOrigin = o
         } else {
@@ -283,28 +289,38 @@ final class Controller: NSObject, NSApplicationDelegate, SettingsPanelDelegate {
     }
 
     func applyMode() {
-        if tools.tool != .text || ink.page != tools.board { ink.endBubble(commit: true) } // switching tool or page confirms the note being typed
+        applyTool()
+        syncToolbar()
+    }
+
+    // The tool and page: ink, cursor, focus, whether the overlay takes the mouse, its background, the zoom.
+    func applyTool() {
+        if tools.tool != .text || ink.page != tools.board.rawValue { ink.endBubble(commit: true) } // switching tool or page confirms the note being typed
         let t = tools
-        ink.page = t.board
+        ink.page = t.board.rawValue
         ink.tool = t.tool
         ink.cursor = t.tool == .text ? textCursor : t.tool == .eraser ? eraserCursor : t.tool == .highlighter ? highlightCursor : penCursor
         updateFocus()
         (t.penMode ? ink.cursor : NSCursor.arrow).set() // the pointer may already be over the overlay
         overlay.ignoresMouseEvents = !t.penMode
-        overlay.backgroundColor = t.board == 1 ? .white : t.board == 2 ? .black : t.penMode ? NSColor(white: 0, alpha: 1.0 / 255) : .clear
+        overlay.backgroundColor = t.board.color ?? (t.penMode ? NSColor(white: 0, alpha: 1.0 / 255) : .clear)
         zoomer.frozen = t.penMode
         applyZoomTransform()
+    }
 
+    // What the toolbar shows (which buttons are on, the Board and Zoom labels, collapsed), and where it and the settings panel are.
+    func syncToolbar() {
+        let t = tools
         toolbar.highlight("Pen", t.penMode && t.tool == .pen)
         toolbar.highlight("Highlighter", t.penMode && t.tool == .highlighter)
         toolbar.highlight("Eraser", t.erasing)
         toolbar.highlight("Bubble", t.penMode && t.tool == .text)
-        toolbar.highlight("Board", t.board != 0)
+        toolbar.highlight("Board", t.board != .screen)
         toolbar.highlight("Zoom", zoomer.active)
         toolbar.setTitle("Zoom", Lang.t(zoomer.active && zoomer.locked ? "ZoomLocked" : "Zoom")) // locked, the button reads "Locked"
         toolbar.highlight("Break", breakTimer.running)
         toolbar.highlight("Settings", settingsOpen)
-        toolbar.setTitle("Board", Lang.t(["Board", "WhiteBoard", "BlackBoard"][t.board]))
+        toolbar.setTitle("Board", Lang.t(t.board.titleKey))
         toolbar.setCollapsed(collapsed)
         placeBar()
     }
@@ -316,7 +332,7 @@ final class Controller: NSObject, NSApplicationDelegate, SettingsPanelDelegate {
     // Captures the selected monitor as shown without the toolbar, settings panel and spot.
     func capture() {
         guard CGPreflightScreenCaptureAccess() else { askPermission(); return }
-        toast.hide()
+        toast.close()
         let scr = screen(Cfg.monitor)
         let hide = [toolbar.window, settings.window, spot.window].map { CGWindowID($0.windowNumber) }
         Task { @MainActor in

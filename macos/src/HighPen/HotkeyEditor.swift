@@ -6,14 +6,12 @@ import Carbon.HIToolbox
 // Lists every action with its shortcut. Click one, then press the new combination.
 // HighPen's own shortcuts are released while the editor is open so pressing them reaches it.
 @MainActor
-final class HotkeyEditor {
+final class HotkeyEditor: Popup {
     var onOpen: () -> Void = {}, onClose: () -> Void = {}
     private let hotkeys: Hotkeys
-    private var window: Panel?
     private var waiting: Int? // index of the action whose new shortcut is being typed
     private var keyBoxes: [NSButton] = []
-    private let status = NSTextField(wrappingLabelWithString: "")
-    var isOpen: Bool { window != nil }
+    private let status = wrapLabel("", width: 360)
 
     init(hotkeys: Hotkeys) { self.hotkeys = hotkeys }
 
@@ -24,10 +22,7 @@ final class HotkeyEditor {
         keyBoxes = []
         let rows = vstack([], spacing: 4)
         for (i, a) in hotkeys.actions.enumerated() {
-            let name = NSTextField(wrappingLabelWithString: a.title())
-            name.textColor = .white
-            name.font = .systemFont(ofSize: 12)
-            fixedSize(name, 196, nil)
+            let name = wrapLabel(a.title(), width: 196)
             let box = NSButton(title: "", target: nil, action: nil)
             box.isBordered = false
             box.wantsLayer = true
@@ -55,8 +50,6 @@ final class HotkeyEditor {
 
         let hintText = label(Lang.t("HotkeyHint"), color: .gray)
         status.stringValue = ""
-        status.font = .systemFont(ofSize: 12)
-        fixedSize(status, 360, nil)
         let reset = NSButton(title: Lang.t("ResetDefaults"), target: nil, action: nil)
         reset.on { [unowned self] _ in
             self.hotkeys.resetAll()
@@ -71,16 +64,13 @@ final class HotkeyEditor {
         let btns = NSStackView(views: [reset, close])
         btns.spacing = 8
 
-        let w = dialog(vstack([heading(Lang.t("Hotkeys")), hintText, scroll, status, btns], spacing: 8), keyable: true)
-        window = w
         refresh()
+        present(dialog(vstack([heading(Lang.t("Hotkeys")), hintText, scroll, status, btns], spacing: 8), keyable: true), key: true)
         onOpen()
-        w.makeKeyAndOrderFront(nil)
     }
 
-    func close() {
-        window?.orderOut(nil)
-        window = nil
+    override func close() {
+        super.close()
         waiting = nil
         onClose()
     }
@@ -93,7 +83,7 @@ final class HotkeyEditor {
             if plain && (k == kVK_Escape || k == kVK_Return) { close() }
             return
         }
-        func warn(_ t: String) { status.textColor = rgb(0xFF9F0A); status.stringValue = t }
+        func warn(_ t: String) { status.textColor = warnColor; status.stringValue = t }
         if plain && k == kVK_Escape { waiting = nil; status.stringValue = ""; refresh(); return }
         if plain && (k == kVK_Delete || k == kVK_ForwardDelete) { status.stringValue = ""; assign(i, nil); return }
         let h = Hotkey(event: e)

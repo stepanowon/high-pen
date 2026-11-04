@@ -4,9 +4,18 @@ import Cocoa
 
 enum Tool { case pen, highlighter, eraser, text }
 
+// The page shown: the screen itself, or a board covering it. The raw value is the ink page.
+enum Board: Int, CaseIterable {
+    case screen, white, black
+
+    var titleKey: String { ["Board", "WhiteBoard", "BlackBoard"][rawValue] }
+    var color: NSColor? { self == .white ? .white : self == .black ? .black : nil }
+    var next: Board { Board(rawValue: (rawValue + 1) % Board.allCases.count)! }
+}
+
 struct ToolState {
     var penMode = false, tool = Tool.pen
-    var board = 0 // 0 = screen, 1 = white board, 2 = black board
+    var board = Board.screen
 
     var erasing: Bool { penMode && tool == .eraser }
 
@@ -17,18 +26,18 @@ struct ToolState {
 
     mutating func setPen(_ on: Bool) {
         penMode = on
-        if !on { tool = .pen; board = 0 }
+        if !on { tool = .pen; board = .screen }
     }
 
     mutating func cycleBoard() {
-        board = (board + 1) % 3
-        if board != 0 { penMode = true; if tool == .eraser { tool = .pen } }
+        board = board.next
+        if board != .screen { penMode = true; if tool == .eraser { tool = .pen } }
     }
 
     // Keeps the pen visible against the board colour.
     func visiblePenColor(_ c: Int) -> Int {
-        if board == 2 && c == Cfg.black { return Cfg.white }
-        if board == 1 && c == Cfg.white { return Cfg.black }
+        if board == .black && c == Cfg.black { return Cfg.white }
+        if board == .white && c == Cfg.white { return Cfg.black }
         return c
     }
 }

@@ -11,14 +11,33 @@ func dialog(_ content: NSView, keyable: Bool) -> Panel {
     w.keyable = keyable
     let box = NSStackView(views: [content])
     box.edgeInsets = NSEdgeInsets(top: 16, left: 20, bottom: 16, right: 20)
-    box.wantsLayer = true
-    box.layer?.backgroundColor = panelBg.cgColor
-    box.layer?.borderColor = activeBg.cgColor
-    box.layer?.borderWidth = 1
+    bordered(box)
     w.contentView = box
     let s = box.fittingSize, vf = screen(Cfg.monitor).visibleFrame
     w.setFrame(NSRect(x: vf.midX - s.width / 2, y: vf.midY - s.height / 2, width: s.width, height: s.height), display: true)
     return w
+}
+
+// One popup window at a time, made anew each time it opens and let go when it closes.
+@MainActor
+class Popup {
+    private(set) var window: Panel?
+    var isOpen: Bool { window != nil }
+
+    // Shows w in place of the one open; key: takes the keyboard (dialogs) or leaves it with the app in use.
+    func present(_ w: Panel, key: Bool) {
+        window?.orderOut(nil)
+        window = w
+        if key { w.makeKeyAndOrderFront(nil) } else { w.orderFrontRegardless() }
+    }
+
+    func close() {
+        window?.orderOut(nil)
+        window = nil
+    }
+
+    // Closes w only if it is still the one shown (a timer or click of a popup already replaced).
+    func close(_ w: Panel?) { if let w = w, w === window { close() } }
 }
 
 func vstack(_ views: [NSView], spacing: CGFloat = 6) -> NSStackView {
@@ -37,58 +56,33 @@ func heading(_ t: String) -> NSTextField {
 
 // Short message at the bottom of the selected monitor; click closes it.
 @MainActor
-final class Toast {
-    private var window: Panel?
-
+final class Toast: Popup {
     func show(_ text: String, seconds: Double?, click: (() -> Void)? = nil) {
-        hide()
         let t = Panel(level: 4, clickThrough: false)
         let box = ClickView()
-        box.wantsLayer = true
-        box.layer?.backgroundColor = panelBg.cgColor
-        box.layer?.borderColor = activeBg.cgColor
-        box.layer?.borderWidth = 1
-        let l = NSTextField(wrappingLabelWithString: text)
-        l.textColor = .white
-        l.font = .systemFont(ofSize: 13)
+        bordered(box)
+        let l = wrapLabel(text, size: 13)
         l.preferredMaxLayoutWidth = 560
-        l.translatesAutoresizingMaskIntoConstraints = false
-        box.addSubview(l)
-        NSLayoutConstraint.activate([
-            l.leadingAnchor.constraint(equalTo: box.leadingAnchor, constant: 14),
-            l.trailingAnchor.constraint(equalTo: box.trailingAnchor, constant: -14),
-            l.topAnchor.constraint(equalTo: box.topAnchor, constant: 10),
-            l.bottomAnchor.constraint(equalTo: box.bottomAnchor, constant: -10),
-        ])
+        pad(l, in: box, dx: 14, dy: 10)
         box.click = { [weak self, weak t] in
             click?()
-            t?.orderOut(nil)
-            if self?.window === t { self?.window = nil }
+            self?.close(t)
         }
         t.contentView = box
         let s = box.fittingSize
         let vf = screen(Cfg.monitor).visibleFrame
         t.setFrame(NSRect(x: vf.midX - s.width / 2, y: vf.minY + 40, width: s.width, height: s.height), display: true)
-        t.orderFrontRegardless()
-        window = t
+        present(t, key: false)
         if let sec = seconds {
-            DispatchQueue.main.asyncAfter(deadline: .now() + sec) { [weak self, weak t] in
-                t?.orderOut(nil)
-                if self?.window === t { self?.window = nil }
-            }
+            DispatchQueue.main.asyncAfter(deadline: .now() + sec) { [weak self, weak t] in self?.close(t) }
         }
     }
-
-    func hide() { window?.orderOut(nil) }
 }
 
 @MainActor
-final class AboutBox {
-    private var window: Panel?
-    var isOpen: Bool { window != nil }
-
+final class AboutBox: Popup {
     func toggle() {
-        if let w = window { w.orderOut(nil); window = nil; return }
+        if isOpen { close(); return }
         let repo = "https://github.com/stepanowon/high-pen"
         func row(_ name: String, _ value: String, _ url: String?) -> NSView {
             let n = label(name, color: .gray)
@@ -97,7 +91,7 @@ final class AboutBox {
             if let u = url {
                 let b = NSButton(title: value, target: nil, action: nil)
                 b.isBordered = false
-                b.attributedTitle = NSAttributedString(string: value, attributes: [.foregroundColor: rgb(0x7FB2FF), .font: NSFont.systemFont(ofSize: 12)])
+                b.attributedTitle = NSAttributedString(string: value, attributes: [.foregroundColor: linkColor, .font: NSFont.systemFont(ofSize: 12)])
                 b.on { _ in NSWorkspace.shared.open(URL(string: u)!) }
                 v = b
             }
@@ -108,7 +102,7 @@ final class AboutBox {
         let tagline = label(Lang.t("Tagline"), color: .gray)
         let copyright = label("Copyright (c) 2026 StephenWon", size: 11, color: .gray)
         let close = NSButton(title: Lang.t("Close"), target: nil, action: nil)
-        close.on { [unowned self] _ in self.toggle() }
+        close.on { [unowned self] _ in self.close() }
         fixedSize(close, 300, nil)
         let col = vstack([heading("HighPen v" + appVersion), tagline,
                           row(Lang.t("Author"), "StephenWon", nil),
@@ -118,44 +112,25 @@ final class AboutBox {
                           copyright, close])
         col.setCustomSpacing(12, after: tagline)
         col.setCustomSpacing(14, after: copyright)
-        let w = dialog(col, keyable: true)
-        window = w
-        w.makeKeyAndOrderFront(nil)
+        present(dialog(col, keyable: true), key: true)
     }
 }
 
 // Tells about a newer version and opens its release page.
 @MainActor
-final class UpdateBox {
-    private var window: Panel?
-    var isOpen: Bool { window != nil }
-
+final class UpdateBox: Popup {
     func show(_ u: UpdateInfo) {
         if let w = window { w.orderFrontRegardless(); return }
-        func wrap(_ t: String, _ color: NSColor) -> NSTextField {
-            let l = NSTextField(wrappingLabelWithString: t)
-            l.textColor = color
-            l.font = .systemFont(ofSize: 12)
-            fixedSize(l, 360, nil)
-            return l
-        }
         let open = NSButton(title: Lang.t("UpdateDownload"), target: nil, action: nil)
         open.keyEquivalent = "\r"
         open.on { [unowned self] _ in NSWorkspace.shared.open(u.page); self.close() }
         let later = NSButton(title: Lang.t("UpdateLater"), target: nil, action: nil)
         later.on { [unowned self] _ in self.close() }
-        let hint = wrap(Lang.t("UpdateHint"), .gray)
+        let hint = wrapLabel(Lang.t("UpdateHint"), color: .gray, width: 360)
         let col = vstack([heading(Lang.t("UpdateTitle")),
-                          wrap(String(format: Lang.t("UpdateText"), u.version, appVersion), .white),
+                          wrapLabel(String(format: Lang.t("UpdateText"), u.version, appVersion), width: 360),
                           hint, NSStackView(views: [open, later])])
         col.setCustomSpacing(14, after: hint)
-        let w = dialog(col, keyable: true)
-        window = w
-        w.makeKeyAndOrderFront(nil)
-    }
-
-    func close() {
-        window?.orderOut(nil)
-        window = nil
+        present(dialog(col, keyable: true), key: true)
     }
 }

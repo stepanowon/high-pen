@@ -24,15 +24,18 @@ struct Edit {
     var bubbles: [Bubble] = [] // the speech bubbles a clear all removed
 }
 
-// Ink for three pages: 0 = screen annotations, 1 = white board, 2 = black board.
+// Ink for each page (Board.rawValue): the screen annotations, the white board, the black board.
 final class InkView: NSView, NSTextViewDelegate {
-    var pages: [[Stroke]] = [[], [], []]
-    var bubbles: [[Bubble]] = [[], [], []]
+    var pages = [[Stroke]](repeating: [], count: Board.allCases.count)
+    var bubbles = [[Bubble]](repeating: [], count: Board.allCases.count)
     var bubbleStyle: () -> (NSColor, CGFloat) = { (.red, 16) }
     var onBubbleEnd: () -> Void = {}
     private var editor: NSTextView?
     private var editorTop = CGPoint.zero // view coordinates
-    var history: [[Edit]] = [[], [], []]
+    var history = [[Edit]](repeating: [], count: Board.allCases.count)
+    // Undo steps kept per page. Older ones are dropped, so strokes erased (and pages cleared) long ago
+    // do not stay in memory for the whole session.
+    static let maxSteps = 200
     var page = 0 { didSet { needsDisplay = true } }
     var tool = Tool.pen
     var newStroke: () -> Stroke = { Stroke(color: .red, width: 4, highlighter: false, pressure: false) }
@@ -84,7 +87,7 @@ final class InkView: NSView, NSTextViewDelegate {
 
     override func mouseUp(with e: NSEvent) {
         if tool == .eraser { endErase(); return }
-        if let s = current { history[page].append(Edit(added: [s])) }
+        if let s = current { record(Edit(added: [s])) }
         current = nil
     }
 
@@ -108,8 +111,14 @@ final class InkView: NSView, NSTextViewDelegate {
     }
 
     func endErase() {
-        if !erased.isEmpty { history[page].append(Edit(removed: erased)) }
+        if !erased.isEmpty { record(Edit(removed: erased)) }
         erased = []
+    }
+
+    private func record(_ e: Edit) {
+        history[page].append(e)
+        let extra = history[page].count - InkView.maxSteps
+        if extra > 0 { history[page].removeFirst(extra) }
     }
 
     func undo() {
@@ -123,7 +132,7 @@ final class InkView: NSView, NSTextViewDelegate {
     // Removes every stroke and speech bubble of the page as one step, so undo brings them back.
     func clear() {
         guard !pages[page].isEmpty || !bubbles[page].isEmpty else { return }
-        history[page].append(Edit(removed: pages[page], bubbles: bubbles[page]))
+        record(Edit(removed: pages[page], bubbles: bubbles[page]))
         pages[page] = []
         bubbles[page] = []
         needsDisplay = true

@@ -27,11 +27,7 @@ final class Spot {
         if Cfg.spotOn {
             move()
             window.orderFrontRegardless()
-            if timer == nil {
-                let t = Timer(timeInterval: 1.0 / 60, repeats: true) { [weak self] _ in MainActor.assumeIsolated { self?.move() } }
-                RunLoop.main.add(t, forMode: .common)
-                timer = t
-            }
+            if timer == nil { timer = repeatingTimer(1.0 / 60) { [weak self] in self?.move() } }
         } else {
             window.orderOut(nil)
             timer?.invalidate()

@@ -22,6 +22,7 @@ final class SettingsPanel {
     private weak var delegate: SettingsPanelDelegate?
     private var penSwatches: NSSegmentedControl?, highlightSwatches: NSSegmentedControl?
     private var breakTitle = NSTextField(), breakBtns: [NSButton] = [], breakSlider = NSSlider()
+    private var pressureBox: NSButton?, clicksBox: NSButton?
 
     init(hints: Hints, hotkeys: Hotkeys, delegate: SettingsPanelDelegate) {
         self.hints = hints; self.hotkeys = hotkeys; self.delegate = delegate
@@ -29,6 +30,11 @@ final class SettingsPanel {
 
     func showPenColor(_ i: Int) { penSwatches?.selectedSegment = i }
     func showHighlightColor(_ i: Int) { highlightSwatches?.selectedSegment = i }
+    // The checkboxes, after their shortcut changed them.
+    func showSwitches() {
+        pressureBox?.state = Cfg.pressure ? .on : .off
+        clicksBox?.state = Cfg.showClicks ? .on : .off
+    }
 
     // Updates the title, the preset buttons and the slider. A break already running keeps its length.
     private func showBreakMinutes(_ m: Int) {
@@ -59,10 +65,7 @@ final class SettingsPanel {
         col.alignment = .leading
         col.spacing = 6
         col.edgeInsets = NSEdgeInsets(top: 10, left: 10, bottom: 10, right: 10)
-        col.wantsLayer = true
-        col.layer?.backgroundColor = panelBg.cgColor
-        col.layer?.borderColor = lineColor.cgColor
-        col.layer?.borderWidth = 1
+        bordered(col, border: lineColor)
         func title(_ k: String) { col.addArrangedSubview(label(Lang.t(k))) }
         func sep() {
             let b = NSBox()
@@ -73,7 +76,7 @@ final class SettingsPanel {
 
         title("Monitor")
         let mon = segments((1...NSScreen.screens.count).map { String($0) }, Cfg.monitor) { [unowned self] i in self.delegate?.setMonitor(i) }
-        hints.attach(mon, hotkeys.tip(Lang.t("Monitor") + " (" + Lang.t("Cycle") + ")", "Monitor"))
+        hints.attach(mon, hotkeys.tip(hotkeys.action("Monitor")!.title(), "Monitor"))
         col.addArrangedSubview(mon)
         sep()
 
@@ -88,6 +91,7 @@ final class SettingsPanel {
         pr.state = Cfg.pressure ? .on : .off
         hints.attach(pr, hotkeys.tip(Lang.t("Pressure"), "Pressure"))
         pr.on { c in Cfg.pressure = (c as! NSButton).state == .on }
+        pressureBox = pr
         col.addArrangedSubview(pr)
         sep()
 
@@ -107,6 +111,7 @@ final class SettingsPanel {
         cl.state = Cfg.showClicks ? .on : .off
         hints.attach(cl, hotkeys.tip(Lang.t("ClickShow"), "Clicks"))
         cl.on { [unowned self] c in Cfg.showClicks = (c as! NSButton).state == .on; self.delegate?.clicksChanged() }
+        clicksBox = cl
         col.addArrangedSubview(cl)
         sep()
 
@@ -151,11 +156,7 @@ final class SettingsPanel {
         keys.on { [unowned self] _ in self.delegate?.showHotkeyEditor() }
         col.addArrangedSubview(keys)
         if let note = hotkeys.failureNote {
-            let w = NSTextField(wrappingLabelWithString: note)
-            w.textColor = rgb(0xFF9F0A)
-            w.font = .systemFont(ofSize: 11)
-            fixedSize(w, 190, nil)
-            col.addArrangedSubview(w)
+            col.addArrangedSubview(wrapLabel(note, size: 11, color: warnColor, width: 190))
         }
         let up = NSButton(title: Lang.t("UpdateCheck"), target: nil, action: nil)
         hints.attach(up, Lang.t("UpdateCheckTip"))

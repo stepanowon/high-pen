@@ -13,6 +13,8 @@ struct ToolbarButton {
 
 @MainActor
 final class Toolbar: NSObject, NSWindowDelegate {
+    // the bar, and what is left of it collapsed: the arrow
+    static let width: CGFloat = 84, arrowWidth: CGFloat = 28
     let window = Panel(level: 3, clickThrough: false)
     var onMove: () -> Void = {}
     private let hints: Hints
@@ -22,6 +24,8 @@ final class Toolbar: NSObject, NSWindowDelegate {
     private var name = NSTextField()
     private var headerWidth: NSLayoutConstraint?
     private var placing = false
+    // The visible area of the selected monitor, read when the bar is placed: a drag reports many moves a second.
+    private var area = NSRect.zero
 
     init(hints: Hints) {
         self.hints = hints
@@ -38,11 +42,11 @@ final class Toolbar: NSObject, NSWindowDelegate {
         header.wantsLayer = true
         header.layer?.backgroundColor = rgb(0x4A522A).cgColor
         fixedSize(header, nil, 30)
-        headerWidth = header.widthAnchor.constraint(equalToConstant: 84)
+        headerWidth = header.widthAnchor.constraint(equalToConstant: Toolbar.width)
         headerWidth?.isActive = true
         name = label("HighPen", size: 11)
         name.font = .systemFont(ofSize: 11, weight: .semibold)
-        name.frame = NSRect(x: 34, y: 7, width: 50, height: 16)
+        name.frame = NSRect(x: Toolbar.arrowWidth + 6, y: 7, width: Toolbar.width - Toolbar.arrowWidth - 6, height: 16)
         header.addSubview(name)
         collapseBtn = NSButton(image: NSImage(), target: nil, action: nil)
         collapseBtn.on { _ in onCollapse() }
@@ -51,7 +55,7 @@ final class Toolbar: NSObject, NSWindowDelegate {
         collapseBtn.wantsLayer = true
         collapseBtn.layer?.backgroundColor = idleBg.cgColor
         hints.attach(collapseBtn, collapseTip)
-        collapseBtn.frame = NSRect(x: 0, y: 0, width: 28, height: 30)
+        collapseBtn.frame = NSRect(x: 0, y: 0, width: Toolbar.arrowWidth, height: 30)
         header.addSubview(collapseBtn)
 
         let col = NSStackView()
@@ -82,7 +86,7 @@ final class Toolbar: NSObject, NSWindowDelegate {
         b.wantsLayer = true
         b.layer?.backgroundColor = idleBg.cgColor
         hints.attach(b, item.tip)
-        fixedSize(b, 84, 52)
+        fixedSize(b, Toolbar.width, 52)
         buttons[item.id] = b
         return b
     }
@@ -101,7 +105,7 @@ final class Toolbar: NSObject, NSWindowDelegate {
     func setCollapsed(_ c: Bool) {
         column.isHidden = c
         name.isHidden = c
-        headerWidth?.constant = c ? 28 : 84
+        headerWidth?.constant = c ? Toolbar.arrowWidth : Toolbar.width
         collapseBtn.image = NSImage(systemSymbolName: c ? "chevron.right" : "chevron.left", accessibilityDescription: Lang.t("Collapse"))
     }
 
@@ -109,6 +113,7 @@ final class Toolbar: NSObject, NSWindowDelegate {
     func place() {
         guard let v = window.contentView else { return }
         let vf = screen(Cfg.monitor).visibleFrame
+        area = vf
         let s = v.fittingSize
         let x = min(max(vf.minX + Cfg.barX, vf.minX), vf.maxX - s.width)
         let y = min(max(vf.maxY - Cfg.barY - s.height, vf.minY), vf.maxY - s.height)
@@ -119,9 +124,8 @@ final class Toolbar: NSObject, NSWindowDelegate {
 
     func windowDidMove(_ n: Notification) {
         guard !placing else { return }
-        let vf = screen(Cfg.monitor).visibleFrame
-        Cfg.barX = window.frame.minX - vf.minX
-        Cfg.barY = vf.maxY - window.frame.maxY
+        Cfg.barX = window.frame.minX - area.minX
+        Cfg.barY = area.maxY - window.frame.maxY
         onMove()
     }
 }
