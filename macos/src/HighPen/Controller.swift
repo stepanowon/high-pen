@@ -25,6 +25,7 @@ final class Controller: NSObject, NSApplicationDelegate, SettingsPanelDelegate {
 
     var tools = ToolState()
     var settingsOpen = false, collapsed = false, checkingUpdate = false
+    var capturing = 0 // captures under way
     private var keyMonitor: Any? // kept: AppKit holds event monitors only as long as the app does
 
     // Every action that can have a shortcut, in the order the shortcut editor lists them.
@@ -98,6 +99,9 @@ final class Controller: NSObject, NSApplicationDelegate, SettingsPanelDelegate {
                 : Stroke(color: Cfg.palette[Cfg.penColor], width: Cfg.penSize, highlighter: false, pressure: Cfg.pressure)
         }
         zoomer.onChange = { [unowned self] in self.applyZoomTransform() }
+        zoomer.onStop = { [unowned self] in self.syncToolbar() }
+        spot.toShown = { [unowned self] in self.zoomer.shown($0) }
+        clicks.toShown = spot.toShown
         clicks.allowed = { [unowned self] in !self.tools.penMode } // while drawing every pen stroke would be a click
         hints.avoid = { [unowned self] w in w === self.toolbar.window && self.settings.window.isVisible ? self.settings.window.frame : nil }
         toolbar.onMove = { [unowned self] in self.placeSettings() }
@@ -269,6 +273,7 @@ final class Controller: NSObject, NSApplicationDelegate, SettingsPanelDelegate {
 
     func toggleBreak() {
         if breakTimer.running { breakTimer.stop() } else { breakTimer.start(Cfg.breakMinutes) }
+        applyZoomPointer()
         syncToolbar()
     }
 
@@ -282,6 +287,10 @@ final class Controller: NSObject, NSApplicationDelegate, SettingsPanelDelegate {
         }
         ink.needsDisplay = true
     }
+
+    // The zoom shows the real pointer, not its drawn one: in pen mode (the overlay takes input on the display),
+    // while the break screen covers the zoomed image, and during a capture (the drawn pointer would be in the picture).
+    func applyZoomPointer() { zoomer.direct = tools.penMode || breakTimer.running || capturing > 0 }
 
     func applySpot() {
         spot.apply()
@@ -304,7 +313,7 @@ final class Controller: NSObject, NSApplicationDelegate, SettingsPanelDelegate {
         (t.penMode ? ink.cursor : NSCursor.arrow).set() // the pointer may already be over the overlay
         overlay.ignoresMouseEvents = !t.penMode
         overlay.backgroundColor = t.board.color ?? (t.penMode ? NSColor(white: 0, alpha: 1.0 / 255) : .clear)
-        zoomer.frozen = t.penMode
+        applyZoomPointer()
         applyZoomTransform()
     }
 
@@ -334,8 +343,13 @@ final class Controller: NSObject, NSApplicationDelegate, SettingsPanelDelegate {
         guard CGPreflightScreenCaptureAccess() else { askPermission(); return }
         toast.close()
         let scr = screen(Cfg.monitor)
-        let hide = [toolbar.window, settings.window, spot.window].map { CGWindowID($0.windowNumber) }
+        let hide = [toolbar.window, settings.window, spot.window, clicks.window].map { CGWindowID($0.windowNumber) }
+        hints.hide() // the hint of the Capture button would be in the picture
+        capturing += 1
+        applyZoomPointer()
+        CATransaction.flush() // the drawn pointer is only gone once the change reaches the screen
         Task { @MainActor in
+            defer { capturing -= 1; applyZoomPointer() }
             do {
                 let url = try await ScreenCapture.save(scr, hiding: hide)
                 toast.show(String(format: Lang.t("Saved"), url.path), seconds: 5) { NSWorkspace.shared.activateFileViewerSelecting([url]) }

@@ -15,6 +15,8 @@ final class Spot {
     let window = Panel(level: 2, clickThrough: true)
     private let view = SpotView()
     private var timer: Timer?
+    // where the pointer appears (it can be drawn in the zoomed image)
+    var toShown: (CGPoint) -> CGPoint = { $0 }
 
     init() { window.contentView = view }
 
@@ -36,7 +38,7 @@ final class Spot {
     }
 
     private func move() {
-        let p = NSEvent.mouseLocation, s = window.frame.size
+        let p = toShown(NSEvent.mouseLocation), s = window.frame.size
         let o = NSPoint(x: p.x - s.width / 2, y: p.y - s.height / 2)
         if o != window.frame.origin { window.setFrameOrigin(o) }
     }

@@ -10,7 +10,7 @@ The macOS version of the pen app for online lectures. It runs on macOS 14 (Sonom
 
 ## Download
 
-**[Download HighPen-1.4.1.dmg](https://github.com/stepanowon/high-pen/releases/download/macos-v1.4.1/HighPen-1.4.1.dmg)** (release [macos-v1.4.1](https://github.com/stepanowon/high-pen/releases/tag/macos-v1.4.1))
+**[Download HighPen-1.4.2.dmg](https://github.com/stepanowon/high-pen/releases/download/macos-v1.4.2/HighPen-1.4.2.dmg)** (release [macos-v1.4.2](https://github.com/stepanowon/high-pen/releases/tag/macos-v1.4.2))
 
 1. Open the DMG and drag HighPen onto the Applications folder.
 2. **Before opening it the first time**, run this in Terminal. HighPen then opens without any warning.
@@ -61,8 +61,8 @@ Distributing without the warning requires joining the Apple Developer Program, t
 | Undo | ⌃⌥Z | One stroke, everything removed by one eraser drag, or a clear all (its speech bubbles come back too) |
 | Clear | ⌃⌥C | Clears the current page |
 | Note | ⌃⌥T | Text box at the clicked spot. Enter confirms, Shift+Enter adds a line, Esc cancels. Removed only by Clear |
-| Zoom | ⌃⌥X | Live 1.5x / 2x / 2.5x zoom. Turning the pen on freezes the view so you can write on the zoomed screen. After the pointer touches a side, top or bottom edge of the monitor, the view holds at that edge until the pointer passes the middle of the screen (meanwhile what you see is not where you click) |
-| Zoom lock | ⌃⇧X | While zoomed, locks the zoomed view in place (or unlocks it). Locked, the view stays put as the pointer moves and the Zoom button reads "Locked". What you see then is not where you click, so unlock to click. Turning zoom off also unlocks |
+| Zoom | ⌃⌥X | Live 1.5x / 2x / 2.5x zoom. The pointer you see in the zoomed view is where you click. The view only moves when the pointer reaches an edge of what is shown (the pointer moves faster by the zoom factor). Over the toolbar the normal pointer comes back, and the view does not scroll along the screen edge the toolbar sits on. Turning the pen on freezes the view so you can write on the zoomed screen |
+| Zoom lock | ⌃⇧X | While zoomed, locks the zoomed view in place (or unlocks it). Locked, the view stays put as the pointer moves and the Zoom button reads "Locked". You can still click what you see, and the pointer stays inside the part shown. Turning zoom off also unlocks |
 | Capture | ⌃⌥F | Saves the screen with ink as a PNG in `~/Pictures/HighPen` and copies it to the clipboard |
 | Break | ⌃⌥W | Shows the time left and when class resumes, large, over the whole selected monitor. The last minute is orange; when time is up a red 00:00 stays until you press it again. Clicks pass through and the toolbar stays on top |
 | Settings | ⌃⌥D | Colors, widths, spot, zoom level, break length (10 min, 15 min, 1 h, 1 h 30 min buttons or a 5–120 minute slider in 5-minute steps; 10 minutes by default), monitor, language (Korean, Japanese, English) |
@@ -92,7 +92,7 @@ The app is signed against its bundle id (`com.stepanowon.HighPen`) so the permis
 ## Differences from the Windows version
 
 - Shortcuts use `⌃⌥` (Control+Option) instead of `Ctrl+Alt`. Pen colors moved to `⌃⌥1–8` so they do not clash with other apps.
-- Zoom does not confine the pointer to the monitor (macOS has no such feature).
+- While zoomed, the pointer is not confined to the monitor when it is over the toolbar or in pen mode (macOS has no such feature).
 
 ## Layout
 
