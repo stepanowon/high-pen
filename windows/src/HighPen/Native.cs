@@ -71,6 +71,23 @@ namespace HighPen
 
         [DllImport("user32.dll")] public static extern bool ClipCursor(ref RECT r);
         [DllImport("user32.dll")] public static extern bool ClipCursor(IntPtr r);
+        [DllImport("user32.dll")] public static extern bool SetCursorPos(int x, int y);
+        [DllImport("user32.dll")] public static extern short GetAsyncKeyState(int vk);
+        public const int VK_LBUTTON = 1, VK_RBUTTON = 2, VK_MBUTTON = 4;
+        [DllImport("user32.dll")] public static extern bool IsWindowVisible(IntPtr h);
+        [DllImport("user32.dll")] public static extern bool IsWindow(IntPtr h);
+        [DllImport("user32.dll", CharSet = CharSet.Unicode)] public static extern int GetClassName(IntPtr h, System.Text.StringBuilder name, int size);
+        [DllImport("user32.dll")] public static extern IntPtr GetWindow(IntPtr h, uint cmd);
+        public const uint GW_HWNDPREV = 3;
+        [DllImport("dwmapi.dll")] public static extern int DwmGetWindowAttribute(IntPtr h, int attribute, out int value, int size);
+        public const int DWMWA_CLOAKED = 14;
+        [DllImport("user32.dll")] public static extern bool InvalidateRect(IntPtr h, IntPtr rect, bool erase);
+        public delegate bool EnumWindowsProc(IntPtr h, IntPtr data);
+        [DllImport("user32.dll")] public static extern bool EnumThreadWindows(uint thread, EnumWindowsProc proc, IntPtr data);
+        [DllImport("kernel32.dll")] public static extern uint GetCurrentThreadId();
+        public const int GWL_STYLE = -16;
+        public const int MS_SHOWMAGNIFIEDCURSOR = 1;
+        [DllImport("Magnification.dll")] public static extern bool MagShowSystemCursor(bool show);
         [DllImport("Magnification.dll")] public static extern bool MagInitialize();
         [DllImport("Magnification.dll")] public static extern bool MagUninitialize();
         [DllImport("Magnification.dll")] public static extern bool MagSetWindowSource(IntPtr h, RECT r);

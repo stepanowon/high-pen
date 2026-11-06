@@ -212,12 +212,14 @@ Zooms the monitor under the mouse pointer in real time. Pick 1.5x, 2x or 2.5x in
 
 ![Zoom](../screen/화면%20확대.png)
 
-- The view moves so that the content under the pointer stays under the pointer after zooming. Just click where you see things.
+- The pointer shown in the zoomed view is where a click lands. Just click where you see things.
+- The view moves only when the pointer reaches the edge of the visible area. To see the other side after going to a corner, move the pointer all the way to the opposite edge. The pointer moves faster in proportion to the zoom.
+- Over the toolbar the pointer becomes the normal one, so you can click as usual. Where the toolbar touches the screen edge the view does not scroll, so go to the edge past the toolbar.
 - The toolbar is not zoomed and keeps its normal size.
 - The monitor the pointer was on when zoom was turned on is zoomed, and the pointer cannot leave that monitor while zoomed. To zoom another monitor, turn zoom off, move the pointer, and turn it on again.
 - Changing the active monitor while zoomed turns zoom off.
 - **Lock the zoomed view (Ctrl+Shift+X):** press it while zoomed to keep the zoomed view where it is, so it no longer moves around as you move the mouse. The zoom button then reads "Locked". Press it again to let the view follow the pointer again. Turning zoom off also unlocks it.
-- While locked, what you see is not where a click lands. Use the locked view to explain or write with the pen, and unlock it to click.
+- While locked you can still click where you see things, and the pointer stays inside the visible area.
 - **Writing while zoomed:** turning on the pen freezes the zoomed view so you can write where you see things. Turning the pen off makes the zoomed view follow the pointer again. Ink is stored in original screen coordinates, so it stays on the same content at normal size when zoom is turned off. To move to another area while zoomed, turn the pen off, move the pointer, and turn the pen on again.
 
 ### Capture

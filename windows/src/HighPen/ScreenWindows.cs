@@ -156,6 +156,8 @@ namespace HighPen
         readonly Canvas root = new Canvas();
         // Follows the pointer; runs only while the spot is shown (the ripples are animations of their own).
         readonly DispatcherTimer timer = new DispatcherTimer();
+        // Where a pointer position appears on the display (the zoom shows it elsewhere).
+        public Func<Native.POINT, Native.POINT> ToShown = p => p;
 
         public SpotWindow() : base(Native.WS_EX_TRANSPARENT | Native.WS_EX_NOACTIVATE | Native.WS_EX_TOOLWINDOW)
         {
@@ -191,7 +193,7 @@ namespace HighPen
         {
             // grows past the spot so it is not hidden behind it
             double size = (spot.Visibility == Visibility.Visible ? spot.Width : 0) + 60;
-            Point at = FromScreen(p);
+            Point at = FromScreen(ToShown(p));
             Ellipse ring = new Ellipse { Width = size, Height = size, Stroke = new SolidColorBrush(c), StrokeThickness = 3, IsHitTestVisible = false, RenderTransformOrigin = new Point(0.5, 0.5) };
             if (!left) ring.StrokeDashArray = new DoubleCollection { 2, 1.5 };
             ScaleTransform st = new ScaleTransform(0.2, 0.2);
@@ -213,7 +215,7 @@ namespace HighPen
             if (spot.Visibility != Visibility.Visible) return;
             Native.POINT p;
             if (!Native.GetCursorPos(out p)) return;
-            Point at = FromScreen(p);
+            Point at = FromScreen(ToShown(p));
             Canvas.SetLeft(spot, at.X - spot.Width / 2);
             Canvas.SetTop(spot, at.Y - spot.Height / 2);
         }
