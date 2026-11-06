@@ -12,6 +12,8 @@ final class Clicks {
     private var monitors: [Any] = []
     // false while every press is a pen stroke
     var allowed: () -> Bool = { true }
+    // where the pointer appears (it can be drawn in the zoomed image)
+    var toShown: (CGPoint) -> CGPoint = { $0 }
 
     init() {
         view.wantsLayer = true
@@ -43,7 +45,7 @@ final class Clicks {
 
     // Solid ring for the left button, dashed for the right, in the spot colour.
     private func ripple(left: Bool) {
-        let p = NSEvent.mouseLocation, f = window.frame
+        let p = toShown(NSEvent.mouseLocation), f = window.frame
         guard allowed(), f.contains(p), let root = view.layer else { return }
         let size = (Cfg.spotOn ? Cfg.spotSize : 0) + 60 // grows past the spot so it is not hidden behind it
         let ring = CAShapeLayer()

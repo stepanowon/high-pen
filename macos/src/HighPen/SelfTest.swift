@@ -54,11 +54,9 @@ func selfTest() {
     precondition(!t.penMode && t.board == .screen, "pen off leaves the board")
     precondition(BreakTimes.clamp(7) == 5 && BreakTimes.clamp(8) == 10 && BreakTimes.clamp(0) == 5 && BreakTimes.clamp(999) == 120, "break length steps and range")
     precondition(BreakTimes.clock(599) == "09:59" && BreakTimes.clock(3600) == "1:00:00" && BreakTimes.clock(0) == "00:00", "break clock")
-    var e = 0
-    precondition(Zoomer.offset(500, 1001, 0.5, &e) == 250 && e == 0, "zoom follows the pointer before an edge")
-    precondition(Zoomer.offset(0, 1001, 0.5, &e) == 0 && e == -1 && Zoomer.offset(400, 1001, 0.5, &e) == 0, "zoom holds at the left edge until the middle")
-    precondition(Zoomer.offset(750, 1001, 0.5, &e) == 250 && Zoomer.offset(1000, 1001, 0.5, &e) == 500 && e == 1, "zoom reaches the right edge with the pointer")
-    precondition(Zoomer.offset(600, 1001, 0.5, &e) == 500 && Zoomer.offset(250, 1001, 0.5, &e) == 250, "zoom holds at the right edge until the middle")
+    precondition(Zoomer.pan(100, 50, 120) == 100 && Zoomer.pan(100, 50, 160) == 111 && Zoomer.pan(100, 50, 90) == 90, "zoom moves only when the pointer reaches the edge of the view")
+    let o = CGPoint(x: 100, y: 40), c = CGPoint(x: 130, y: 70)
+    precondition(Zoomer.toDisplay(c, o, 2.5) == CGPoint(x: 75, y: 75) && Zoomer.toContent(Zoomer.toDisplay(c, o, 2.5), o, 2.5) == c, "the drawn pointer is over the content the real one is on")
     let rel = #"[{"tag_name":"v9.0.0","html_url":"w"},{"tag_name":"macos-v1.5.0","draft":true,"html_url":"d"},{"tag_name":"macos-v1.4.2","html_url":"https://x/b"},{"tag_name":"macos-v1.4.1","html_url":"a"},{"tag_name":"macos-v1.3.1","html_url":"o"}]"#.data(using: .utf8)!
     precondition(try! Updater.pick(rel, current: "1.4.0")?.version == "1.4.2", "update picks the newest published macOS release")
     precondition(try! Updater.pick(rel, current: "1.4.2") == nil && Updater.version("1.4") == [1, 4, 0] && Updater.version("dev") == nil, "no update when up to date")
