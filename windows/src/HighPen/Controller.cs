@@ -91,6 +91,7 @@ namespace HighPen
 
             zoomer.ViewChanged = OnZoomView;
             zoomer.Factor = cfg.ZoomFactor;
+            spotWin.ToShown = zoomer.ToShown;
 
             topmost.Add(zoomer);
             topmost.Add(overlay);
@@ -152,6 +153,7 @@ namespace HighPen
             ApplyPen();
             overlay.SetBackground(tools.Board, tools.PenMode);
             zoomer.Frozen = tools.PenMode;
+            ApplyZoomPointer();
             ApplyZoomTransform();
             WindowUtil.SetClickThrough(overlay, !tools.PenMode || snipping.Active);
             Toolbar.ShowTools(tools);
@@ -212,7 +214,14 @@ namespace HighPen
             if (b == zoomBounds && r.Left == zoomSource.Left && r.Top == zoomSource.Top && r.Right == zoomSource.Right && r.Bottom == zoomSource.Bottom) return;
             zoomBounds = b;
             zoomSource = r;
+            ApplyZoomPointer();
             ApplyZoomTransform();
+        }
+
+        // The zoom draws the pointer in its image; anything covering that image needs the real pointer instead.
+        void ApplyZoomPointer()
+        {
+            zoomer.Direct = snipping.Active || (monitorBounds == zoomBounds && breakWin.Running);
         }
 
         // Ink only follows the zoom on the screen page of the monitor being zoomed.
@@ -244,6 +253,7 @@ namespace HighPen
             {
                 WindowUtil.SetClickThrough(overlay, true);
                 spotWin.SetSpotVisible(false);
+                ApplyZoomPointer();
             }
             else
             {
@@ -347,6 +357,7 @@ namespace HighPen
             if (breakWin.Running) breakWin.Stop();
             else breakWin.Start(cfg.BreakMinutes);
             Toolbar.ShowBreak(breakWin.Running);
+            ApplyZoomPointer();
             topmost.Reassert();
         }
 
