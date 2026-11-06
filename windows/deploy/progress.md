@@ -40,10 +40,10 @@
 | 1.8.5 버그 수정: 배율이 다른 모니터에서 확대 위치 어긋남 | 완료 | HighPen은 시스템 DPI 인식 프로세스라, 화면 배율이 시스템 DPI와 다른 모니터에서는 커서·모니터 좌표가 가상화되는데 Magnification API는 물리 픽셀로 해석해 확대 화면이 다른 영역(아래·오른쪽 또는 위·왼쪽)으로 치우쳤음. 확대 창 생성과 위치 계산만 스레드 DPI 컨텍스트를 Per-Monitor V2로 바꿔 물리 픽셀로 처리하고, 필기 오버레이에는 프로세스 좌표로 바꿔 전달. 확대 창이 흐릿하게 늘어나던 것도 사라짐. 테스트: 좌표 패턴을 확대해 화면 픽셀로 확인하는 하네스로 모니터 3대 100%, DISPLAY1·DISPLAY3 125/150/175%에서 통과(수정 전 코드는 150%에서 실패 재현). 시스템 DPI가 모니터보다 높은 경우는 이 PC에서 재현 불가 |
 | 1.8.5 GitHub 릴리스 | 완료 | 1.8.5.0 Partner Center 제출 후 Store 게시 전에 GitHub 릴리스 HighPen v1.8.5(릴리스 삭제됨) (`HighPen-Setup.exe` `48449869…`, `HighPen.exe` `5a23f64a…`, `HighPen.msix` `007e1d75…`, `SHA256SUMS.txt`), 한·일·영 변경 내용 포함. 받은 파일의 해시가 SHA256SUMS.txt와 같음 확인. 한·영·일 Windows README의 다운로드 링크와 버전 표기를 v1.8.5로 변경 |
 | 1.8.6 개선: 메모리·CPU 사용 | 완료 | [#52](https://github.com/stepanowon/high-pen/pull/52) 병합(main `282e23d`). 되돌리기 기록을 페이지마다 최근 200단계로 제한, 공용 브러시 Freeze, 스냅 감시의 Process 해제, 확대 중 같은 뷰는 다시 처리하지 않음. 마우스 스폿을 끄면 포인터 추적 타이머도 멈춤(대기 중 5초 CPU 109~141ms → 31ms). 중복 코드 정리(팝업·셸 실행·모니터 정보). macOS 리팩토링 후보는 `macos/REFACTORING.md`에 기록만 함. 테스트: 실제 앱을 단축키·클릭·스크린샷으로 조작해 확인(되돌리기 205획/210회, 확대·고정 중 배율 변경, 언어 20회 전환 시 메모리·핸들, 팝업·토스트, 툴바 드래그 제한) |
-| 1.8.6 GitHub 릴리스 | 완료 | 사용자 요청으로 Store 제출 **전에** GitHub 릴리스 [HighPen v1.8.6](https://github.com/stepanowon/high-pen/releases/tag/v1.8.6) (`HighPen-Setup.exe` `bfa6749e…`, `HighPen.exe` `6590ae5c…`, `HighPen.msix` `7dbd8ba6…`, `SHA256SUMS.txt`), 한·일·영 변경 내용 포함. 받은 파일의 해시가 SHA256SUMS.txt와 같음 확인. 한·영·일 Windows README의 다운로드 링크와 버전 표기를 v1.8.6으로 변경 |
-| 1.8.7 버그 수정: 확대 중 클릭 위치와 화면 이동 | 완료 | [#55](https://github.com/stepanowon/high-pen/pull/55) 병합(main `51377b9`). 실제 커서는 원본 내용 위에 숨기고 돋보기가 확대 이미지 안에 커서를 그려, 보이는 포인터 위치와 클릭 위치가 같아짐. 포인터가 보이는 영역의 끝에 닿을 때만 화면이 움직임. 설정바·팝업 위, 펜 모드, 쉬는 시간, 캡처, 시작 메뉴 같은 Windows 화면에서는 실제 커서를 화면 좌표에 표시. 펜 모드 밖의 펜·터치 입력, 실제 Win+Shift+S 오버레이, Alt+Tab·빠른 설정, 배율이 다른 모니터는 시험하지 못함 |
-| 1.8.7 GitHub 릴리스 | 완료 | 사용자 요청으로 Store 게시 **전에** GitHub 릴리스 [HighPen v1.8.7](https://github.com/stepanowon/high-pen/releases/tag/v1.8.7) (`HighPen-Setup.exe` `0110364c…`, `HighPen.exe` `bb7d26b4…`, `HighPen.msix` `83ce0bc5…`, `SHA256SUMS.txt`), 한·일·영 변경 내용 포함. README 링크는 v1.8.6으로 남겨 뒀다가 1.8.8 때 함께 변경 |
-| 1.8.8 버전 변경 | 완료 | [#56](https://github.com/stepanowon/high-pen/pull/56) 병합(main `a0b4a19`). 코드는 1.8.7과 같고 버전 문자열만 변경. 검토 수정 전 1.8.7.0 패키지를 Partner Center에 이미 올려서 번호를 다시 쓸 수 없었음 |
+| 1.8.6 GitHub 릴리스 | 완료 | 사용자 요청으로 Store 제출 **전에** GitHub 릴리스 HighPen v1.8.6(릴리스 삭제됨) (`HighPen-Setup.exe` `bfa6749e…`, `HighPen.exe` `6590ae5c…`, `HighPen.msix` `7dbd8ba6…`, `SHA256SUMS.txt`), 한·일·영 변경 내용 포함. 받은 파일의 해시가 SHA256SUMS.txt와 같음 확인. 한·영·일 Windows README의 다운로드 링크와 버전 표기를 v1.8.6으로 변경 |
+| 1.8.7 버그 수정: 1.8.6의 확대 중 클릭 위치와 화면 이동 문제 | 완료 | 1.8.6의 버그만 고친 버전. [#55](https://github.com/stepanowon/high-pen/pull/55) 병합(main `51377b9`). 실제 커서는 원본 내용 위에 숨기고 돋보기가 확대 이미지 안에 커서를 그려, 보이는 포인터 위치와 클릭 위치가 같아짐. 포인터가 보이는 영역의 끝에 닿을 때만 화면이 움직임. 설정바·팝업 위, 펜 모드, 쉬는 시간, 캡처, 시작 메뉴 같은 Windows 화면에서는 실제 커서를 화면 좌표에 표시. 펜 모드 밖의 펜·터치 입력, 실제 Win+Shift+S 오버레이, Alt+Tab·빠른 설정, 배율이 다른 모니터는 시험하지 못함 |
+| 1.8.7 GitHub 릴리스 | 완료 | 사용자 요청으로 Store 게시 **전에** GitHub 릴리스 HighPen v1.8.7(릴리스 삭제됨) (`HighPen-Setup.exe` `0110364c…`, `HighPen.exe` `bb7d26b4…`, `HighPen.msix` `83ce0bc5…`, `SHA256SUMS.txt`), 한·일·영 변경 내용 포함. README 링크는 v1.8.6으로 남겨 뒀다가 1.8.8 때 함께 변경 |
+| 1.8.8 버전 변경 | 완료 | [#56](https://github.com/stepanowon/high-pen/pull/56) 병합(main `a0b4a19`). 코드는 1.8.7과 같고 버전 문자열만 변경. 1.8.7.0 패키지를 Partner Center에 이미 올려서 번호를 다시 쓸 수 없었음 |
 | 1.8.8 GitHub 릴리스 | 완료 | Store 게시 후(사용자 확인) GitHub 릴리스 [HighPen v1.8.8](https://github.com/stepanowon/high-pen/releases/tag/v1.8.8) (`HighPen-Setup.exe` `f72262c3…`, `HighPen.exe` `e34b9e7a…`, `HighPen.msix` `cbdfc3e3…`, `SHA256SUMS.txt`), 한·일·영 변경 내용 포함. 공개 주소에서 받은 파일의 해시가 SHA256SUMS.txt와 같음 확인. 한·영·일 Windows README의 다운로드 링크와 버전 표기를 v1.8.8로 변경 |
 
 ### winget
@@ -90,7 +90,7 @@
 | 1.8.5 제출 | 완료 | 1.8.5.0 패키지를 Partner Center에 제출함(2026-11-02, 사용자 확인). 인증·게시 확인 필요 |
 | 1.8.6 MSIX | 완료 | `dist/HighPen.msix` (1.8.6.0) `7dbd8ba6…` 빌드. MSIX 안의 `HighPen.exe`가 `dist/HighPen.exe`와 같음(`6590ae5c…`) 확인. `HighPen-Setup.exe` `bfa6749e…`는 같은 exe로 빌드. `SHA256SUMS.txt` 작성 |
 | 1.8.6 제출 | 대기 | 1.8.6.0 패키지를 Partner Center에 제출해야 함 |
-| 1.8.7 제출 | 건너뜀 | 검토 수정 전 빌드의 1.8.7.0 패키지(`54abfbaa…`)를 Partner Center에 올림. 번호를 다시 쓸 수 없어 수정본은 1.8.8로 제출 |
+| 1.8.7 제출 | 완료 | 1.8.6의 버그만 고친 1.8.7.0 패키지를 Partner Center에 올림(게시 여부는 기록 없음). 번호를 다시 쓸 수 없어 다음 제출은 1.8.8로 함 |
 | 1.8.8 MSIX | 완료 | `dist/HighPen.msix` (1.8.8.0) `cbdfc3e3…` 빌드. MSIX 안의 `HighPen.exe`가 `dist/HighPen.exe`와 같음(`e34b9e7a…`) 확인. `HighPen-Setup.exe` `f72262c3…`는 같은 exe로 빌드. `SHA256SUMS.txt` 작성 |
 | 1.8.8 제출 | 완료 | 1.8.8.0 패키지가 Store에 게시됨(2026-11-07, 사용자 확인). 현재 Store 버전 |
 
