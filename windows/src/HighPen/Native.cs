@@ -75,6 +75,12 @@ namespace HighPen
         [DllImport("user32.dll")] public static extern short GetAsyncKeyState(int vk);
         public const int VK_LBUTTON = 1, VK_RBUTTON = 2, VK_MBUTTON = 4;
         [DllImport("user32.dll")] public static extern bool IsWindowVisible(IntPtr h);
+        [DllImport("user32.dll")] public static extern bool IsWindow(IntPtr h);
+        [DllImport("user32.dll", CharSet = CharSet.Unicode)] public static extern int GetClassName(IntPtr h, System.Text.StringBuilder name, int size);
+        [DllImport("user32.dll")] public static extern IntPtr GetWindow(IntPtr h, uint cmd);
+        public const uint GW_HWNDPREV = 3;
+        [DllImport("dwmapi.dll")] public static extern int DwmGetWindowAttribute(IntPtr h, int attribute, out int value, int size);
+        public const int DWMWA_CLOAKED = 14;
         [DllImport("user32.dll")] public static extern bool InvalidateRect(IntPtr h, IntPtr rect, bool erase);
         public delegate bool EnumWindowsProc(IntPtr h, IntPtr data);
         [DllImport("user32.dll")] public static extern bool EnumThreadWindows(uint thread, EnumWindowsProc proc, IntPtr data);

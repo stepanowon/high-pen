@@ -218,10 +218,11 @@ namespace HighPen
             ApplyZoomTransform();
         }
 
-        // The zoom draws the pointer in its image; anything covering that image needs the real pointer instead.
+        // The zoom draws the pointer in its image; anything covering that image needs the real pointer instead,
+        // and a capture would otherwise contain the enlarged pointer.
         void ApplyZoomPointer()
         {
-            zoomer.Direct = snipping.Active || (monitorBounds == zoomBounds && breakWin.Running);
+            zoomer.Direct = capturing || snipping.Active || (monitorBounds == zoomBounds && breakWin.Running);
         }
 
         // Ink only follows the zoom on the screen page of the monitor being zoomed.
@@ -543,6 +544,7 @@ namespace HighPen
         {
             if (capturing) return;
             capturing = true;
+            ApplyZoomPointer();
             if (toastWin != null) toastWin.Close();
             Toolbar.Opacity = 0;
             spotWin.SetSpotVisible(false);
@@ -555,6 +557,7 @@ namespace HighPen
                 Toolbar.Opacity = 1;
                 ApplySpot();
                 capturing = false;
+                ApplyZoomPointer();
                 if (r.Path == null) ShowToast(Lang.T("CaptureFailed"), null, 4);
                 else ShowToast(string.Format(Lang.T(r.Copied ? "Saved" : "SavedOnly"), r.Path), r.Path, 5);
             };

@@ -8,8 +8,8 @@ namespace HighPen
     // The real pointer stays on the unzoomed content, hidden, and the magnifier draws it enlarged in the image,
     // so a click lands exactly on what the pointer is shown over. The view holds still until the pointer
     // reaches one of its edges and then moves along with the pointer.
-    // HighPen's own windows are not magnified and the ink canvas takes input in display coordinates, so over
-    // those the real pointer is shown instead, at the position on the display (see pointerDirect).
+    // HighPen's own windows are not magnified, windows above the magnifier cover its image, and the ink canvas takes
+    // input in display coordinates, so there the real pointer is shown instead, at the position on the display (see pointerDirect).
     class Zoomer : ITopmost
     {
         public static readonly double[] Factors = { 1.5, 2, 2.5 };
@@ -48,6 +48,21 @@ namespace HighPen
         readonly Native.EnumWindowsProc scanOwnWindow;
         Native.POINT scanPoint;
         bool scanHit;
+        static readonly Predicate<IntPtr> WindowClosed = h => !Native.IsWindow(h);
+        // The pointer position after the last update, and how many updates ago the windows were last looked at
+        // and the image last refreshed. While the pointer rests both happen less often.
+        Native.POINT lastPointer;
+        int updatesSinceScan, updatesSinceDraw;
+        bool coveredAtPointer;
+        // The Windows screens that sit above topmost windows but are not in the ordinary window order:
+        // Start and search, Alt+Tab and Task View, quick settings, the tray overflow.
+        static readonly string[] ShellOverlays = { "Windows.UI.Core.CoreWindow", "XamlExplorerHostIslandWindow", "XamlExplorerHostIslandWindow_WASDK", "ControlCenterWindow", "TopLevelWindowForOverflowXamlIsland", "NotifyIconOverflowWindow" };
+        IntPtr checkedForeground;
+        bool foregroundIsOverlay;
+        // Where the pointer came off a window. The two coordinate systems round differently, so that position can map
+        // back just inside the window; it only counts as over the window again once the pointer has moved.
+        Native.POINT leftAt;
+        bool justLeft;
         readonly DispatcherTimer timer = new DispatcherTimer();
         public bool Active { get { return host != IntPtr.Zero; } }
 
@@ -109,6 +124,7 @@ namespace HighPen
             viewSet = false;
             pointerDirect = true;
             redraw = true;
+            justLeft = false;
             Update();
             Native.SetWindowPos(host, Native.HWND_TOPMOST, 0, 0, 0, 0, Native.SWP_NOSIZE | Native.SWP_NOMOVE | Native.SWP_NOACTIVATE | Native.SWP_SHOWWINDOW);
             timer.Start();
@@ -142,10 +158,7 @@ namespace HighPen
         public Native.POINT ToShown(Native.POINT p)
         {
             if (!Active || pointerDirect || lockedView.IsEmpty) return p;
-            Native.POINT o;
-            o.X = lockedView.X + (int)Math.Round((p.X - shownView.Left) * factor);
-            o.Y = lockedView.Y + (int)Math.Round((p.Y - shownView.Top) * factor);
-            return o;
+            return ContentToDisplay(p, shownView.Left, shownView.Top, lockedView, factor);
         }
 
         void Update()
@@ -180,8 +193,15 @@ namespace HighPen
                 if (locked.IsEmpty) return false;
             }
             System.Drawing.Rectangle b = locked;
+            int outsideX = p.X, outsideY = p.Y;
             p.X = Math.Max(b.Left, Math.Min(b.Right - 1, p.X));
             p.Y = Math.Max(b.Top, Math.Min(b.Bottom - 1, p.Y));
+            // Windows can drop the clip when another window comes to the front; a hidden pointer must not get away
+            if (!Direct && (p.X != outsideX || p.Y != outsideY))
+            {
+                Native.SetCursorPos(p.X, p.Y);
+                clip = System.Drawing.Rectangle.Empty;
+            }
             if (b != current)
             {
                 current = b;
@@ -200,7 +220,7 @@ namespace HighPen
             else if (viewFactor != factor)
             {
                 // the content the pointer is shown over stays there when the factor changes
-                Native.POINT at = pointerDirect ? p : ContentToDisplay(p, b, viewFactor);
+                Native.POINT at = pointerDirect ? p : ContentToDisplay(p, viewX, viewY, b, viewFactor);
                 viewX = (int)Math.Round(viewX + (at.X - b.X) * (1.0 / viewFactor - 1.0 / factor));
                 viewY = (int)Math.Round(viewY + (at.Y - b.Y) * (1.0 / viewFactor - 1.0 / factor));
                 viewFactor = factor;
@@ -208,22 +228,39 @@ namespace HighPen
             viewX = Math.Max(b.Left, Math.Min(b.Right - w, viewX));
             viewY = Math.Max(b.Top, Math.Min(b.Bottom - h, viewY));
 
-            Native.POINT shown = pointerDirect ? p : ContentToDisplay(p, b, factor);
-            bool overOwnWindow = ScanOwnWindows(shown);
+            Native.POINT shown = pointerDirect ? p : ContentToDisplay(p, viewX, viewY, b, factor);
+            bool moved = p.X != lastPointer.X || p.Y != lastPointer.Y;
+            // a window opening under a resting pointer is noticed a little later
+            if (moved || redraw || ++updatesSinceScan >= 8)
+            {
+                updatesSinceScan = 0;
+                bool overOwn = ScanOwnWindows(shown);
+                coveredAtPointer = overOwn || ShellOverlayOn(b) || WindowAboveAt(shown);
+            }
+            bool covered = coveredAtPointer;
+            if (justLeft)
+            {
+                if (p.X == leftAt.X && p.Y == leftAt.Y) covered = false;
+                else justLeft = false;
+            }
             // a held button stays with the pointer mode it was pressed in, so a drag is not cut off halfway
-            bool direct = Frozen || Direct || (ButtonHeld() ? pointerDirect : overOwnWindow);
-            if (direct != pointerDirect)
+            if (covered != pointerDirect && ButtonHeld()) covered = pointerDirect;
+            bool direct = Frozen || Direct || covered;
+            bool switched = direct != pointerDirect;
+            if (switched)
             {
                 // the old clip could keep the pointer from reaching its new position
                 SetClip(b);
                 p = direct ? shown : DisplayToContent(p, b);
                 Native.SetCursorPos(p.X, p.Y);
                 ShowPointerInImage(!direct);
-                redraw = true;
+                leftAt = p;
+                justLeft = !direct;
             }
             if (direct) RestoreClicks();
             else LetClicksThrough();
 
+            int shownX = viewX, shownY = viewY;
             if (!direct)
             {
                 if (Locked) KeepInView(ref p, w, h);
@@ -233,6 +270,7 @@ namespace HighPen
                     viewY = Pan(viewY, h, p.Y);
                 }
             }
+            lastPointer = p;
             // locked, the pointer cannot leave the part being shown: outside it there would be no pointer to see
             SetClip(!direct && Locked ? new System.Drawing.Rectangle(viewX, viewY, w, h) : b);
 
@@ -240,9 +278,14 @@ namespace HighPen
             r.Top = viewY;
             r.Right = viewX + w;
             r.Bottom = viewY + h;
-            Native.MagSetWindowSource(mag, r);
-            // asks for a redraw on every update, as Microsoft's magnifier sample does; not tested without it
-            Native.InvalidateRect(mag, IntPtr.Zero, true);
+            // the image stays live while the pointer rests (a video may be playing), at about a third of the rate
+            if (moved || redraw || switched || viewX != shownX || viewY != shownY || ++updatesSinceDraw >= 3)
+            {
+                updatesSinceDraw = 0;
+                Native.MagSetWindowSource(mag, r);
+                // asks for a redraw on every update, as Microsoft's magnifier sample does; not tested without it
+                Native.InvalidateRect(mag, IntPtr.Zero, false);
+            }
             redraw = false;
             return true;
         }
@@ -264,13 +307,14 @@ namespace HighPen
             p.X = x;
             p.Y = y;
             Native.SetCursorPos(x, y);
+            clip = System.Drawing.Rectangle.Empty;
         }
 
-        Native.POINT ContentToDisplay(Native.POINT p, System.Drawing.Rectangle b, float f)
+        static Native.POINT ContentToDisplay(Native.POINT p, int left, int top, System.Drawing.Rectangle b, float f)
         {
             Native.POINT o;
-            o.X = Math.Max(b.Left, Math.Min(b.Right - 1, b.X + (int)Math.Round((p.X - viewX) * f)));
-            o.Y = Math.Max(b.Top, Math.Min(b.Bottom - 1, b.Y + (int)Math.Round((p.Y - viewY) * f)));
+            o.X = Math.Max(b.Left, Math.Min(b.Right - 1, b.X + (int)Math.Round((p.X - left) * f)));
+            o.Y = Math.Max(b.Top, Math.Min(b.Bottom - 1, b.Y + (int)Math.Round((p.Y - top) * f)));
             return o;
         }
 
@@ -322,14 +366,54 @@ namespace HighPen
             bool throughAlways = (Native.GetWindowLong(h, Native.GWL_EXSTYLE) & Native.WS_EX_TRANSPARENT) != 0 && !madeClickThrough.Contains(h);
             if (throughAlways) return true;
             ownWindows.Add(h);
-            Native.RECT r;
-            if (Native.GetWindowRect(h, out r) && scanPoint.X >= r.Left && scanPoint.X < r.Right && scanPoint.Y >= r.Top && scanPoint.Y < r.Bottom)
-                scanHit = true;
+            if (Contains(h, scanPoint)) scanHit = true;
             return true;
+        }
+
+        // A Windows screen such as the Start menu is up on the zoomed monitor. It comes with the taskbar and covers the
+        // image the pointer is drawn in, so the real pointer is used on the whole monitor until it closes.
+        bool ShellOverlayOn(System.Drawing.Rectangle b)
+        {
+            IntPtr h = Native.GetForegroundWindow();
+            if (h != checkedForeground)
+            {
+                checkedForeground = h;
+                System.Text.StringBuilder name = new System.Text.StringBuilder(64);
+                Native.GetClassName(h, name, name.Capacity);
+                foregroundIsOverlay = Array.IndexOf(ShellOverlays, name.ToString()) >= 0;
+            }
+            if (!foregroundIsOverlay) return false;
+            Native.RECT r;
+            return Native.GetWindowRect(h, out r) && r.Left < b.Right && r.Right > b.Left && r.Top < b.Bottom && r.Bottom > b.Top;
+        }
+
+        // Another program's window above the magnifier at the given point, such as a topmost window until HighPen's
+        // windows are next raised: it covers the image the pointer is drawn in, and it is shown where it really is.
+        bool WindowAboveAt(Native.POINT at)
+        {
+            uint me = Native.GetCurrentThreadId();
+            IntPtr h = Native.GetWindow(host, Native.GW_HWNDPREV);
+            for (int i = 0; h != IntPtr.Zero && i < 256; i++, h = Native.GetWindow(h, Native.GW_HWNDPREV))
+            {
+                uint pid;
+                if (!Native.IsWindowVisible(h) || Native.GetWindowThreadProcessId(h, out pid) == me) continue;
+                if ((Native.GetWindowLong(h, Native.GWL_EXSTYLE) & Native.WS_EX_TRANSPARENT) != 0) continue;
+                int cloaked;
+                if (Native.DwmGetWindowAttribute(h, Native.DWMWA_CLOAKED, out cloaked, sizeof(int)) == 0 && cloaked != 0) continue;
+                if (Contains(h, at)) return true;
+            }
+            return false;
+        }
+
+        static bool Contains(IntPtr h, Native.POINT p)
+        {
+            Native.RECT r;
+            return Native.GetWindowRect(h, out r) && p.X >= r.Left && p.X < r.Right && p.Y >= r.Top && p.Y < r.Bottom;
         }
 
         void LetClicksThrough()
         {
+            madeClickThrough.RemoveAll(WindowClosed);
             foreach (IntPtr h in ownWindows)
             {
                 if (madeClickThrough.Contains(h)) continue;
@@ -340,6 +424,8 @@ namespace HighPen
 
         void RestoreClicks()
         {
+            if (madeClickThrough.Count == 0) return;
+            madeClickThrough.RemoveAll(WindowClosed);
             foreach (IntPtr h in madeClickThrough)
                 Native.SetWindowLong(h, Native.GWL_EXSTYLE, Native.GetWindowLong(h, Native.GWL_EXSTYLE) & ~Native.WS_EX_TRANSPARENT);
             madeClickThrough.Clear();
