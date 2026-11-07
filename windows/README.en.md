@@ -8,7 +8,7 @@
 
 HighPen is a Windows pen app for online lectures. You can write directly on the screen, highlight the mouse pointer with a spotlight, zoom in on the screen, and bring up a whiteboard or a break timer. It works with pen tablets such as Wacom (Windows Ink) as well as with a mouse.
 
-![HighPen toolbar and mouse spot](../screen/전체화면1.png)
+![HighPen toolbar and mouse spot](../screen/en/overview.png)
 
 ## Installation
 
@@ -151,7 +151,7 @@ A semi-transparent round spot follows the mouse pointer so viewers can easily fi
 
 A transparent ink layer covers the screen so you can draw directly on it. Both Wacom pens and the mouse work.
 
-![Writing on the screen](../screen/펜1.png)
+![Pen, shapes and highlighter](../screen/en/pen.png)
 
 - **Pen on:** the screen enters writing mode and clicks to the screen below are blocked.
 - **Pen off:** your ink stays on screen and the mouse controls the screen below again. You can advance slides with the ink still showing.
@@ -195,7 +195,7 @@ Covers the whole screen with a white or black board to write on. Each press of t
 
 | White board | Black board |
 |---|---|
-| ![White board](../screen/화이트보드.png) | ![Black board](../screen/블랙보드.png) |
+| ![White board](../screen/en/whiteboard.png) | ![Black board](../screen/en/blackboard.png) |
 
 ### Undo / Clear
 
@@ -215,13 +215,13 @@ Attaches a text note to the screen. Use it to leave terms or explanations in cle
 - Notes cannot be moved or edited after they are created; they can only be removed with Clear.
 - Notes belong to the current page (screen, white board, black board) and are kept per page.
 
-![Ink and notes](../screen/펜2.png)
+![Ink and notes](../screen/en/note.png)
 
 ### Zoom
 
 Zooms the monitor under the mouse pointer in real time. Pick 1.5x, 2x or 2.5x in the settings panel; changing it while zoomed applies immediately.
 
-![Zoom](../screen/화면%20확대.png)
+![Zoom](../screen/en/zoom.png)
 
 - The pointer shown in the zoomed view is where a click lands. Just click where you see things.
 - The view moves only when the pointer reaches the edge of the visible area. To see the other side after going to a corner, move the pointer all the way to the opposite edge. The pointer moves faster in proportion to the zoom.

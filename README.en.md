@@ -6,7 +6,7 @@
 
 HighPen is a pen app for online lectures. You can write directly on the screen, highlight the mouse pointer with a spotlight, zoom in on the screen, and bring up a whiteboard.
 
-![HighPen toolbar and mouse spot](screen/전체화면1.png)
+![HighPen toolbar and mouse spot](screen/en/overview.png)
 
 ## Platforms
 
