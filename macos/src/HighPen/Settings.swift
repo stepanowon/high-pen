@@ -25,6 +25,8 @@ enum Cfg {
     static var highlightSize: Double { get { num("HighlightSize", 20, 5...60) } set { d.set(newValue, forKey: "HighlightSize") } }
     static var spotColor: Int { get { int("SpotColor", 2, colors) } set { d.set(newValue, forKey: "SpotColor") } }
     static var spotSize: Double { get { num("SpotSize", 70, 20...200) } set { d.set(newValue, forKey: "SpotSize") } }
+    // percent; 40 is how the spot looked before it could be changed
+    static var spotOpacity: Double { get { num("SpotOpacity", 40, 10...100) } set { d.set(newValue, forKey: "SpotOpacity") } }
     static var showClicks: Bool { get { flag("ShowClicks", false) } set { d.set(newValue, forKey: "ShowClicks") } }
     static var spotOn: Bool { get { flag("SpotOn", true) } set { d.set(newValue, forKey: "SpotOn") } }
     static var breakMinutes: Int { get { BreakTimes.clamp(int("BreakMinutes", 10, 0...1000)) } set { d.set(newValue, forKey: "BreakMinutes") } }

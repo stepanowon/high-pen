@@ -10,7 +10,7 @@ The macOS version of the pen app for online lectures. It runs on macOS 14 (Sonom
 
 ## Download
 
-**[Download HighPen-1.4.4.dmg](https://github.com/stepanowon/high-pen/releases/download/macos-v1.4.4/HighPen-1.4.4.dmg)** (release [macos-v1.4.4](https://github.com/stepanowon/high-pen/releases/tag/macos-v1.4.4))
+**[Download HighPen-1.5.0.dmg](https://github.com/stepanowon/high-pen/releases/download/macos-v1.5.0/HighPen-1.5.0.dmg)** (release [macos-v1.5.0](https://github.com/stepanowon/high-pen/releases/tag/macos-v1.5.0))
 
 1. Open the DMG and drag HighPen onto the Applications folder.
 2. **Before opening it the first time**, run this in Terminal. HighPen then opens without any warning.
@@ -56,6 +56,7 @@ Distributing without the warning requires joining the Apple Developer Program, t
 | Show clicks | ⌃⌥K | A ring spreads out and fades where you click: solid for the left button, dashed for the right, in the spot color. Only on the selected monitor, and not while drawing with the pen (also **Show clicks** in Settings) |
 | Pen | ⌃⌥P | Write on the screen. Uses pen tablet pressure (toggle with ⌃⌥R) |
 | Highlighter | ⌃⌥L | Translucent, drawn beneath pen strokes |
+| Shape | ⌃⌥O | Drag to draw a rectangle or an ellipse. Each press goes rectangle → ellipse → off (back to the pen). Hold ⇧ for a square or circle. A shape is a stroke in the pen's color and width, so the eraser, undo, capture, the boards and writing while zoomed treat it like any other ink |
 | Eraser | ⌃⌥E | Erases whole strokes. Press again while erasing to clear everything |
 | Board | ⌃⌥B | White board → black board → off. Kept separately from the screen annotations |
 | Undo | ⌃⌥Z | One stroke, everything removed by one eraser drag, or a clear all (its speech bubbles come back too) |
@@ -65,7 +66,7 @@ Distributing without the warning requires joining the Apple Developer Program, t
 | Zoom lock | ⌃⇧X | While zoomed, locks the zoomed view in place or unlocks it (see [Zoom](#zoom)) |
 | Capture | ⌃⌥F | Saves the screen with ink as a PNG in `~/Pictures/HighPen` and copies it to the clipboard |
 | Break | ⌃⌥W | Shows the time left and when class resumes, large, over the whole selected monitor. The last minute is orange; when time is up a red 00:00 stays until you press it again. Clicks pass through and the toolbar stays on top |
-| Settings | ⌃⌥D | Colors, widths, spot, zoom level, break length (10 min, 15 min, 1 h, 1 h 30 min buttons or a 5–120 minute slider in 5-minute steps; 10 minutes by default), monitor, language (Korean, Japanese, English) |
+| Settings | ⌃⌥D | Colors, widths, spot (color, size, opacity 10–100%, 40% by default), zoom level, break length (10, 15, 60, 90 min buttons or a 5–120 minute slider in 5-minute steps; 10 minutes by default), monitor, language (Korean, Japanese, English) |
 | Collapse/expand | ⌃⌥H | Collapses the toolbar (also the `<` button at the left of the header). Collapsed, only the `>` button is left |
 | Cycle monitor | ⌃⌥M | Changes the monitor HighPen works on, with several monitors |
 | Pen color | ⌃⌥1 – ⌃⌥8 | Red, orange, yellow, green, blue, purple, black, white (the highlighter color while the highlighter is on) |
@@ -89,6 +90,7 @@ In Settings > **Shortcuts**, click an item, then press the new combination. Esc 
 
 ### Toolbar
 
+- Upright, each button shows its icon with its name beside it on one row. Long names are set smaller so that they all fit.
 - Drag it by its header (HighPen) to move it; its position and shape are saved and come back on the next start.
 - Bring the pointer to the very top or bottom of the screen (below the menu bar, above the Dock) while dragging and the toolbar lies along that edge as a row, with icons only on its buttons. Drag the header away from the edge to make it upright again.
 - An upright toolbar against the left or right end of the screen stays upright when taken to the top or bottom, so it can slide along that side into a corner. It also stays upright on a monitor too narrow for the row.
