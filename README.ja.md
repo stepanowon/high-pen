@@ -23,7 +23,7 @@ Microsoft Store からのインストールをおすすめします。winget、�
 
 ### macOS
 
-**[HighPen-1.4.4.dmg をダウンロード](https://github.com/stepanowon/high-pen/releases/download/macos-v1.4.4/HighPen-1.4.4.dmg)** (リリース [macos-v1.4.4](https://github.com/stepanowon/high-pen/releases/tag/macos-v1.4.4))
+**[HighPen-1.5.0.dmg をダウンロード](https://github.com/stepanowon/high-pen/releases/download/macos-v1.5.0/HighPen-1.5.0.dmg)** (リリース [macos-v1.5.0](https://github.com/stepanowon/high-pen/releases/tag/macos-v1.5.0))
 
 macOS 14 (Sonoma) 以降、Apple シリコンと Intel の Mac に対応しています。DMG を開き、HighPen を Applications フォルダーにドラッグするとインストールされます。まだ Apple の公証を受けていないため、**初めて開く前に**ターミナルで次のコマンドを実行すると警告なしで開けます。(コマンドなしで開き、警告で**ゴミ箱に入れる**を押すとアプリが削除されます。)
 
