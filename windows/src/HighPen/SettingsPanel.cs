@@ -36,6 +36,18 @@ namespace HighPen
         Panel penSwatches, highlightSwatches;
         Border pressureBtn, clicksBtn;
         TextBlock pressureText, clicksText, hotkeyWarn;
+        // The groups of settings, in the order they stack in when the panel is upright.
+        readonly List<StackPanel> sections = new List<StackPanel>();
+        // Beside a bar along an edge they stand in columns, as indexes into sections.
+        // Four of these are narrower than the bar in any language, so the bar's width still decides whether it fits.
+        static readonly int[][] WideColumns = { new[] { 0, 4, 6 }, new[] { 1 }, new[] { 2, 5 }, new[] { 3, 7 } };
+        const double SectionWidth = 190;
+        // In columns height is what counts: the eight colours fit on one row at this size.
+        const double SwatchSize = 24, WideSwatchSize = 20;
+        readonly List<Panel> allSwatches = new List<Panel>();
+        Separator versionDivider;
+        StackPanel root;
+        bool wide;
 
         public SettingsPanel(Settings cfg, HotkeyBindings bindings, ISettingsActions actions)
         {
@@ -46,7 +58,60 @@ namespace HighPen
             BorderBrush = Theme.Line;
             BorderThickness = new Thickness(0, 1, 1, 1);
             VerticalAlignment = VerticalAlignment.Top;
-            Child = Build();
+            // scrolls only when the bar lies along an edge and limits the panel to the room left beside it
+            Child = new ScrollViewer { VerticalScrollBarVisibility = ScrollBarVisibility.Auto, Content = Build() };
+            ArrangeSections();
+        }
+
+        // In columns (beside a bar along an edge) or stacked.
+        public void SetWide(bool on)
+        {
+            if (on == wide) return;
+            wide = on;
+            ArrangeSections();
+        }
+
+        // The controls are moved, not rebuilt, so they keep their state.
+        void ArrangeSections()
+        {
+            foreach (StackPanel s in sections)
+            {
+                Panel parent = s.Parent as Panel;
+                if (parent != null) parent.Children.Remove(s);
+            }
+            root.Children.Clear();
+            root.Orientation = wide ? Orientation.Horizontal : Orientation.Vertical;
+            root.Margin = wide ? new Thickness(10, 6, 10, 6) : new Thickness(10);
+            versionDivider.Visibility = wide ? Visibility.Collapsed : Visibility.Visible;
+            foreach (Panel swatches in allSwatches) SizeSwatches(swatches);
+            if (!wide)
+            {
+                FillColumn(root, sections);
+                return;
+            }
+            for (int i = 0; i < WideColumns.Length; i++)
+            {
+                if (i > 0) root.Children.Add(new Border { Width = 1, Margin = new Thickness(8, 0, 8, 0), Background = Theme.Line });
+                StackPanel column = new StackPanel();
+                FillColumn(column, Array.ConvertAll(WideColumns[i], n => sections[n]));
+                root.Children.Add(column);
+            }
+        }
+
+        void FillColumn(StackPanel column, IList<StackPanel> parts)
+        {
+            for (int i = 0; i < parts.Count; i++)
+            {
+                if (i > 0) column.Children.Add(column == root ? Divider() : new Separator { Margin = new Thickness(0, 4, 0, 2) });
+                column.Children.Add(parts[i]);
+            }
+        }
+
+        StackPanel NextSection()
+        {
+            StackPanel s = new StackPanel { Width = SectionWidth };
+            sections.Add(s);
+            return s;
         }
 
         public void MarkMonitor(int monitor)
@@ -81,7 +146,8 @@ namespace HighPen
 
         UIElement Build()
         {
-            StackPanel p = new StackPanel { Margin = new Thickness(10), Width = 190 };
+            root = new StackPanel { Margin = new Thickness(10) };
+            StackPanel p = NextSection();
 
             p.Children.Add(Theme.SectionTitle(Lang.T("Monitor")));
             WrapPanel mp = new WrapPanel();
@@ -96,7 +162,7 @@ namespace HighPen
                 mp.Children.Add(mb);
             }
             p.Children.Add(mp);
-            p.Children.Add(Divider());
+            p = NextSection();
 
             p.Children.Add(Theme.SectionTitle(Lang.T("PenColor")));
             penSwatches = Swatches(cfg.PenColor, delegate (string c) { cfg.PenColor = c; actions.PenStyleChanged(); }, true);
@@ -105,14 +171,14 @@ namespace HighPen
             p.Children.Add(MakeSlider(1, 30, cfg.PenSize, delegate (double v) { cfg.PenSize = v; actions.PenStyleChanged(); }));
             p.Children.Add(Switch("Pressure", "Pressure", actions.TogglePressure, out pressureBtn, out pressureText));
             ShowPressure(cfg.Pressure);
-            p.Children.Add(Divider());
+            p = NextSection();
 
             p.Children.Add(Theme.SectionTitle(Lang.T("HighlightColor")));
             highlightSwatches = Swatches(cfg.HighlightColor, delegate (string c) { cfg.HighlightColor = c; actions.PenStyleChanged(); }, true);
             p.Children.Add(highlightSwatches);
             p.Children.Add(Theme.SectionTitle(Lang.T("HighlightSize")));
             p.Children.Add(MakeSlider(5, 60, cfg.HighlightSize, delegate (double v) { cfg.HighlightSize = v; actions.PenStyleChanged(); }));
-            p.Children.Add(Divider());
+            p = NextSection();
 
             p.Children.Add(Theme.SectionTitle(Lang.T("SpotColor")));
             p.Children.Add(Swatches(cfg.SpotColor, delegate (string c) { cfg.SpotColor = c; actions.SpotStyleChanged(); }, false));
@@ -120,7 +186,7 @@ namespace HighPen
             p.Children.Add(MakeSlider(20, 200, cfg.SpotSize, delegate (double v) { cfg.SpotSize = v; actions.SpotStyleChanged(); }));
             p.Children.Add(Switch("ClickShow", "Clicks", actions.ToggleClicks, out clicksBtn, out clicksText));
             ShowClicks(cfg.ShowClicks);
-            p.Children.Add(Divider());
+            p = NextSection();
 
             p.Children.Add(Theme.SectionTitle(Lang.T("ZoomFactor")));
             WrapPanel zp = new WrapPanel();
@@ -134,7 +200,7 @@ namespace HighPen
             }
             MarkZoomFactor(cfg.ZoomFactor);
             p.Children.Add(zp);
-            p.Children.Add(Divider());
+            p = NextSection();
 
             breakTitle = Theme.SectionTitle("");
             p.Children.Add(breakTitle);
@@ -159,7 +225,7 @@ namespace HighPen
             breakSlider.TickFrequency = BreakTimes.Step;
             p.Children.Add(breakSlider);
             MarkBreakMinutes(cfg.BreakMinutes);
-            p.Children.Add(Divider());
+            p = NextSection();
 
             p.Children.Add(Theme.SectionTitle(Lang.T("Language")));
             WrapPanel lp = new WrapPanel();
@@ -173,7 +239,7 @@ namespace HighPen
                 lp.Children.Add(lb);
             }
             p.Children.Add(lp);
-            p.Children.Add(Divider());
+            p = NextSection();
 
             Border hk = Theme.TextButton(Lang.T("Hotkeys"), double.NaN, 26, new Thickness(0, 2, 0, 0));
             hk.MouseLeftButtonUp += delegate { actions.ShowHotkeyEditor(); };
@@ -187,9 +253,10 @@ namespace HighPen
             up.MouseLeftButtonUp += delegate { actions.CheckForUpdates(); };
             p.Children.Add(up);
 
-            p.Children.Add(Divider());
+            versionDivider = Divider();
+            p.Children.Add(versionDivider);
             p.Children.Add(new TextBlock { Text = "HighPen v" + AppInfo.AppVersion, Foreground = Brushes.Gray, FontSize = 11, HorizontalAlignment = HorizontalAlignment.Center });
-            return p;
+            return root;
         }
 
         static Separator Divider()
@@ -230,7 +297,19 @@ namespace HighPen
                 wp.Children.Add(b);
             }
             MarkSwatch(wp, current);
+            allSwatches.Add(wp);
             return wp;
+        }
+
+        void SizeSwatches(Panel swatches)
+        {
+            double size = wide ? WideSwatchSize : SwatchSize;
+            foreach (Border b in swatches.Children)
+            {
+                b.Width = b.Height = size;
+                b.CornerRadius = new CornerRadius(size / 2);
+                b.Margin = new Thickness(wide ? 1.5 : 2);
+            }
         }
 
         static void MarkSwatch(Panel swatches, string color)

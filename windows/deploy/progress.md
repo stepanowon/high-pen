@@ -45,6 +45,8 @@
 | 1.8.7 GitHub 릴리스 | 완료 | 사용자 요청으로 Store 게시 **전에** GitHub 릴리스 HighPen v1.8.7(릴리스 삭제됨) (`HighPen-Setup.exe` `0110364c…`, `HighPen.exe` `bb7d26b4…`, `HighPen.msix` `83ce0bc5…`, `SHA256SUMS.txt`), 한·일·영 변경 내용 포함. README 링크는 v1.8.6으로 남겨 뒀다가 1.8.8 때 함께 변경 |
 | 1.8.8 버전 변경 | 완료 | [#56](https://github.com/stepanowon/high-pen/pull/56) 병합(main `a0b4a19`). 코드는 1.8.7과 같고 버전 문자열만 변경. 1.8.7.0 패키지를 Partner Center에 이미 올려서 번호를 다시 쓸 수 없었음 |
 | 1.8.8 GitHub 릴리스 | 완료 | Store 게시 후(사용자 확인) GitHub 릴리스 [HighPen v1.8.8](https://github.com/stepanowon/high-pen/releases/tag/v1.8.8) (`HighPen-Setup.exe` `f72262c3…`, `HighPen.exe` `e34b9e7a…`, `HighPen.msix` `cbdfc3e3…`, `SHA256SUMS.txt`), 한·일·영 변경 내용 포함. 공개 주소에서 받은 파일의 해시가 SHA256SUMS.txt와 같음 확인. 한·영·일 Windows README의 다운로드 링크와 버전 표기를 v1.8.8로 변경 |
+| 1.8.9 기능: 가로 설정바 | 병합 대기 | `feat/horizontal-toolbar`. 끌면서 포인터를 작업 영역 맨 위나 맨 아래로 가져가면 설정바가 그 끝에 붙어 가로로 바뀜(아이콘만 표시, 높이 37px, 이름과 단축키는 툴팁). 가로일 때 설정 패널은 4열로 열림. 가로 폭이 작업 영역보다 긴 모니터에서는 세로 유지. 세로로 좌·우측 끝에 닿아 있으면 위아래로 가도 세로 유지. 가장 우측에서는 `<` 버튼과 HighPen의 위치가 바뀜. 확대 중 설정바 위에서 끝까지 가면 화면이 이동함. macOS는 보류. 테스트: 실제 앱을 입력 합성과 스크린샷으로 확인(끝 붙이기·떼기, 재시작, 모니터·언어 변경, 설정 패널, 접기, 확대 중 이동). 100%가 아닌 DPI, 작업표시줄이 없거나 위쪽·옆에 있는 경우는 시험하지 못함 |
+| 1.8.9 GitHub 릴리스 | 대기 | Store 게시 후 만든다. 한·영·일 README의 다운로드 링크와 버전 표기는 그때 v1.8.9로 바꾼다 |
 
 ### winget
 
@@ -93,6 +95,8 @@
 | 1.8.7 제출 | 완료 | 1.8.6의 버그만 고친 1.8.7.0 패키지를 Partner Center에 올림(게시 여부는 기록 없음). 번호를 다시 쓸 수 없어 다음 제출은 1.8.8로 함 |
 | 1.8.8 MSIX | 완료 | `dist/HighPen.msix` (1.8.8.0) `cbdfc3e3…` 빌드. MSIX 안의 `HighPen.exe`가 `dist/HighPen.exe`와 같음(`e34b9e7a…`) 확인. `HighPen-Setup.exe` `f72262c3…`는 같은 exe로 빌드. `SHA256SUMS.txt` 작성 |
 | 1.8.8 제출 | 완료 | 1.8.8.0 패키지가 Store에 게시됨(2026-11-07, 사용자 확인). 현재 Store 버전 |
+| 1.8.9 MSIX | 완료 | `dist/HighPen.msix` (1.8.9.0) `70ef3489…` 빌드. MSIX 안의 `HighPen.exe`가 `dist/HighPen.exe`와 같음(`aecb32b6…`) 확인. `HighPen-Setup.exe` `daf9170b…`도 같은 exe를 포함함을 확인. `SHA256SUMS.txt` 작성 |
+| 1.8.9 제출 | 대기 | 1.8.9.0 패키지를 Partner Center에 제출해야 함 |
 
 ## Store 정보
 

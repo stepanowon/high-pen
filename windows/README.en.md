@@ -214,7 +214,7 @@ Zooms the monitor under the mouse pointer in real time. Pick 1.5x, 2x or 2.5x in
 
 - The pointer shown in the zoomed view is where a click lands. Just click where you see things.
 - The view moves only when the pointer reaches the edge of the visible area. To see the other side after going to a corner, move the pointer all the way to the opposite edge. The pointer moves faster in proportion to the zoom.
-- Over the toolbar the pointer becomes the normal one, so you can click as usual. Where the toolbar touches the screen edge the view does not scroll, so go to the edge past the toolbar.
+- Over the toolbar the pointer becomes the normal one, so you can click as usual. Where the toolbar touches the screen edge, hold the pointer at the very edge of the monitor on the toolbar for a moment and the view moves that way.
 - The toolbar is not zoomed and keeps its normal size.
 - The monitor the pointer was on when zoom was turned on is zoomed, and the pointer cannot leave that monitor while zoomed. To zoom another monitor, turn zoom off, move the pointer, and turn it on again.
 - Changing the active monitor while zoomed turns zoom off.
@@ -253,10 +253,11 @@ Choose the monitor the app works on with **Monitor** in the settings panel (or C
 ### Toolbar
 
 - Drag the top row (HighPen) to move the toolbar; the position is saved and used on the next launch. If the saved position is off screen, it returns to the top-left corner.
+- Bring the pointer to the top or bottom of the working area while dragging and the toolbar lies along that edge, horizontally. To keep it low, its buttons then show only their icons; the tooltips give their names and shortcuts. Drag HighPen at its left end away from the edge to make it vertical again. A vertical toolbar touching the left or right end of the working area stays vertical when brought to the top or bottom. On a monitor where the horizontal toolbar would be wider than the working area, it stays vertical.
 - The toolbar stays inside the selected monitor. Whether you drag it or it grows (expanding, opening the settings panel), it is kept within that monitor's work area (excluding the taskbar).
-- Use the `<` button on the left of the top row to collapse and expand it. When collapsed, the HighPen title disappears too and only the `>` button remains, so you can click what was behind the toolbar. Press `>` to expand it again in the same place. The toolbar cannot be dragged while collapsed.
+- Use the `<` button on the left of the top row to collapse and expand it. When collapsed, the HighPen title disappears too and only the `>` button remains, so you can click what was behind the toolbar. Press `>` to expand it again in the same place. The toolbar cannot be dragged while collapsed. With the toolbar at the far right of the working area, the collapse button and HighPen swap places, and the button stays where it is when collapsed.
 
-- The settings panel opens to the right of the toolbar, or to its left when the toolbar is at the right edge of the screen.
+- The settings panel opens to the right of the toolbar, or to its left when the toolbar is at the right edge of the screen. A horizontal toolbar opens it toward the middle of the screen (below on the top edge, above on the bottom edge) with its settings in four columns, and it scrolls when there is not enough height.
 - Hovering over a button shows its name and shortcut as a tooltip.
 - Clicking it does not take focus away from the screen you are presenting.
 - While running, its icon appears on the taskbar and can be pinned.
