@@ -215,7 +215,7 @@ Zooms the monitor under the mouse pointer in real time. Pick 1.5x, 2x or 2.5x in
 - The pointer shown in the zoomed view is where a click lands. Just click where you see things.
 - The view moves only when the pointer reaches the edge of the visible area. To see the other side after going to a corner, move the pointer all the way to the opposite edge. The pointer moves faster in proportion to the zoom.
 - Over the toolbar the pointer becomes the normal one, so you can click as usual. Where the toolbar touches the screen edge, hold the pointer at the very edge of the monitor on the toolbar for a moment and the view moves that way.
-- The toolbar is not zoomed and keeps its normal size.
+- The toolbar is not zoomed and keeps its normal size. Its tooltips, however, are magnified along with the screen.
 - The monitor the pointer was on when zoom was turned on is zoomed, and the pointer cannot leave that monitor while zoomed. To zoom another monitor, turn zoom off, move the pointer, and turn it on again.
 - Changing the active monitor while zoomed turns zoom off.
 - **Lock the zoomed view (Ctrl+Shift+X):** press it while zoomed to keep the zoomed view where it is, so it no longer moves around as you move the mouse. The zoom button then reads "Locked". Press it again to let the view follow the pointer again. Turning zoom off also unlocks it.
