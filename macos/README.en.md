@@ -10,7 +10,7 @@ The macOS version of the pen app for online lectures. It runs on macOS 14 (Sonom
 
 ## Download
 
-**[Download HighPen-1.4.2.dmg](https://github.com/stepanowon/high-pen/releases/download/macos-v1.4.2/HighPen-1.4.2.dmg)** (release [macos-v1.4.2](https://github.com/stepanowon/high-pen/releases/tag/macos-v1.4.2))
+**[Download HighPen-1.4.3.dmg](https://github.com/stepanowon/high-pen/releases/download/macos-v1.4.3/HighPen-1.4.3.dmg)** (release [macos-v1.4.3](https://github.com/stepanowon/high-pen/releases/tag/macos-v1.4.3))
 
 1. Open the DMG and drag HighPen onto the Applications folder.
 2. **Before opening it the first time**, run this in Terminal. HighPen then opens without any warning.
@@ -61,7 +61,7 @@ Distributing without the warning requires joining the Apple Developer Program, t
 | Undo | ⌃⌥Z | One stroke, everything removed by one eraser drag, or a clear all (its speech bubbles come back too) |
 | Clear | ⌃⌥C | Clears the current page |
 | Note | ⌃⌥T | Text box at the clicked spot. Enter confirms, Shift+Enter adds a line, Esc cancels. Removed only by Clear |
-| Zoom | ⌃⌥X | Live 1.5x / 2x / 2.5x zoom. The pointer you see in the zoomed view is where you click. The view only moves when the pointer reaches an edge of what is shown (the pointer moves faster by the zoom factor). Over the toolbar the normal pointer comes back, and the view does not scroll along the screen edge the toolbar sits on. Turning the pen on freezes the view so you can write on the zoomed screen |
+| Zoom | ⌃⌥X | Live 1.5x / 2x / 2.5x zoom. The pointer you see in the zoomed view is where you click. The view only moves when the pointer reaches an edge of what is shown (the pointer moves faster by the zoom factor). Over the toolbar the normal pointer comes back. When the toolbar touches a screen edge, hold the pointer at the very edge of the monitor on the toolbar for a moment and the view moves that way. Turning the pen on freezes the view so you can write on the zoomed screen |
 | Zoom lock | ⌃⇧X | While zoomed, locks the zoomed view in place (or unlocks it). Locked, the view stays put as the pointer moves and the Zoom button reads "Locked". You can still click what you see, and the pointer stays inside the part shown. Turning zoom off also unlocks |
 | Capture | ⌃⌥F | Saves the screen with ink as a PNG in `~/Pictures/HighPen` and copies it to the clipboard |
 | Break | ⌃⌥W | Shows the time left and when class resumes, large, over the whole selected monitor. The last minute is orange; when time is up a red 00:00 stays until you press it again. Clicks pass through and the toolbar stays on top |
@@ -77,7 +77,7 @@ Distributing without the warning requires joining the Apple Developer Program, t
 
 In Settings > **Shortcuts**, click an item, then press the new combination. Esc cancels, Delete removes the shortcut, and **Reset all** restores every default. A shortcut must include ⌃, ⌥ or ⌘; F1–F20 can be used alone. You are told when a combination is already used for another item or by another app.
 
-Drag the toolbar by its header to move it; its position and all settings are saved automatically. Clicking the Dock icon expands a collapsed toolbar. Hover over a toolbar button or a settings item to see its name and shortcut.
+Drag the toolbar by its header to move it; its position and all settings are saved automatically. Bring the pointer to the very top or bottom of the screen (below the menu bar, above the Dock) while dragging and the toolbar lies along that edge as a row: the buttons show only their icons (hover for the name and shortcut) and the settings panel opens toward the middle of the screen in four columns. Drag the header away from the edge to make it upright again. An upright toolbar against the left or right end of the screen stays upright, and so does one on a monitor too narrow for the row. At the right end of the screen the collapse button moves to the right, so it stays in the corner when collapsed. Clicking the Dock icon expands a collapsed toolbar. Hover over a toolbar button or a settings item to see its name and shortcut.
 
 With several monitors, HighPen remembers the monitor chosen under **Monitor** in Settings (or with ⌃⌥M), even if the monitor order changes. If that monitor is disconnected, HighPen moves to the main monitor, and returns once it is connected again (zoom is turned off if it was on).
 

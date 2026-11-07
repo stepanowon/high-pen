@@ -9,6 +9,8 @@ final class Hints {
     private weak var owner: NSView?
     // The area a hint beside window w must not cover (the settings panel next to the toolbar).
     var avoid: (NSWindow) -> NSRect? = { _ in nil }
+    // The edge window w lies along: its hints go below or above the control instead of beside it.
+    var along: (NSWindow) -> BarEdge = { _ in .free }
 
     init() {
         let box = NSView()
@@ -19,14 +21,18 @@ final class Hints {
         win.contentView = box
     }
 
-    func attach(_ v: NSView, _ t: String) {
-        v.onHover({ [unowned self, unowned v] in self.show(t, for: v) },
+    func attach(_ v: NSView, _ t: String) { attach(v) { t } }
+
+    // t is read each time the hint shows.
+    func attach(_ v: NSView, _ t: @escaping () -> String) {
+        v.onHover({ [unowned self, unowned v] in self.show(t(), for: v) },
                   { [unowned self, unowned v] in if self.owner === v { self.hide() } }) // exits can arrive after the next enter
     }
 
     func hide() { win.orderOut(nil) }
 
     // Beside the control: to the right, or to the left when that would cover the avoided area or leave the monitor.
+    // Along an edge: on the side of the control away from that edge.
     private func show(_ t: String, for v: NSView) {
         guard let w = v.window else { return }
         owner = v
@@ -35,9 +41,13 @@ final class Hints {
         let r = w.convertToScreen(v.convert(v.bounds, to: nil))
         let vf = screen(Cfg.monitor).visibleFrame
         var f = NSRect(x: w.frame.maxX + 6, y: r.midY - s.height / 2, width: s.width, height: s.height)
-        if f.maxX > vf.maxX || avoid(w)?.intersects(f) == true {
-            f.origin.x = w.frame.minX - 6 - s.width
+        switch along(w) {
+        case .top: f.origin = NSPoint(x: r.midX - s.width / 2, y: w.frame.minY - 6 - s.height)
+        case .bottom: f.origin = NSPoint(x: r.midX - s.width / 2, y: w.frame.maxY + 6)
+        case .free:
+            if f.maxX > vf.maxX || avoid(w)?.intersects(f) == true { f.origin.x = w.frame.minX - 6 - s.width }
         }
+        f.origin.x = min(max(f.minX, vf.minX), vf.maxX - s.width)
         f.origin.y = min(max(f.minY, vf.minY), vf.maxY - s.height)
         win.setFrame(f, display: true)
         win.orderFrontRegardless()

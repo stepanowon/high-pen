@@ -105,6 +105,12 @@ final class Controller: NSObject, NSApplicationDelegate, SettingsPanelDelegate {
         clicks.allowed = { [unowned self] in !self.tools.penMode } // while drawing every pen stroke would be a click
         hints.avoid = { [unowned self] w in w === self.toolbar.window && self.settings.window.isVisible ? self.settings.window.frame : nil }
         toolbar.onMove = { [unowned self] in self.placeSettings() }
+        hints.along = { [unowned self] w in w === self.toolbar.window ? self.toolbar.edge : .free }
+        toolbar.onEdgeChange = { [unowned self] in
+            self.hints.hide()
+            self.settings.wide = self.toolbar.horizontal
+            self.placeSettings()
+        }
         editor.onOpen = { [unowned self] in self.updateFocus() }
         editor.onClose = { [unowned self] in
             self.hotkeys.register()
@@ -183,7 +189,7 @@ final class Controller: NSObject, NSApplicationDelegate, SettingsPanelDelegate {
         placeSettings()
     }
 
-    func placeSettings() { settings.place(beside: toolbar.window.frame, visible: settingsOpen && !collapsed) }
+    func placeSettings() { settings.place(beside: toolbar.window.frame, edge: toolbar.edge, visible: settingsOpen && !collapsed) }
 
     func rebuild() {
         hints.hide() // its control is about to go away
