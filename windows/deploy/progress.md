@@ -45,8 +45,25 @@
 | 1.8.7 GitHub 릴리스 | 완료 | 사용자 요청으로 Store 게시 **전에** GitHub 릴리스 HighPen v1.8.7(릴리스 삭제됨) (`HighPen-Setup.exe` `0110364c…`, `HighPen.exe` `bb7d26b4…`, `HighPen.msix` `83ce0bc5…`, `SHA256SUMS.txt`), 한·일·영 변경 내용 포함. README 링크는 v1.8.6으로 남겨 뒀다가 1.8.8 때 함께 변경 |
 | 1.8.8 버전 변경 | 완료 | [#56](https://github.com/stepanowon/high-pen/pull/56) 병합(main `a0b4a19`). 코드는 1.8.7과 같고 버전 문자열만 변경. 1.8.7.0 패키지를 Partner Center에 이미 올려서 번호를 다시 쓸 수 없었음 |
 | 1.8.8 GitHub 릴리스 | 완료 | Store 게시 후(사용자 확인) GitHub 릴리스 HighPen v1.8.8(릴리스 삭제됨) (`HighPen-Setup.exe` `f72262c3…`, `HighPen.exe` `e34b9e7a…`, `HighPen.msix` `cbdfc3e3…`, `SHA256SUMS.txt`), 한·일·영 변경 내용 포함. 공개 주소에서 받은 파일의 해시가 SHA256SUMS.txt와 같음 확인. 한·영·일 Windows README의 다운로드 링크와 버전 표기를 v1.8.8로 변경 |
-| 1.8.9 기능: 가로 설정바 | 완료 | [#60](https://github.com/stepanowon/high-pen/pull/60) 병합(main `1d9dd28`). 끌면서 포인터를 작업 영역 맨 위나 맨 아래로 가져가면 설정바가 그 끝에 붙어 가로로 바뀜(아이콘만 표시, 높이 37px, 이름과 단축키는 툴팁). 가로일 때 설정 패널은 4열로 열림. 가로 폭이 작업 영역보다 긴 모니터에서는 세로 유지. 세로로 좌·우측 끝에 닿아 있으면 위아래로 가도 세로 유지. 가장 우측에서는 `<` 버튼과 HighPen의 위치가 바뀜. 확대 중 설정바 위에서 끝까지 가면 화면이 이동함. macOS는 보류. 테스트: 실제 앱을 입력 합성과 스크린샷으로 확인(끝 붙이기·떼기, 재시작, 모니터·언어 변경, 설정 패널, 접기, 확대 중 이동). 100%가 아닌 DPI, 작업표시줄이 없거나 위쪽·옆에 있는 경우는 시험하지 못함 |
+| 1.8.9 기능: 가로 설정바 | 완료 | [#60](https://github.com/stepanowon/high-pen/pull/60) 병합(main `1d9dd28`). 끌면서 포인터를 작업 영역 맨 위나 맨 아래로 가져가면 설정바가 그 끝에 붙어 가로로 바뀜(아이콘만 표시, 높이 37px, 이름과 단축키는 툴팁). 가로일 때 설정 패널은 4열로 열림. 가로 폭이 작업 영역보다 긴 모니터에서는 세로 유지. 세로로 좌·우측 끝에 닿아 있으면 위아래로 가도 세로 유지. 가장 우측에서는 `<` 버튼과 HighPen의 위치가 바뀜. 확대 중 설정바 위에서 끝까지 가면 화면이 이동함. macOS는 1.4.3에서 반영. 테스트: 실제 앱을 입력 합성과 스크린샷으로 확인(끝 붙이기·떼기, 재시작, 모니터·언어 변경, 설정 패널, 접기, 확대 중 이동). 100%가 아닌 DPI, 작업표시줄이 없거나 위쪽·옆에 있는 경우는 시험하지 못함 |
 | 1.8.9 GitHub 릴리스 | 완료 | 사용자 요청으로 Store 게시 **전에** GitHub 릴리스 [HighPen v1.8.9](https://github.com/stepanowon/high-pen/releases/tag/v1.8.9) (`HighPen-Setup.exe` `daf9170b…`, `HighPen.exe` `aecb32b6…`, `HighPen.msix` `70ef3489…`, `SHA256SUMS.txt`), 한·일·영 변경 내용 포함. 공개 주소에서 받은 파일의 해시가 SHA256SUMS.txt와 같음 확인. 한·영·일 Windows README의 다운로드 링크와 버전 표기를 v1.8.9로 변경 |
+
+### macOS
+
+macOS 앱은 `macos/`에 있고 DMG로만 배포한다(Apple 공증 없음). 태그는 `macos-vX.Y.Z` 형식이며, Windows 릴리스가 "Latest"로 남도록 `--latest=false`로 만든다.
+
+| 단계 | 상태 | 내용 |
+| --- | --- | --- |
+| 첫 macOS 앱 | 완료 | [#15](https://github.com/stepanowon/high-pen/pull/15) 병합(main `27c1c9d`, 2026-10-23). AppKit·ScreenCaptureKit·Carbon 단축키, `build.sh`로 universal 빌드와 ad-hoc 서명. [#17](https://github.com/stepanowon/high-pen/pull/17)에서 말풍선 추가 |
+| 1.1.0 | 완료 | [#18](https://github.com/stepanowon/high-pen/pull/18) 병합(main `e5ffaf6`). 첫 DMG 릴리스(삭제됨). README에 DMG 링크([#16](https://github.com/stepanowon/high-pen/pull/16))와 경고 없이 여는 방법([#19](https://github.com/stepanowon/high-pen/pull/19)) 추가 |
+| 1.2.0 | 완료 | [#24](https://github.com/stepanowon/high-pen/pull/24) 병합(main `08df99c`). 모니터 분리 대응, 책임별 파일로 나눔. 릴리스 삭제됨 |
+| 1.3.0 | 완료 | [#33](https://github.com/stepanowon/high-pen/pull/33) 병합(main `88a6394`). 쉬는 시간 타이머, 확대 화면 고정, 툴바 접기 개선(Windows 1.7.x 반영). 릴리스 삭제됨 |
+| 1.3.1 | 완료 | [#37](https://github.com/stepanowon/high-pen/pull/37) 병합(main `5237fc4`). 전체 지우기도 되돌리기로 되살림(Windows 1.7.4 반영). 릴리스 삭제됨 |
+| 1.4.0 | 완료 | [#48](https://github.com/stepanowon/high-pen/pull/48) 병합(main `b649719`). 확대 화면 모서리 고정, 클릭 표시, 업데이트 확인(Windows 1.8.x 반영). 업데이트 확인은 `macos-v` 태그만 봄. 릴리스 삭제됨 |
+| 1.4.1 | 완료 | [#54](https://github.com/stepanowon/high-pen/pull/54) 병합(main `d0a2409`, 2026-11-04). `macos/REFACTORING.md` 후보 모두 반영, 되돌리기 200단계 제한(Windows 1.8.6 반영). 메모리: 설정 패널을 다시 만들며 쌓이던 AppKit 객체, 확대를 끈 뒤 들어온 프레임, 확대를 빠르게 두 번 누를 때 두 번째 스트림 수정. 릴리스 삭제됨 |
+| 1.4.2 | 완료 | [#59](https://github.com/stepanowon/high-pen/pull/59) 병합(main `b033f28`, 2026-11-06). 확대 중 실제 커서를 숨기고 확대 화면에 커서를 그려 보이는 위치가 클릭 위치가 됨, 보이는 영역 끝에서만 화면 이동(Windows 1.8.7 반영). 코드 리뷰 반영(시작 중 끄기, 스트림 중단 시 확대 끄기, 캡처에 힌트·클릭 링·커서 제외). DMG `9b22d102…`. 릴리스 삭제됨 |
+| 1.4.3 | 완료 | [#64](https://github.com/stepanowon/high-pen/pull/64) 병합(main `00846a8`, 2026-11-07). 맨 위·맨 아래에 붙는 가로 툴바, 가로일 때 설정 패널 4열, 툴바 위 모니터 끝에서 확대 화면 이동(Windows 1.8.9 반영). 툴바를 가로·세로로 바꿀 때 AppKit 객체가 쌓이던 것 수정(30회 전환 시 1020 → 0). DMG `3039b01d…`. 릴리스 삭제됨 |
+| 1.4.4 | 완료 | [#65](https://github.com/stepanowon/high-pen/pull/65) 병합(main `09a3cd7`, 2026-11-07). 문서 정리만(코드 변경 없음): 한·영·일 macOS README를 확대·툴바·다중 모니터·펜 모드 절로 나눔, `REFACTORING.md`를 정리 기록·메모리 주의점·알려진 한계로 다시 씀. GitHub 릴리스 [HighPen for macOS v1.4.4](https://github.com/stepanowon/high-pen/releases/tag/macos-v1.4.4) (`HighPen-1.4.4.dmg` `fbad0c3e…`), 공개 주소에서 받은 파일의 해시가 로컬 빌드와 같음 확인 |
 
 ### winget
 
@@ -136,3 +153,16 @@ Windows 앱 파일은 모두 `windows/` 아래에 있다. 아래 경로와 명�
    ```
 4. 한·영·일 `README.md`의 다운로드 링크와 `SHA256SUMS.txt` 링크(`releases/download/v1.x.x/...`)를 새 버전으로 바꾼다.
 5. Partner Center에서 **새 제출**의 패키지만 `dist\HighPen.msix`로 바꿔 제출한다 (자세한 내용: `packaging/STORE.md`). 패키지 페이지에서 **Windows 10/11 Desktop** 체크가 유지되는지 반드시 확인한다.
+
+## macOS 배포 절차
+
+macOS 앱 파일은 모두 `macos/` 아래에 있다. Command Line Tools만 있으면 된다.
+
+1. `build.sh`의 `VERSION`을 올린다.
+2. `./build.sh test`로 빌드와 자체 점검을 한 뒤 `./build.sh dmg`로 `dist/HighPen-<버전>.dmg`를 만든다. DMG를 열어 `Info.plist`의 버전과 `--selftest`를 확인한다.
+3. 루트와 `macos/`의 한·영·일 README에서 DMG 링크(`releases/download/macos-vX.Y.Z/HighPen-X.Y.Z.dmg`)를 새 버전으로 바꾼다.
+4. 브랜치를 푸시하고 릴리스를 만든다. 태그는 반드시 `macos-vX.Y.Z` 형식이어야 한다(앱의 업데이트 확인이 이 태그만 본다).
+   ```
+   gh release create macos-vX.Y.Z macos/dist/HighPen-X.Y.Z.dmg --target <브랜치> --title "HighPen for macOS vX.Y.Z" --notes-file <노트> --latest=false
+   ```
+5. 공개 주소에서 받은 DMG의 SHA-256이 로컬 빌드와 같은지 확인한 뒤 PR을 만들어 병합한다.
