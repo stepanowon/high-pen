@@ -21,7 +21,7 @@ final class Controller: NSObject, NSApplicationDelegate, SettingsPanelDelegate {
     lazy var toolbar = Toolbar(hints: hints)
     lazy var settings = SettingsPanel(hints: hints, hotkeys: hotkeys, delegate: self)
     lazy var editor = HotkeyEditor(hotkeys: hotkeys)
-    let penCursor = symbolCursor("pencil"), highlightCursor = symbolCursor("highlighter"), eraserCursor = ringCursor(16), textCursor = NSCursor.iBeam
+    let penCursor = symbolCursor("pencil"), highlightCursor = symbolCursor("highlighter"), eraserCursor = ringCursor(16), textCursor = NSCursor.iBeam, shapeCursor = NSCursor.crosshair
 
     var tools = ToolState()
     var settingsOpen = false, collapsed = false, checkingUpdate = false
@@ -36,6 +36,7 @@ final class Controller: NSObject, NSApplicationDelegate, SettingsPanelDelegate {
             HotkeyAction(id: "Clicks", def: Hotkey(mods: ctrlOpt, key: kVK_ANSI_K, name: "K"), title: { Lang.t("ClickShow") }, run: { [unowned self] in self.toggleClicks() }),
             HotkeyAction(id: "Pen", def: Hotkey(mods: ctrlOpt, key: kVK_ANSI_P, name: "P"), title: { Lang.t("Pen") }, run: { [unowned self] in self.togglePen() }),
             HotkeyAction(id: "Highlighter", def: Hotkey(mods: ctrlOpt, key: kVK_ANSI_L, name: "L"), title: { Lang.t("Highlighter") }, run: { [unowned self] in self.toggleHighlighter() }),
+            HotkeyAction(id: "Shape", def: Hotkey(mods: ctrlOpt, key: kVK_ANSI_O, name: "O"), title: { Lang.t("ShapeTip") }, run: { [unowned self] in self.cycleShape() }),
             HotkeyAction(id: "Eraser", def: Hotkey(mods: ctrlOpt, key: kVK_ANSI_E, name: "E"), title: { Lang.t("Eraser") }, run: { [unowned self] in self.eraserHotkey() }),
             HotkeyAction(id: "Bubble", def: Hotkey(mods: ctrlOpt, key: kVK_ANSI_T, name: "T"), title: { Lang.t("Bubble") }, run: { [unowned self] in self.toggleBubble() }),
             HotkeyAction(id: "Board", def: Hotkey(mods: ctrlOpt, key: kVK_ANSI_B, name: "B"), title: { Lang.t("Board") }, run: { [unowned self] in self.cycleBoard() }),
@@ -71,6 +72,7 @@ final class Controller: NSObject, NSApplicationDelegate, SettingsPanelDelegate {
             button("Spot", "smallcircle.filled.circle", "Spot", tip: "MouseSpot"),
             button("Pen", "pencil.tip", "Pen"),
             button("Highlighter", "highlighter", "Highlighter"),
+            button("Shape", "square.on.circle", "Shape", tip: "ShapeTip", more: "\n" + Lang.t("ShapeSquare")),
             button("Eraser", "eraser", "Eraser", more: "\n" + Lang.t("EraserTip")) { [unowned self] in self.toggleEraser() },
             button("Board", "rectangle.inset.filled", "Board", tip: "BoardTip"),
             button("Undo", "arrow.uturn.backward", "Undo"),
@@ -96,7 +98,7 @@ final class Controller: NSObject, NSApplicationDelegate, SettingsPanelDelegate {
         ink.newStroke = { [unowned self] in
             self.tools.tool == .highlighter
                 ? Stroke(color: Cfg.palette[Cfg.highlightColor], width: Cfg.highlightSize, highlighter: true, pressure: false)
-                : Stroke(color: Cfg.palette[Cfg.penColor], width: Cfg.penSize, highlighter: false, pressure: Cfg.pressure)
+                : Stroke(color: Cfg.palette[Cfg.penColor], width: Cfg.penSize, highlighter: false, pressure: Cfg.pressure && !self.tools.tool.isShape)
         }
         zoomer.onChange = { [unowned self] in self.applyZoomTransform() }
         zoomer.onStop = { [unowned self] in self.syncToolbar() }
@@ -206,6 +208,7 @@ final class Controller: NSObject, NSApplicationDelegate, SettingsPanelDelegate {
     func toggleHighlighter() { tools.toggleHighlighter(); applyMode() }
     func toggleEraser() { tools.toggleEraser(); applyMode() }
     func toggleBubble() { tools.toggleBubble(); applyMode() }
+    func cycleShape() { tools.cycleShape(); applyMode() }
     // First press enters eraser mode; pressing again while erasing wipes the page.
     func eraserHotkey() { if tools.erasing { ink.clear() } else { toggleEraser() } }
     func toggleSettings() { settingsOpen.toggle(); syncToolbar() }
@@ -314,7 +317,7 @@ final class Controller: NSObject, NSApplicationDelegate, SettingsPanelDelegate {
         let t = tools
         ink.page = t.board.rawValue
         ink.tool = t.tool
-        ink.cursor = t.tool == .text ? textCursor : t.tool == .eraser ? eraserCursor : t.tool == .highlighter ? highlightCursor : penCursor
+        ink.cursor = t.tool == .text ? textCursor : t.tool == .eraser ? eraserCursor : t.tool == .highlighter ? highlightCursor : t.tool.isShape ? shapeCursor : penCursor
         updateFocus()
         (t.penMode ? ink.cursor : NSCursor.arrow).set() // the pointer may already be over the overlay
         overlay.ignoresMouseEvents = !t.penMode
@@ -328,6 +331,10 @@ final class Controller: NSObject, NSApplicationDelegate, SettingsPanelDelegate {
         let t = tools
         toolbar.highlight("Pen", t.penMode && t.tool == .pen)
         toolbar.highlight("Highlighter", t.penMode && t.tool == .highlighter)
+        let shape = t.penMode && t.tool.isShape ? t.tool : nil
+        toolbar.highlight("Shape", shape != nil)
+        toolbar.setTitle("Shape", Lang.t(shape == .rect ? "Rectangle" : shape == .ellipse ? "Ellipse" : "Shape"),
+                         symbol: shape == .rect ? "rectangle" : shape == .ellipse ? "circle" : "square.on.circle")
         toolbar.highlight("Eraser", t.erasing)
         toolbar.highlight("Bubble", t.penMode && t.tool == .text)
         toolbar.highlight("Board", t.board != .screen)

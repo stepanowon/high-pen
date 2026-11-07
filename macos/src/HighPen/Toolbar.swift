@@ -28,7 +28,13 @@ final class DragView: NSView {
 @MainActor
 final class Toolbar: NSObject {
     // the bar, and what is left of it collapsed: the arrow
-    static let width: CGFloat = 84, arrowWidth: CGFloat = 28, buttonHeight: CGFloat = 52, headerHeight: CGFloat = 30
+    static let width: CGFloat = 84, arrowWidth: CGFloat = 28, buttonHeight: CGFloat = 32, headerHeight: CGFloat = 30
+    // Upright each button is one row: a smaller icon, then its title to the right. The titles are labelSize unless
+    // the longest in the language needs them smaller (down to minLabelSize) to fit.
+    static let iconSize: CGFloat = 15, wideIconSize: CGFloat = 18, iconColumn: CGFloat = 24, rowPadding: CGFloat = 2, labelGap: CGFloat = 3
+    static let labelSize: CGFloat = 10, minLabelSize: CGFloat = 8
+    // titles that only show in some states
+    static let otherTitles = ["WhiteBoard", "BlackBoard", "ZoomLocked", "Rectangle", "Ellipse"]
     // Lying along an edge the buttons show only their icons, to keep the bar low; the hints still name them.
     static let wideButton: CGFloat = 56, wideQuit: CGFloat = 44, wideHeight: CGFloat = 36
     // How far from the top or bottom of the visible area the pointer takes the bar onto that edge, and off it again,
@@ -52,6 +58,7 @@ final class Toolbar: NSObject {
     private var arrowRight = false
     // The visible area of the selected monitor, read when the bar is placed or a drag starts.
     private var area = NSRect.zero
+    private var labelFont = NSFont.systemFont(ofSize: Toolbar.labelSize)
 
     init(hints: Hints) {
         self.hints = hints
@@ -87,6 +94,7 @@ final class Toolbar: NSObject {
         col.spacing = 1
         for item in items { col.addArrangedSubview(makeButton(item)) }
         column = col
+        fitLabels(items.map(\.title) + Toolbar.otherTitles.map(Lang.t))
 
         root = NSStackView(views: [header, col])
         root.spacing = 1
@@ -114,24 +122,34 @@ final class Toolbar: NSObject {
         return b
     }
 
+    // The titles share one size, the largest up to labelSize (in half points) at which the longest fits the row.
+    private func fitLabels(_ all: [String]) {
+        let room = Toolbar.width - 2 * Toolbar.rowPadding - Toolbar.iconColumn - Toolbar.labelGap - 1
+        let font = NSFont.systemFont(ofSize: Toolbar.labelSize)
+        let longest = all.map { NSAttributedString(string: $0, attributes: [.font: font]).size().width }.max() ?? 0
+        let size = longest <= room ? Toolbar.labelSize : max(Toolbar.minLabelSize, (Toolbar.labelSize * room / longest * 2).rounded(.down) / 2)
+        labelFont = .systemFont(ofSize: size)
+    }
+
     // Along an edge the buttons have no titles, so a title that changed (Locked, the board) leads the hint.
     private func tip(_ id: String) -> String {
         guard let t = titles[id] else { return "" }
         return horizontal && t.now != t.base ? t.now + "\n" + t.tip : t.tip
     }
 
-    // The button's face: the icon, with the title under it when upright. Drawn as one image so that switching
+    // The button's face: the icon, with the title right of it when upright. Drawn as one image so that switching
     // orientation only swaps images: a button whose own title comes and goes leaves AppKit objects behind each time.
     private func showFace(_ id: String) {
         guard let t = titles[id], let b = buttons.first(where: { $0.id == id })?.button else { return }
         let symbol = NSImage(systemSymbolName: t.symbol, accessibilityDescription: nil)?
-            .withSymbolConfiguration(NSImage.SymbolConfiguration(pointSize: 18, weight: .regular).applying(.init(paletteColors: [.white, t.tint]))) ?? NSImage()
+            .withSymbolConfiguration(NSImage.SymbolConfiguration(pointSize: horizontal ? Toolbar.wideIconSize : Toolbar.iconSize, weight: .regular)
+                .applying(.init(paletteColors: [.white, t.tint]))) ?? NSImage()
         guard !horizontal else { b.image = symbol; return }
-        let title = NSAttributedString(string: t.now, attributes: [.foregroundColor: NSColor.white, .font: NSFont.systemFont(ofSize: 10)])
+        let title = NSAttributedString(string: t.now, attributes: [.foregroundColor: NSColor.white, .font: labelFont])
         b.image = NSImage(size: NSSize(width: Toolbar.width, height: Toolbar.buttonHeight), flipped: false) { r in
-            let s = symbol.size, ts = title.size()
-            symbol.draw(in: NSRect(x: (r.width - s.width) / 2, y: 20 + (26 - s.height) / 2, width: s.width, height: s.height))
-            title.draw(at: NSPoint(x: (r.width - ts.width) / 2, y: 5))
+            let s = symbol.size, ts = title.size(), x = Toolbar.rowPadding + Toolbar.iconColumn + Toolbar.labelGap
+            symbol.draw(in: NSRect(x: Toolbar.rowPadding + (Toolbar.iconColumn - s.width) / 2, y: (r.height - s.height) / 2, width: s.width, height: s.height))
+            title.draw(at: NSPoint(x: x, y: (r.height - ts.height) / 2))
             return true
         }
     }
@@ -140,9 +158,10 @@ final class Toolbar: NSObject {
         buttons.first { $0.id == id }?.button.layer?.backgroundColor = (on ? activeBg : idleBg).cgColor
     }
 
-    func setTitle(_ id: String, _ t: String) {
-        guard titles[id]?.now != t else { return }
+    func setTitle(_ id: String, _ t: String, symbol: String? = nil) {
+        guard titles[id]?.now != t || symbol.map({ $0 != titles[id]?.symbol }) == true else { return }
         titles[id]?.now = t
+        if let s = symbol { titles[id]?.symbol = s }
         showFace(id)
     }
 
@@ -155,7 +174,7 @@ final class Toolbar: NSObject {
         layoutHeader()
     }
 
-    // Upright: a column with titled buttons. Along an edge: a row of icons, with no border on the screen's edge
+    // Upright: a column of rows, icon and title. Along an edge: a row of icons, with no border on the screen's edge
     // (a pointer thrown against it lands on the buttons).
     private func applyOrientation() {
         let h = horizontal

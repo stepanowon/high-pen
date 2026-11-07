@@ -3,9 +3,9 @@ import Cocoa
 // ---------- mouse spot (a translucent circle that follows the pointer) ----------
 
 final class SpotView: NSView {
-    var color = NSColor.yellow
+    var color = NSColor.yellow, opacity: CGFloat = 0.4
     override func draw(_ r: NSRect) {
-        color.withAlphaComponent(0.4).setFill()
+        color.withAlphaComponent(opacity).setFill()
         NSBezierPath(ovalIn: bounds).fill()
     }
 }
@@ -24,6 +24,7 @@ final class Spot {
     func apply() {
         let s = Cfg.spotSize
         view.color = Cfg.palette[Cfg.spotColor]
+        view.opacity = Cfg.spotOpacity / 100
         view.needsDisplay = true
         window.setContentSize(NSSize(width: s, height: s))
         if Cfg.spotOn {

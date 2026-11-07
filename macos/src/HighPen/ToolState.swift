@@ -2,7 +2,10 @@ import Cocoa
 
 // ---------- tool state (which tool is on and which page is shown; no windows, so the rules can be self-checked) ----------
 
-enum Tool { case pen, highlighter, eraser, text }
+enum Tool {
+    case pen, highlighter, eraser, text, rect, ellipse
+    var isShape: Bool { self == .rect || self == .ellipse }
+}
 
 // The page shown: the screen itself, or a board covering it. The raw value is the ink page.
 enum Board: Int, CaseIterable {
@@ -22,6 +25,12 @@ struct ToolState {
     mutating func togglePen() { if penMode && tool == .pen { setPen(false) } else { tool = .pen; setPen(true) } }
     mutating func toggleHighlighter() { if penMode && tool == .highlighter { setPen(false) } else { tool = .highlighter; setPen(true) } }
     mutating func toggleEraser() { if erasing { tool = .pen } else { tool = .eraser; penMode = true } }
+    // rectangle -> ellipse -> back to the pen
+    mutating func cycleShape() {
+        if penMode && tool == .rect { tool = .ellipse }
+        else if penMode && tool == .ellipse { tool = .pen }
+        else { tool = .rect; penMode = true }
+    }
     mutating func toggleBubble() { if penMode && tool == .text { tool = .pen } else { tool = .text; penMode = true } }
 
     mutating func setPen(_ on: Bool) {

@@ -44,6 +44,9 @@ final class InkView: NSView, NSTextViewDelegate {
     var cursor = NSCursor.arrow
     private var current: Stroke?
     private var erased: [Stroke] = []
+    private var shapeStart: CGPoint?
+    // A click, or a drag shorter than this, leaves no shape behind.
+    static let minShape: CGFloat = 3
 
     override func acceptsFirstMouse(for event: NSEvent?) -> Bool { true }
 
@@ -71,6 +74,7 @@ final class InkView: NSView, NSTextViewDelegate {
         if editor != nil { endBubble(commit: true); return } // clicking elsewhere confirms the note
         if tool == .text { beginBubble(convert(e.locationInWindow, from: nil)); return }
         if tool == .eraser { erased = []; erase(at: point(e)); return }
+        if tool.isShape { shapeStart = point(e); current = nil; return }
         let s = newStroke()
         s.add(point(e), pressure(e))
         current = s
@@ -80,6 +84,7 @@ final class InkView: NSView, NSTextViewDelegate {
 
     override func mouseDragged(with e: NSEvent) {
         if tool == .eraser { erase(at: point(e)); return }
+        if let a = shapeStart { dragShape(from: a, to: point(e), square: e.modifierFlags.contains(.shift)); return }
         guard let s = current else { return }
         s.add(point(e), pressure(e))
         dirty(s)
@@ -87,8 +92,26 @@ final class InkView: NSView, NSTextViewDelegate {
 
     override func mouseUp(with e: NSEvent) {
         if tool == .eraser { endErase(); return }
+        if let a = shapeStart { dragShape(from: a, to: point(e), square: e.modifierFlags.contains(.shift)) }
+        shapeStart = nil
         if let s = current { record(Edit(added: [s])) }
         current = nil
+    }
+
+    // The shape follows the pointer. It joins the page once it is big enough; from then on only its points
+    // change, so the whole drag is one stroke added: one undo step.
+    private func dragShape(from a: CGPoint, to b: CGPoint, square: Bool) {
+        if current == nil {
+            guard abs(b.x - a.x) >= InkView.minShape || abs(b.y - a.y) >= InkView.minShape else { return }
+            let s = newStroke()
+            s.outline = true
+            current = s
+            pages[page].append(s)
+        }
+        guard let s = current else { return }
+        s.pts = Stroke.shape(tool, from: a, to: b, square: square)
+        s.prs = s.pts.map { _ in 0.5 }
+        needsDisplay = true
     }
 
     // Redraw only around the newest points of a stroke being drawn.

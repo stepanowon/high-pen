@@ -23,6 +23,7 @@ final class SettingsPanel {
     private var penSwatches: NSSegmentedControl?, highlightSwatches: NSSegmentedControl?
     private var breakTitle = NSTextField(), breakBtns: [NSButton] = [], breakSlider = NSSlider()
     private var pressureBox: NSButton?, clicksBox: NSButton?
+    private var spotOpacityTitle = NSTextField()
     // beside a bar lying along an edge: in columns. Changing it rearranges the groups without making them again
     // (making controls leaves AppKit bookkeeping behind each time).
     // The groups never leave their container, only their constraints change, and only when the panel is shown:
@@ -87,7 +88,7 @@ final class SettingsPanel {
             self.sections.append(v)
         }
         func add(_ v: NSView) { self.sections[self.sections.count - 1].addArrangedSubview(v) }
-        func title(_ k: String) { add(label(Lang.t(k))) }
+        func title(_ k: String) { add(label(Lang.t(k), size: SettingsPanel.textSize)) }
         section()
 
         title("Monitor")
@@ -103,7 +104,7 @@ final class SettingsPanel {
         add(ps)
         title("PenSize")
         add(slider(1, 30, Cfg.penSize) { Cfg.penSize = $0 })
-        let pr = NSButton(checkboxWithTitle: Lang.t("Pressure"), target: nil, action: nil)
+        let pr = checkbox(Lang.t("Pressure"))
         pr.state = Cfg.pressure ? .on : .off
         hints.attach(pr, hotkeys.tip(Lang.t("Pressure"), "Pressure"))
         pr.on { c in Cfg.pressure = (c as! NSButton).state == .on }
@@ -123,7 +124,19 @@ final class SettingsPanel {
         add(swatches(Cfg.spotColor) { [unowned self] in Cfg.spotColor = $0; self.delegate?.spotChanged() })
         title("SpotSize")
         add(slider(20, 200, Cfg.spotSize) { [unowned self] in Cfg.spotSize = $0; self.delegate?.spotChanged() })
-        let cl = NSButton(checkboxWithTitle: Lang.t("ClickShow"), target: nil, action: nil)
+        spotOpacityTitle = label("", size: SettingsPanel.textSize)
+        add(spotOpacityTitle)
+        let so = slider(10, 100, Cfg.spotOpacity) { [unowned self] v in
+            Cfg.spotOpacity = v
+            self.showSpotOpacity()
+            self.delegate?.spotChanged()
+        }
+        so.numberOfTickMarks = 19 // steps of 5%
+        so.allowsTickMarkValuesOnly = true
+        so.tickMarkPosition = .below
+        add(so)
+        showSpotOpacity()
+        let cl = checkbox(Lang.t("ClickShow"))
         cl.state = Cfg.showClicks ? .on : .off
         hints.attach(cl, hotkeys.tip(Lang.t("ClickShow"), "Clicks"))
         cl.on { [unowned self] c in Cfg.showClicks = (c as! NSButton).state == .on; self.delegate?.clicksChanged() }
@@ -132,28 +145,26 @@ final class SettingsPanel {
 
         section()
         title("ZoomFactor")
-        add(segments(Cfg.zoomFactors.map { String(format: "%gx", $0) }, Cfg.zoomIndex) { [unowned self] i in
+        add(segments(Cfg.zoomFactors.map { String(format: "%gx", $0) }, Cfg.zoomIndex, fill: true) { [unowned self] i in
             Cfg.zoomIndex = i
             self.delegate?.zoomChanged()
         })
 
         section()
-        breakTitle = label("")
+        breakTitle = label("", size: SettingsPanel.textSize)
         add(breakTitle)
         breakBtns = BreakTimes.presets.map { m in
-            let b = NSButton(title: BreakTimes.label(m), target: nil, action: nil)
+            let b = NSButton(title: String(format: Lang.t("Minutes"), m), target: nil, action: nil)
             b.isBordered = false
             b.wantsLayer = true
-            b.attributedTitle = NSAttributedString(string: b.title, attributes: [.foregroundColor: NSColor.white, .font: NSFont.systemFont(ofSize: 11)])
+            b.attributedTitle = NSAttributedString(string: b.title, attributes: [.foregroundColor: NSColor.white, .font: NSFont.systemFont(ofSize: SettingsPanel.textSize)])
             b.on { [unowned self] _ in self.setBreakMinutes(m) }
-            fixedSize(b, 93, 24)
+            fixedSize(b, (SettingsPanel.columnWidth - 3 * 4) / 4, 24)
             return b
         }
-        for i in stride(from: 0, to: breakBtns.count, by: 2) { // two to a row
-            let row = NSStackView(views: Array(breakBtns[i..<min(i + 2, breakBtns.count)]))
-            row.spacing = 4
-            add(row)
-        }
+        let row = NSStackView(views: breakBtns) // one row filling the group
+        row.spacing = 4
+        add(row)
         breakSlider = slider(Double(BreakTimes.min), Double(BreakTimes.max), Double(Cfg.breakMinutes)) { [unowned self] v in
             let m = BreakTimes.clamp(Int(v.rounded()))
             if m != Cfg.breakMinutes { self.setBreakMinutes(m) }
@@ -165,16 +176,18 @@ final class SettingsPanel {
 
         section()
         title("Language")
-        add(segments(Lang.names, Lang.cur) { [unowned self] i in self.delegate?.setLanguage(i) })
+        add(segments(Lang.names, Lang.cur, fill: true) { [unowned self] i in self.delegate?.setLanguage(i) })
 
         section()
         let keys = NSButton(title: Lang.t("Hotkeys"), target: nil, action: nil)
+        keys.controlSize = .small
         keys.on { [unowned self] _ in self.delegate?.showHotkeyEditor() }
         add(keys)
         if let note = hotkeys.failureNote {
-            add(wrapLabel(note, size: 11, color: warnColor, width: 190))
+            add(wrapLabel(note, size: SettingsPanel.textSize, color: warnColor, width: SettingsPanel.columnWidth))
         }
         let up = NSButton(title: Lang.t("UpdateCheck"), target: nil, action: nil)
+        up.controlSize = .small
         hints.attach(up, Lang.t("UpdateCheckTip"))
         up.on { [unowned self] _ in self.delegate?.checkForUpdates() }
         add(up)
@@ -182,7 +195,7 @@ final class SettingsPanel {
         let c = NSView()
         bordered(c, border: lineColor)
         versionSep = SettingsPanel.sep()
-        version = label("HighPen v" + appVersion, size: 11, color: .gray)
+        version = label("HighPen v" + appVersion, size: SettingsPanel.textSize, color: .gray)
         for v in sections + [versionSep, version] {
             v.translatesAutoresizingMaskIntoConstraints = false
             c.addSubview(v)
@@ -196,7 +209,9 @@ final class SettingsPanel {
     // Upright, the groups stack in one column; beside a bar along an edge they stand in four columns
     // (as indexes into the groups), each as wide as the upright panel.
     static let wideColumns = [[0, 4, 6], [1], [2, 5], [3, 7]]
-    static let columnWidth: CGFloat = 190, gap: CGFloat = 16, inset: CGFloat = 10
+    static let columnWidth: CGFloat = 160, gap: CGFloat = 16, inset: CGFloat = 10
+    // the size of the toolbar's titles, for the text in the panel
+    static let textSize: CGFloat = 10
 
     private func arrange() {
         guard !sections.isEmpty else { return }
@@ -236,7 +251,7 @@ final class SettingsPanel {
 
     private func swatches(_ sel: Int, _ pick: @escaping (Int) -> Void) -> NSSegmentedControl {
         let images = Cfg.palette.map { c in
-            NSImage(size: NSSize(width: 14, height: 14), flipped: false) { r in
+            NSImage(size: NSSize(width: 12, height: 12), flipped: false) { r in
                 let o = NSBezierPath(ovalIn: r.insetBy(dx: 1, dy: 1))
                 c.setFill(); o.fill()
                 NSColor.gray.setStroke(); o.stroke()
@@ -244,7 +259,9 @@ final class SettingsPanel {
             }
         }
         let s = NSSegmentedControl(images: images, trackingMode: .selectOne, target: nil, action: nil)
-        for i in 0..<images.count { s.setWidth(20, forSegment: i) }
+        s.controlSize = .small
+        // the eight colours fill one row of the group
+        for i in 0..<images.count { s.setWidth(floor((SettingsPanel.columnWidth - 8) / CGFloat(images.count)), forSegment: i) }
         s.selectedSegment = sel
         s.on { c in pick((c as! NSSegmentedControl).selectedSegment) }
         return s
@@ -253,12 +270,26 @@ final class SettingsPanel {
     private func slider(_ min: Double, _ max: Double, _ v: Double, _ f: @escaping (Double) -> Void) -> NSSlider {
         let s = NSSlider(value: v, minValue: min, maxValue: max, target: nil, action: nil)
         s.on { c in f((c as! NSSlider).doubleValue) }
-        fixedSize(s, 190, nil)
+        s.controlSize = .small
+        fixedSize(s, SettingsPanel.columnWidth, nil)
         return s
     }
 
-    private func segments(_ labels: [String], _ sel: Int, _ f: @escaping (Int) -> Void) -> NSSegmentedControl {
+    private func checkbox(_ t: String) -> NSButton {
+        let b = NSButton(checkboxWithTitle: t, target: nil, action: nil)
+        b.controlSize = .small
+        b.font = .systemFont(ofSize: SettingsPanel.textSize)
+        return b
+    }
+
+    private func showSpotOpacity() { spotOpacityTitle.stringValue = String(format: Lang.t("SpotOpacity"), Int(Cfg.spotOpacity.rounded())) }
+
+    // fill: as wide as the group, the segments sharing it equally
+    private func segments(_ labels: [String], _ sel: Int, fill: Bool = false, _ f: @escaping (Int) -> Void) -> NSSegmentedControl {
         let s = NSSegmentedControl(labels: labels, trackingMode: .selectOne, target: nil, action: nil)
+        s.controlSize = .small
+        s.font = .systemFont(ofSize: SettingsPanel.textSize)
+        if fill { s.segmentDistribution = .fillEqually; fixedSize(s, SettingsPanel.columnWidth, nil) }
         s.selectedSegment = sel
         s.on { c in f((c as! NSSegmentedControl).selectedSegment) }
         return s
