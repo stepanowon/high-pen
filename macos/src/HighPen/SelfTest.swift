@@ -57,6 +57,7 @@ func selfTest() {
     precondition(Zoomer.pan(100, 50, 120) == 100 && Zoomer.pan(100, 50, 160) == 111 && Zoomer.pan(100, 50, 90) == 90, "zoom moves only when the pointer reaches the edge of the view")
     let o = CGPoint(x: 100, y: 40), c = CGPoint(x: 130, y: 70)
     precondition(Zoomer.toDisplay(c, o, 2.5) == CGPoint(x: 75, y: 75) && Zoomer.toContent(Zoomer.toDisplay(c, o, 2.5), o, 2.5) == c, "the drawn pointer is over the content the real one is on")
+    precondition(SettingsPanel.wideColumns.joined().sorted() == Array(0..<8), "the wide settings panel shows every group once")
     let rel = #"[{"tag_name":"v9.0.0","html_url":"w"},{"tag_name":"macos-v1.5.0","draft":true,"html_url":"d"},{"tag_name":"macos-v1.4.2","html_url":"https://x/b"},{"tag_name":"macos-v1.4.1","html_url":"a"},{"tag_name":"macos-v1.3.1","html_url":"o"}]"#.data(using: .utf8)!
     precondition(try! Updater.pick(rel, current: "1.4.0")?.version == "1.4.2", "update picks the newest published macOS release")
     precondition(try! Updater.pick(rel, current: "1.4.2") == nil && Updater.version("1.4") == [1, 4, 0] && Updater.version("dev") == nil, "no update when up to date")

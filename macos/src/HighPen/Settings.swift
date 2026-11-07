@@ -44,6 +44,8 @@ enum Cfg {
     // toolbar offset from the top-left of the monitor's visible area, in points
     static var barX: Double { get { num("BarX", 20, 0...100_000) } set { d.set(newValue, forKey: "BarX") } }
     static var barY: Double { get { num("BarY", 20, 0...100_000) } set { d.set(newValue, forKey: "BarY") } }
+    // the edge the toolbar lies along (BarEdge)
+    static var barEdge: Int { get { int("BarEdge", 0, 0...2) } set { d.set(newValue, forKey: "BarEdge") } }
     static var language: String? { get { d.string(forKey: "Language") } set { d.set(newValue, forKey: "Language") } }
     // Shortcuts changed from their defaults, by action id (Hotkey.saved, or "" = no shortcut).
     static var hotkeys: [String: String] { get { d.dictionary(forKey: "Hotkeys") as? [String: String] ?? [:] } set { d.set(newValue, forKey: "Hotkeys") } }

@@ -46,6 +46,10 @@ final class Zoomer: NSObject, SCStreamOutput, SCStreamDelegate {
     // updates skipped since HighPen's windows were last looked at: a window opening under a resting pointer is noticed a little later
     private var updatesSinceScan = 0
     private var cursorSize = CGSize.zero, cursorHotSpot = CGPoint.zero
+    // Holding the real pointer on the monitor's edge over a HighPen window (the toolbar along that edge) moves the
+    // view: after about 200 ms, so a pointer flung at the bar moves nothing, and then about 1.5 s across the whole view.
+    private static let edgeHold = 12, edgeCross: CGFloat = 90
+    private var edgeHeld = 0
 
     override init() {
         super.init()
@@ -138,7 +142,7 @@ final class Zoomer: NSObject, SCStreamOutput, SCStreamDelegate {
         let size = frame.size, w = size.width / factor, h = size.height / factor
         var p = NSEvent.mouseLocation
         updatesSinceScan += 1
-        if p == lastPointer && !force && updatesSinceScan < 8 { return }
+        if p == lastPointer && !force && updatesSinceScan < 8 && edgeHeld == 0 { return }
         updatesSinceScan = 0
         // the pointer stays on the zoomed monitor; a hidden one that got away would click somewhere unseen
         // ponytail: put back on the next update, so for up to a frame it can be on the next monitor; an event tap would close that gap
@@ -163,6 +167,7 @@ final class Zoomer: NSObject, SCStreamOutput, SCStreamDelegate {
                 o = CGPoint(x: Zoomer.pan(o.x, w, local.x), y: Zoomer.pan(o.y, h, local.y))
             }
         }
+        if direct && covered && !self.direct && !locked { o = panFromEdge(p, o, w, h) } else { edgeHeld = 0 }
         o = CGPoint(x: min(max(o.x, 0), size.width - w), y: min(max(o.y, 0), size.height - h))
         lastPointer = p
         CATransaction.begin()
@@ -174,6 +179,15 @@ final class Zoomer: NSObject, SCStreamOutput, SCStreamDelegate {
         }
         if !direct { drawPointer(at: shown(p) - frame.origin) }
         CATransaction.commit()
+    }
+
+    // A HighPen window along the monitor's edge keeps the hidden pointer from getting to the edge of the view.
+    private func panFromEdge(_ p: CGPoint, _ o: CGPoint, _ w: CGFloat, _ h: CGFloat) -> CGPoint {
+        let dx: CGFloat = p.x <= frame.minX ? -1 : p.x >= frame.maxX - 1 ? 1 : 0
+        let dy: CGFloat = p.y <= frame.minY + 1 ? -1 : p.y >= frame.maxY ? 1 : 0
+        if dx == 0 && dy == 0 { edgeHeld = 0; return o }
+        if edgeHeld < Zoomer.edgeHold { edgeHeld += 1; return o }
+        return CGPoint(x: o.x + dx * max(1, w / Zoomer.edgeCross), y: o.y + dy * max(1, h / Zoomer.edgeCross))
     }
 
     // The start of the view along one axis, moved only as far as it takes to keep the pointer inside.

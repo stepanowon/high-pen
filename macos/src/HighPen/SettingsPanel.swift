@@ -23,6 +23,15 @@ final class SettingsPanel {
     private var penSwatches: NSSegmentedControl?, highlightSwatches: NSSegmentedControl?
     private var breakTitle = NSTextField(), breakBtns: [NSButton] = [], breakSlider = NSSlider()
     private var pressureBox: NSButton?, clicksBox: NSButton?
+    // beside a bar lying along an edge: in columns. Changing it rearranges the groups without making them again
+    // (making controls leaves AppKit bookkeeping behind each time).
+    // The groups never leave their container, only their constraints change, and only when the panel is shown:
+    // each time AppKit lays its controls out anew it keeps some bookkeeping (about 20 small objects) for good.
+    var wide = false
+    private var arrangedWide = false
+    private var sections: [NSStackView] = []
+    private var container = NSView(), versionSep = NSView(), version = NSTextField()
+    private var placement: [NSLayoutConstraint] = []
 
     init(hints: Hints, hotkeys: Hotkeys, delegate: SettingsPanelDelegate) {
         self.hints = hints; self.hotkeys = hotkeys; self.delegate = delegate
@@ -48,82 +57,89 @@ final class SettingsPanel {
         showBreakMinutes(Cfg.breakMinutes)
     }
 
-    // To the right of the toolbar, or to its left when it would run past the monitor edge.
-    func place(beside bar: NSRect, visible: Bool) {
+    // To the right of the toolbar, or to its left when it would run past the monitor edge. Beside a bar along
+    // an edge: on the side away from that edge, by the end of the bar where the Settings button is.
+    // ponytail: no scrolling; a monitor too low for the panel shows it cut off
+    func place(beside bar: NSRect, edge: BarEdge, visible: Bool) {
         guard visible, let v = window.contentView else { window.orderOut(nil); return }
+        if arrangedWide != wide { arrange() }
         let vf = screen(Cfg.monitor).visibleFrame
         let s = v.fittingSize
-        let x = bar.maxX + s.width <= vf.maxX ? bar.maxX : bar.minX - s.width
-        let y = max(bar.maxY - s.height, vf.minY)
+        var x = bar.maxX + s.width <= vf.maxX ? bar.maxX : bar.minX - s.width
+        var y = max(bar.maxY - s.height, vf.minY)
+        if edge != .free {
+            x = min(max(bar.maxX - s.width, vf.minX), vf.maxX - s.width)
+            y = edge == .top ? bar.minY - s.height : bar.maxY
+        }
         window.setFrame(NSRect(x: x, y: y, width: s.width, height: s.height), display: true)
         window.orderFrontRegardless()
     }
 
     func rebuild() {
-        let col = NSStackView()
-        col.orientation = .vertical
-        col.alignment = .leading
-        col.spacing = 6
-        col.edgeInsets = NSEdgeInsets(top: 10, left: 10, bottom: 10, right: 10)
-        bordered(col, border: lineColor)
-        func title(_ k: String) { col.addArrangedSubview(label(Lang.t(k))) }
-        func sep() {
-            let b = NSBox()
-            b.boxType = .separator
-            fixedSize(b, 190, nil)
-            col.addArrangedSubview(b)
+        // the groups of settings, in the order they stack in beside an upright bar
+        sections = []
+        func section() {
+            let v = NSStackView()
+            v.orientation = .vertical
+            v.alignment = .leading
+            v.spacing = 6
+            v.addArrangedSubview(SettingsPanel.sep()) // shown between groups
+            self.sections.append(v)
         }
+        func add(_ v: NSView) { self.sections[self.sections.count - 1].addArrangedSubview(v) }
+        func title(_ k: String) { add(label(Lang.t(k))) }
+        section()
 
         title("Monitor")
         let mon = segments((1...NSScreen.screens.count).map { String($0) }, Cfg.monitor) { [unowned self] i in self.delegate?.setMonitor(i) }
         hints.attach(mon, hotkeys.tip(hotkeys.action("Monitor")!.title(), "Monitor"))
-        col.addArrangedSubview(mon)
-        sep()
+        add(mon)
 
+        section()
         title("PenColor")
         let ps = swatches(Cfg.penColor) { Cfg.penColor = $0 }
         hints.attach(ps, (0..<Cfg.palette.count).map { hotkeys.tip(Lang.t(Cfg.colorNames[$0]), "Color" + String($0)) }.joined(separator: "\n"))
         penSwatches = ps
-        col.addArrangedSubview(ps)
+        add(ps)
         title("PenSize")
-        col.addArrangedSubview(slider(1, 30, Cfg.penSize) { Cfg.penSize = $0 })
+        add(slider(1, 30, Cfg.penSize) { Cfg.penSize = $0 })
         let pr = NSButton(checkboxWithTitle: Lang.t("Pressure"), target: nil, action: nil)
         pr.state = Cfg.pressure ? .on : .off
         hints.attach(pr, hotkeys.tip(Lang.t("Pressure"), "Pressure"))
         pr.on { c in Cfg.pressure = (c as! NSButton).state == .on }
         pressureBox = pr
-        col.addArrangedSubview(pr)
-        sep()
+        add(pr)
 
+        section()
         title("HighlightColor")
         let hs = swatches(Cfg.highlightColor) { Cfg.highlightColor = $0 }
         highlightSwatches = hs
-        col.addArrangedSubview(hs)
+        add(hs)
         title("HighlightSize")
-        col.addArrangedSubview(slider(5, 60, Cfg.highlightSize) { Cfg.highlightSize = $0 })
-        sep()
+        add(slider(5, 60, Cfg.highlightSize) { Cfg.highlightSize = $0 })
 
+        section()
         title("SpotColor")
-        col.addArrangedSubview(swatches(Cfg.spotColor) { [unowned self] in Cfg.spotColor = $0; self.delegate?.spotChanged() })
+        add(swatches(Cfg.spotColor) { [unowned self] in Cfg.spotColor = $0; self.delegate?.spotChanged() })
         title("SpotSize")
-        col.addArrangedSubview(slider(20, 200, Cfg.spotSize) { [unowned self] in Cfg.spotSize = $0; self.delegate?.spotChanged() })
+        add(slider(20, 200, Cfg.spotSize) { [unowned self] in Cfg.spotSize = $0; self.delegate?.spotChanged() })
         let cl = NSButton(checkboxWithTitle: Lang.t("ClickShow"), target: nil, action: nil)
         cl.state = Cfg.showClicks ? .on : .off
         hints.attach(cl, hotkeys.tip(Lang.t("ClickShow"), "Clicks"))
         cl.on { [unowned self] c in Cfg.showClicks = (c as! NSButton).state == .on; self.delegate?.clicksChanged() }
         clicksBox = cl
-        col.addArrangedSubview(cl)
-        sep()
+        add(cl)
 
+        section()
         title("ZoomFactor")
-        col.addArrangedSubview(segments(Cfg.zoomFactors.map { String(format: "%gx", $0) }, Cfg.zoomIndex) { [unowned self] i in
+        add(segments(Cfg.zoomFactors.map { String(format: "%gx", $0) }, Cfg.zoomIndex) { [unowned self] i in
             Cfg.zoomIndex = i
             self.delegate?.zoomChanged()
         })
-        sep()
 
+        section()
         breakTitle = label("")
-        col.addArrangedSubview(breakTitle)
+        add(breakTitle)
         breakBtns = BreakTimes.presets.map { m in
             let b = NSButton(title: BreakTimes.label(m), target: nil, action: nil)
             b.isBordered = false
@@ -136,7 +152,7 @@ final class SettingsPanel {
         for i in stride(from: 0, to: breakBtns.count, by: 2) { // two to a row
             let row = NSStackView(views: Array(breakBtns[i..<min(i + 2, breakBtns.count)]))
             row.spacing = 4
-            col.addArrangedSubview(row)
+            add(row)
         }
         breakSlider = slider(Double(BreakTimes.min), Double(BreakTimes.max), Double(Cfg.breakMinutes)) { [unowned self] v in
             let m = BreakTimes.clamp(Int(v.rounded()))
@@ -144,28 +160,78 @@ final class SettingsPanel {
         }
         breakSlider.numberOfTickMarks = (BreakTimes.max - BreakTimes.min) / BreakTimes.step + 1
         breakSlider.allowsTickMarkValuesOnly = true
-        col.addArrangedSubview(breakSlider)
+        add(breakSlider)
         showBreakMinutes(Cfg.breakMinutes)
-        sep()
 
+        section()
         title("Language")
-        col.addArrangedSubview(segments(Lang.names, Lang.cur) { [unowned self] i in self.delegate?.setLanguage(i) })
-        sep()
+        add(segments(Lang.names, Lang.cur) { [unowned self] i in self.delegate?.setLanguage(i) })
 
+        section()
         let keys = NSButton(title: Lang.t("Hotkeys"), target: nil, action: nil)
         keys.on { [unowned self] _ in self.delegate?.showHotkeyEditor() }
-        col.addArrangedSubview(keys)
+        add(keys)
         if let note = hotkeys.failureNote {
-            col.addArrangedSubview(wrapLabel(note, size: 11, color: warnColor, width: 190))
+            add(wrapLabel(note, size: 11, color: warnColor, width: 190))
         }
         let up = NSButton(title: Lang.t("UpdateCheck"), target: nil, action: nil)
         hints.attach(up, Lang.t("UpdateCheckTip"))
         up.on { [unowned self] _ in self.delegate?.checkForUpdates() }
-        col.addArrangedSubview(up)
-        sep()
+        add(up)
 
-        col.addArrangedSubview(label("HighPen v" + appVersion, size: 11, color: .gray))
-        window.contentView = col
+        let c = NSView()
+        bordered(c, border: lineColor)
+        versionSep = SettingsPanel.sep()
+        version = label("HighPen v" + appVersion, size: 11, color: .gray)
+        for v in sections + [versionSep, version] {
+            v.translatesAutoresizingMaskIntoConstraints = false
+            c.addSubview(v)
+        }
+        container = c
+        placement = []
+        arrange()
+        window.contentView = c
+    }
+
+    // Upright, the groups stack in one column; beside a bar along an edge they stand in four columns
+    // (as indexes into the groups), each as wide as the upright panel.
+    static let wideColumns = [[0, 4, 6], [1], [2, 5], [3, 7]]
+    static let columnWidth: CGFloat = 190, gap: CGFloat = 16, inset: CGFloat = 10
+
+    private func arrange() {
+        guard !sections.isEmpty else { return }
+        NSLayoutConstraint.deactivate(placement)
+        placement = []
+        arrangedWide = wide
+        let c = container, cols = wide ? SettingsPanel.wideColumns : [Array(sections.indices)]
+        for (i, col) in cols.enumerated() {
+            var above: NSView?
+            for j in col {
+                let s = sections[j]
+                // the separator stays in place (hiding it also leaves bookkeeping behind): first in a column it is
+                // only made invisible, above the panel's inset
+                s.arrangedSubviews[0].alphaValue = above == nil ? 0 : 1
+                placement += [s.leadingAnchor.constraint(equalTo: c.leadingAnchor, constant: SettingsPanel.inset + CGFloat(i) * (SettingsPanel.columnWidth + SettingsPanel.gap)),
+                              above == nil ? s.arrangedSubviews[1].topAnchor.constraint(equalTo: c.topAnchor, constant: SettingsPanel.inset)
+                                           : s.topAnchor.constraint(equalTo: above!.bottomAnchor, constant: 6)]
+                above = s
+            }
+            if let a = above { placement.append(versionSep.topAnchor.constraint(greaterThanOrEqualTo: a.bottomAnchor, constant: 6)) }
+        }
+        let n = CGFloat(cols.count)
+        placement += [versionSep.leadingAnchor.constraint(equalTo: c.leadingAnchor, constant: SettingsPanel.inset),
+                      version.topAnchor.constraint(equalTo: versionSep.bottomAnchor, constant: 6),
+                      version.leadingAnchor.constraint(equalTo: c.leadingAnchor, constant: SettingsPanel.inset),
+                      version.bottomAnchor.constraint(equalTo: c.bottomAnchor, constant: -SettingsPanel.inset),
+                      c.widthAnchor.constraint(equalToConstant: 2 * SettingsPanel.inset + n * SettingsPanel.columnWidth + (n - 1) * SettingsPanel.gap)]
+        NSLayoutConstraint.activate(placement)
+    }
+
+    private static func sep() -> NSView {
+        let b = NSBox()
+        b.boxType = .separator
+        fixedSize(b, columnWidth, nil)
+        return b
     }
 
     private func swatches(_ sel: Int, _ pick: @escaping (Int) -> Void) -> NSSegmentedControl {
