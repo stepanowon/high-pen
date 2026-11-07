@@ -20,6 +20,7 @@ namespace HighPen
         readonly ToolState tools = new ToolState();
         readonly InkHistory history;
         readonly SpeechBubbles bubbles;
+        readonly ShapeDrawer shapes;
         readonly HotkeyBindings bindings;
         readonly GlobalHotkeys hotkeys;
         readonly TopmostKeeper topmost = new TopmostKeeper();
@@ -67,6 +68,7 @@ namespace HighPen
             history = new InkHistory(overlay.Canvas, overlay.Pages);
             bubbles = new SpeechBubbles(overlay, tools, cfg);
             bubbles.Finished = ApplyMode;
+            shapes = new ShapeDrawer(overlay, tools);
 
             Toolbar.Loaded += delegate
             {
@@ -114,6 +116,7 @@ namespace HighPen
             bindings.Add("Spot", "Ctrl+Alt+S", delegate { return Lang.T("MouseSpot"); }, ToggleSpot);
             bindings.Add("Pen", "Ctrl+Alt+P", delegate { return Lang.T("Pen"); }, TogglePen);
             bindings.Add("Highlighter", "Ctrl+Alt+L", delegate { return Lang.T("Highlighter"); }, ToggleHighlighter);
+            bindings.Add("Shape", "Ctrl+Alt+O", delegate { return Lang.T("ShapeTip"); }, CycleShape);
             bindings.Add("Eraser", "Ctrl+Alt+E", delegate { return Lang.T("Eraser"); }, EraserHotkey);
             bindings.Add("Board", "Ctrl+Alt+B", delegate { return Lang.T("Board"); }, CycleBoard);
             bindings.Add("Undo", "Ctrl+Alt+Z", delegate { return Lang.T("Undo"); }, Undo);
@@ -149,7 +152,7 @@ namespace HighPen
         void ApplyMode()
         {
             overlay.ShowPage(tools.Board);
-            overlay.SetEditing(tools.PenMode, tools.Eraser, tools.TextMode);
+            overlay.SetEditing(tools.PenMode, tools.Eraser, tools.TextMode, tools.ShapeActive);
             ApplyPen();
             overlay.SetBackground(tools.Board, tools.PenMode);
             zoomer.Frozen = tools.PenMode;
@@ -168,7 +171,7 @@ namespace HighPen
 
         void ApplySpot()
         {
-            spotWin.SetStyle(Theme.ParseColor(cfg.SpotColor), cfg.SpotSize);
+            spotWin.SetStyle(Theme.ParseColor(cfg.SpotColor), cfg.SpotSize, cfg.SpotOpacity);
             spotWin.SetSpotVisible(cfg.SpotOn);
             Toolbar.ShowSpot(cfg.SpotOn);
         }
@@ -290,6 +293,7 @@ namespace HighPen
         public void ToggleSpot() { cfg.SpotOn = !cfg.SpotOn; ApplySpot(); Save(); }
         public void TogglePen() { tools.TogglePen(); ApplyMode(); }
         public void ToggleHighlighter() { tools.ToggleHighlighter(); ApplyMode(); }
+        public void CycleShape() { tools.CycleShape(); ApplyMode(); }
         public void ToggleEraser() { tools.ToggleEraser(); ApplyMode(); }
         public void ToggleText() { tools.ToggleText(); ApplyMode(); }
 

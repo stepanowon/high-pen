@@ -5,16 +5,20 @@ namespace HighPen
     class ToolState
     {
         public const int NoBoard = 0, WhiteBoard = 1, BlackBoard = 2;
+        public const int NoShape = 0, RectShape = 1, EllipseShape = 2;
 
-        // Pen mode: the overlay takes input (pen, highlighter, eraser or speech bubbles); otherwise clicks go to the desktop.
+        // Pen mode: the overlay takes input (pen, highlighter, shapes, eraser or speech bubbles); otherwise clicks go to the desktop.
         public bool PenMode { get; private set; }
         public bool Eraser { get; private set; }
         public bool TextMode { get; private set; }
         public bool Highlighter { get; private set; }
         public int Board { get; private set; }
+        // The shape drawn instead of free ink. Like the highlighter, it comes back when the eraser or text mode ends.
+        public int Shape { get; private set; }
 
-        public bool PenActive { get { return PenMode && !Eraser && !TextMode && !Highlighter; } }
+        public bool PenActive { get { return PenMode && !Eraser && !TextMode && !Highlighter && Shape == NoShape; } }
         public bool HighlighterActive { get { return PenMode && !Eraser && !TextMode && Highlighter; } }
+        public bool ShapeActive { get { return PenMode && !Eraser && !TextMode && Shape != NoShape; } }
 
         public void TogglePen()
         {
@@ -22,6 +26,7 @@ namespace HighPen
             Eraser = false;
             TextMode = false;
             Highlighter = false;
+            Shape = NoShape;
             SetPen(true);
         }
 
@@ -31,6 +36,18 @@ namespace HighPen
             Eraser = false;
             TextMode = false;
             Highlighter = true;
+            Shape = NoShape;
+            SetPen(true);
+        }
+
+        // rectangle -> ellipse -> back to the pen
+        public void CycleShape()
+        {
+            if (ShapeActive) { Shape = Shape == RectShape ? EllipseShape : NoShape; return; }
+            Eraser = false;
+            TextMode = false;
+            Highlighter = false;
+            Shape = RectShape;
             SetPen(true);
         }
 
@@ -56,11 +73,11 @@ namespace HighPen
             if (Board != NoBoard) { PenMode = true; Eraser = false; TextMode = false; }
         }
 
-        // Leaving pen mode also drops the eraser, highlighter, text mode and board.
+        // Leaving pen mode also drops the eraser, highlighter, shape, text mode and board.
         void SetPen(bool on)
         {
             PenMode = on;
-            if (!on) { TextMode = false; Eraser = false; Highlighter = false; Board = NoBoard; }
+            if (!on) { TextMode = false; Eraser = false; Highlighter = false; Shape = NoShape; Board = NoBoard; }
         }
     }
 }

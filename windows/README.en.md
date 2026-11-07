@@ -85,6 +85,7 @@ Shortcuts are global, so they work while you are using other programs. A combina
 | Spot | Ctrl+Alt+S | Turns the round spot that follows the mouse pointer on/off. Clicks pass through to the screen below. |
 | Pen | Ctrl+Alt+P | Writes on the screen. When the pen is turned off, the ink stays on screen and the mouse passes through to the screen below. Switches back to the pen from eraser or note mode. |
 | Highlighter | Ctrl+Alt+L | A wide translucent pen for marking text or pictures. What is underneath stays visible, and it is drawn beneath pen ink. Press again to turn it off. |
+| Shape | Ctrl+Alt+O | Drag to draw a rectangle or an ellipse. Each press switches rectangle → ellipse → off (back to the pen). |
 | Eraser | Ctrl+Alt+E | Erases whole strokes. Pressing it again while erasing deletes all pen ink and notes on the current page. |
 | Board | Ctrl+Alt+B | Cycles white board → black board → off. Ink on the screen and on the two boards is kept separately. |
 | Undo | Ctrl+Alt+Z | Cancels the last pen stroke or eraser action. |
@@ -108,8 +109,8 @@ Shortcuts are global, so they work while you are using other programs. A combina
 | Pen width | | 1–30 |
 | Pressure | Ctrl+Alt+R | The harder you press the pen, the thicker the line. A mouse always draws at the set width. |
 | Highlighter color / width | | 8 colors and widths 5–60. While the highlighter is in use, the pen color shortcuts (Ctrl+Shift+…) change the highlighter color. |
-| Spot color / size | | 8 colors and sizes 20–200. |
-| Break length | | Length of the break timer. Pick 10 min, 15 min, 1 h or 1 h 30 min with the buttons, or 5–120 minutes in 5-minute steps with the slider. Default 10 minutes. |
+| Spot color / size / opacity | | 8 colors, sizes 20–200 and opacity 10–100% (40% by default). |
+| Break length | | Length of the break timer. Pick 10, 15, 60 or 90 min with the buttons, or 5–120 minutes in 5-minute steps with the slider. Default 10 minutes. |
 | Show clicks | Ctrl+Alt+K | Briefly shows an expanding ring where you click. Off by default. |
 | Language | | Choose 한국어, 日本語 or English; the change applies immediately. The default is English (see [Changing the language](#changing-the-language)). |
 | Shortcuts | | Change any shortcut to the combination you want, or remove it (see [Changing shortcuts](#changing-shortcuts)). |
@@ -143,7 +144,7 @@ If you turn on the pen while zoomed, the zoomed view freezes in place so you can
 A semi-transparent round spot follows the mouse pointer so viewers can easily find it.
 
 - The spot does not catch clicks, so you can use the screen below as usual.
-- Change its color (8 colors) and size (20–200) in the settings panel. It is a plain colored circle without a border.
+- Change its color (8 colors), size (20–200) and opacity (10–100%, 40% by default) in the settings panel. It is a plain colored circle without a border.
 - It is shown only on the monitor selected as the active monitor.
 
 ### Pen (writing)
@@ -166,6 +167,16 @@ Use it to emphasize sentences or pictures in your material. Press the highlighte
 - Change the color (yellow by default) and width (20 by default) with **Highlighter color** and **Highlighter width** in the settings panel. While the highlighter is in use, the pen color shortcuts (Ctrl+Shift+R and so on) change the highlighter color.
 - Eraser, undo and clear work on it just as on pen ink.
 - Press the pen button to go back to the normal pen.
+
+### Shapes
+
+Draws neat rectangles and ellipses, for example to frame part of a table or picture.
+
+- Each press of the shape button (Ctrl+Alt+O) switches **rectangle → ellipse → off**. Off returns to the normal pen.
+- Drag from one corner to the opposite one; the shape is previewed while you drag. A click without a drag draws nothing.
+- Hold **Shift** while drawing for a square or a circle.
+- Shapes use the pen's color and width (without pressure), so the pen color shortcuts change them too.
+- A shape is ink like any pen stroke: the eraser, undo, clear and capture work on it, and it can be drawn on the boards and while zoomed.
 
 ### Eraser
 
@@ -234,7 +245,7 @@ Use it to keep a board or on-screen ink as lecture material. Press the capture b
 
 Shows how much of a break is left during a lecture. Press the break button (Ctrl+Alt+W) and the whole active monitor dims with the time left in large digits, easy to read for viewers on a shared screen.
 
-- **Length:** pick it under **Break length** in the settings panel with the 10 min, 15 min, 1 h and 1 h 30 min buttons or the slider (5–120 minutes in 5-minute steps). It is saved for the next launch. A change made while the timer runs applies to the next break.
+- **Length:** pick it under **Break length** in the settings panel with the 10, 15, 60 and 90 min buttons or the slider (5–120 minutes in 5-minute steps). It is saved for the next launch. A change made while the timer runs applies to the next break.
 - The time the lecture resumes (e.g. "Back at 13:26") is shown under the countdown, and the last minute turns orange.
 - When time is up, a red 00:00 and "The break is over" stay on screen until you press the break button or Ctrl+Alt+W again.
 - The timer screen lets clicks through, so you can keep using the PC during the break, and the toolbar stays visible above it.
@@ -274,7 +285,7 @@ When you use `HighPen.exe` or `HighPen-Setup.exe` from GitHub, HighPen checks fo
 
 ### Saved settings
 
-Pen color, width, pressure, highlighter color and width, changed shortcuts, spot color and size, whether the spot is on, show clicks, the zoom level, the break length, the active monitor, the toolbar position and the language are saved automatically to `%APPDATA%\HighPen\settings.txt` and reused on the next launch.
+Pen color, width, pressure, highlighter color and width, changed shortcuts, spot color, size and opacity, whether the spot is on, show clicks, the zoom level, the break length, the active monitor, the toolbar position and the language are saved automatically to `%APPDATA%\HighPen\settings.txt` and reused on the next launch.
 
 ## Notes / limitations
 

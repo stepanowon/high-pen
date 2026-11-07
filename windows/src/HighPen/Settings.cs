@@ -14,6 +14,9 @@ namespace HighPen
         public double HighlightSize = 20;
         public string SpotColor = "#FFD60A";
         public double SpotSize = 70;
+        // percent; 40 is how the spot looked before it could be changed
+        public double SpotOpacity = 40;
+        public const double SpotOpacityMin = 10, SpotOpacityStep = 5;
         public bool SpotOn = true;
         public int Monitor = 0; // index of the monitor in use
         public string MonitorDevice = ""; // the monitor the user chose ("" = from before this was saved: use Monitor)
@@ -33,6 +36,7 @@ namespace HighPen
         {
             if (Array.IndexOf(Zoomer.Factors, ZoomFactor) < 0) ZoomFactor = 2;
             HighlightSize = Math.Max(5, Math.Min(60, HighlightSize));
+            SpotOpacity = Math.Max(SpotOpacityMin, Math.Min(100, SpotOpacity));
             BreakMinutes = BreakTimes.Clamp(BreakMinutes);
             if (BarEdge != BarTop && BarEdge != BarBottom) BarEdge = BarFree;
         }
@@ -66,6 +70,7 @@ namespace HighPen
             Number("HighlightSize", (s, v) => s.HighlightSize = v, s => s.HighlightSize),
             Text("SpotColor", (s, v) => s.SpotColor = v, s => s.SpotColor),
             Number("SpotSize", (s, v) => s.SpotSize = v, s => s.SpotSize),
+            Number("SpotOpacity", (s, v) => s.SpotOpacity = v, s => s.SpotOpacity),
             Flag("SpotOn", (s, v) => s.SpotOn = v, s => s.SpotOn),
             Integer("Monitor", (s, v) => s.Monitor = v, s => s.Monitor),
             Text("MonitorDevice", (s, v) => s.MonitorDevice = v, s => s.MonitorDevice),
