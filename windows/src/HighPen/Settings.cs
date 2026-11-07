@@ -22,6 +22,8 @@ namespace HighPen
         public double ZoomFactor = 2;
         public int BreakMinutes = 10; // length of the break timer
         public int BarX = 20, BarY = 20; // offset from the monitor work area, in pixels
+        public const int BarFree = 0, BarTop = 1, BarBottom = 2;
+        public int BarEdge = BarFree; // the edge of the work area the bar lies along, horizontally
         public string Language = ""; // "" = English (the default)
         // Shortcuts changed from their defaults, by command id ("" = no shortcut).
         public Dictionary<string, string> Hotkeys = new Dictionary<string, string>();
@@ -32,6 +34,7 @@ namespace HighPen
             if (Array.IndexOf(Zoomer.Factors, ZoomFactor) < 0) ZoomFactor = 2;
             HighlightSize = Math.Max(5, Math.Min(60, HighlightSize));
             BreakMinutes = BreakTimes.Clamp(BreakMinutes);
+            if (BarEdge != BarTop && BarEdge != BarBottom) BarEdge = BarFree;
         }
     }
 
@@ -72,6 +75,7 @@ namespace HighPen
             Integer("BreakMinutes", (s, v) => s.BreakMinutes = v, s => s.BreakMinutes),
             Integer("BarX", (s, v) => s.BarX = v, s => s.BarX),
             Integer("BarY", (s, v) => s.BarY = v, s => s.BarY),
+            Integer("BarEdge", (s, v) => s.BarEdge = v, s => s.BarEdge),
             Text("Language", (s, v) => s.Language = v, s => s.Language),
         };
 

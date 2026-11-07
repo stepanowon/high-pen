@@ -373,6 +373,7 @@ namespace HighPen
             if (!Toolbar.GetBarOffset(out x, out y)) return;
             cfg.BarX = x;
             cfg.BarY = y;
+            cfg.BarEdge = Toolbar.Edge;
             Save();
         }
 

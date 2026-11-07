@@ -53,7 +53,11 @@ namespace HighPen
         // and the image last refreshed. While the pointer rests both happen less often.
         Native.POINT lastPointer;
         int updatesSinceScan, updatesSinceDraw;
-        bool coveredAtPointer;
+        bool coveredAtPointer, ownAtPointer;
+        // Holding the real pointer on the monitor's edge over a HighPen window moves the view: about 200 ms before it
+        // starts, so a pointer flung at the bar does not move anything, and then about 1.4 s across the whole view.
+        const int EdgeHoldUpdates = 12, EdgeCrossUpdates = 90;
+        int edgeHeld;
         // The Windows screens that sit above topmost windows but are not in the ordinary window order:
         // Start and search, Alt+Tab and Task View, quick settings, the tray overflow.
         static readonly string[] ShellOverlays = { "Windows.UI.Core.CoreWindow", "XamlExplorerHostIslandWindow", "XamlExplorerHostIslandWindow_WASDK", "ControlCenterWindow", "TopLevelWindowForOverflowXamlIsland", "NotifyIconOverflowWindow" };
@@ -234,8 +238,8 @@ namespace HighPen
             if (moved || redraw || ++updatesSinceScan >= 8)
             {
                 updatesSinceScan = 0;
-                bool overOwn = ScanOwnWindows(shown);
-                coveredAtPointer = overOwn || ShellOverlayOn(b) || WindowAboveAt(shown);
+                ownAtPointer = ScanOwnWindows(shown);
+                coveredAtPointer = ownAtPointer || ShellOverlayOn(b) || WindowAboveAt(shown);
             }
             bool covered = coveredAtPointer;
             if (justLeft)
@@ -270,6 +274,9 @@ namespace HighPen
                     viewY = Pan(viewY, h, p.Y);
                 }
             }
+            // a HighPen window along the monitor's edge keeps the hidden pointer from getting to the edge of the view
+            if (direct && ownAtPointer && !Frozen && !Direct && !Locked && !ButtonHeld()) PanFromEdge(p, b, w, h);
+            else edgeHeld = 0;
             lastPointer = p;
             // locked, the pointer cannot leave the part being shown: outside it there would be no pointer to see
             SetClip(!direct && Locked ? new System.Drawing.Rectangle(viewX, viewY, w, h) : b);
@@ -296,6 +303,16 @@ namespace HighPen
             if (pointer < start) return pointer;
             if (pointer >= start + size) return pointer - size + 1;
             return start;
+        }
+
+        void PanFromEdge(Native.POINT p, System.Drawing.Rectangle b, int w, int h)
+        {
+            int dx = p.X <= b.Left ? -1 : (p.X >= b.Right - 1 ? 1 : 0);
+            int dy = p.Y <= b.Top ? -1 : (p.Y >= b.Bottom - 1 ? 1 : 0);
+            if (dx == 0 && dy == 0) { edgeHeld = 0; return; }
+            if (edgeHeld < EdgeHoldUpdates) { edgeHeld++; return; }
+            viewX = Math.Max(b.Left, Math.Min(b.Right - w, viewX + dx * Math.Max(1, w / EdgeCrossUpdates)));
+            viewY = Math.Max(b.Top, Math.Min(b.Bottom - h, viewY + dy * Math.Max(1, h / EdgeCrossUpdates)));
         }
 
         // Windows can drop the clip when another window comes to the front.
