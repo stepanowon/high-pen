@@ -17,6 +17,7 @@ namespace HighPen
         void ToggleSpot();
         void TogglePen();
         void ToggleHighlighter();
+        void CycleShape();
         void ToggleEraser();
         void CycleBoard();
         void Undo();
@@ -38,9 +39,15 @@ namespace HighPen
     class ToolbarWindow : Window, ITopmost
     {
         const string GlyphCollapse = "", GlyphExpand = "";
-        // the bar, and what is left of it when collapsed: the arrow and the border
+        // the bar (its header along an edge), and what is left of it when collapsed: the arrow and the border
         const double BarWidth = 84, ArrowWidth = 28, CollapsedWidth = ArrowWidth + 2;
-        const double ButtonHeight = 52;
+        // Upright, each button is one row: a smaller icon, then its label to the right, within the bar's width.
+        // Along an edge the icons keep their full size.
+        const double ButtonHeight = 32, IconSize = 17, IconColumn = 24, WideIconSize = 20, WideIconColumn = 30;
+        const double RowPadding = 2, LabelGap = 3, LabelEnd = 3;
+        // Labels are this size unless the longest one in the language needs them smaller to fit.
+        const double LabelSize = 10, MinLabelSize = 8;
+        const double CloseSize = 24, WideCloseSize = 30;
         // Lying along an edge the buttons show only their icons, to keep the bar low; the tooltips still name them.
         const double WideButtonWidth = 56, WideCloseWidth = 44, WideHeight = 36;
         // How far from the edge of the working area the pointer takes the bar onto that edge, and off it again.
@@ -66,9 +73,17 @@ namespace HighPen
         Border mainPanel, grip, arrowBtn;
         // At the right end of the working area the arrow goes to the right of the title, so that it stays in the corner when collapsed.
         bool arrowRight;
-        TextBlock arrow, boardLabel, zoomLabel;
-        Border zoomBtn, bubbleBtn, spotBtn, penBtn, highlightBtn, eraserBtn, boardBtn, setBtn, breakBtn;
+        TextBlock arrow, boardLabel, zoomLabel, shapeLabel;
+        Border zoomBtn, bubbleBtn, spotBtn, penBtn, highlightBtn, shapeBtn, eraserBtn, boardBtn, setBtn, breakBtn;
+        // The shape button's icon shows a rectangle and an ellipse, or just the shape being drawn.
+        Rectangle shapeRectIcon;
+        Ellipse shapeEllipseIcon;
         readonly List<TextBlock> buttonLabels = new List<TextBlock>();
+        readonly List<StackPanel> buttonContents = new List<StackPanel>();
+        readonly List<TextBlock> buttonIcons = new List<TextBlock>();
+        // The longest label at LabelSize, including those that only show in some states.
+        double longestLabel;
+        Grid closeCircle, shapeIcon;
         Border closeBtn;
         // The label on the zoom button says so while the view is locked; along an edge only the tooltip can.
         bool zoomLocked;
@@ -172,6 +187,21 @@ namespace HighPen
                 b.Margin = h ? new Thickness(1, 0, 0, 0) : new Thickness(0, 1, 0, 0);
             }
             foreach (TextBlock label in buttonLabels) label.Visibility = h ? Visibility.Collapsed : Visibility.Visible;
+            // upright the icons line up on the left with their labels after them; along an edge each icon is centred
+            foreach (StackPanel c in buttonContents)
+            {
+                c.HorizontalAlignment = h ? HorizontalAlignment.Center : HorizontalAlignment.Left;
+                c.Margin = h ? new Thickness(0) : new Thickness(RowPadding, 0, 0, 0);
+            }
+            foreach (TextBlock icon in buttonIcons)
+            {
+                icon.FontSize = h ? WideIconSize : IconSize;
+                icon.Width = h ? WideIconColumn : IconColumn;
+            }
+            double s = h ? 1 : IconSize / WideIconSize;
+            shapeIcon.LayoutTransform = new ScaleTransform(s, s);
+            shapeIcon.Margin = new Thickness(((h ? WideIconColumn : IconColumn) - 24 * s) / 2 / s, 0, ((h ? WideIconColumn : IconColumn) - 24 * s) / 2 / s, 0);
+            closeCircle.Width = closeCircle.Height = h ? WideCloseSize : CloseSize;
             // along an edge the panel sits by the settings button, at the end of the bar
             SettingsPanel.HorizontalAlignment = h ? HorizontalAlignment.Right : HorizontalAlignment.Stretch;
             SettingsPanel.SetWide(h);
@@ -209,6 +239,13 @@ namespace HighPen
         {
             Theme.Highlight(penBtn, t.PenActive);
             Theme.Highlight(highlightBtn, t.HighlighterActive);
+            Theme.Highlight(shapeBtn, t.ShapeActive);
+            int shape = t.ShapeActive ? t.Shape : ToolState.NoShape;
+            ShowShapeIcon(shape);
+            shapeLabel.Text = Lang.T(shape == ToolState.NoShape ? "Shape" : (shape == ToolState.RectShape ? "Rectangle" : "Ellipse"));
+            Tip(shapeBtn, Lang.T("ShapeTip"), "Shape");
+            shapeBtn.ToolTip += "\n" + Lang.T("ShapeSquare");
+            if (shape != ToolState.NoShape) shapeBtn.ToolTip = shapeLabel.Text + "\n" + shapeBtn.ToolTip;
             Theme.Highlight(eraserBtn, t.Eraser);
             Theme.Highlight(bubbleBtn, t.TextMode);
             Theme.Highlight(boardBtn, t.Board != ToolState.NoBoard);
@@ -220,6 +257,21 @@ namespace HighPen
         }
 
         public void ShowSpot(bool on) { Theme.Highlight(spotBtn, on); }
+
+        void ShowShapeIcon(int shape)
+        {
+            bool both = shape == ToolState.NoShape;
+            shapeRectIcon.Visibility = shape != ToolState.EllipseShape ? Visibility.Visible : Visibility.Collapsed;
+            shapeRectIcon.Width = both ? 13 : 19;
+            shapeRectIcon.Height = both ? 13 : 15;
+            shapeRectIcon.HorizontalAlignment = both ? HorizontalAlignment.Left : HorizontalAlignment.Center;
+            shapeRectIcon.VerticalAlignment = both ? VerticalAlignment.Top : VerticalAlignment.Center;
+            shapeEllipseIcon.Visibility = shape != ToolState.RectShape ? Visibility.Visible : Visibility.Collapsed;
+            shapeEllipseIcon.Width = both ? 14 : 20;
+            shapeEllipseIcon.Height = both ? 14 : 15;
+            shapeEllipseIcon.HorizontalAlignment = both ? HorizontalAlignment.Right : HorizontalAlignment.Center;
+            shapeEllipseIcon.VerticalAlignment = both ? VerticalAlignment.Bottom : VerticalAlignment.Center;
+        }
         // While the zoomed view is locked the button reads "Locked".
         public void ShowZoom(bool on, bool locked)
         {
@@ -439,6 +491,8 @@ namespace HighPen
             buttons = new StackPanel(); // a fresh panel: the old one is still parented to the previous toolbar
             barRow = new StackPanel();
             buttonLabels.Clear();
+            buttonContents.Clear();
+            buttonIcons.Clear();
             mainPanel = BuildMain();
             barRow.Children.Add(mainPanel);
             SettingsPanel = new SettingsPanel(cfg, bindings, settingsActions);
@@ -474,9 +528,21 @@ namespace HighPen
             header.Children.Add(ab);
             barColumn.Children.Add(header);
 
+            longestLabel = 0;
             spotBtn = AddButton("◎", false, Lang.T("Spot"), Lang.T("MouseSpot"), "Spot", actions.ToggleSpot);
             penBtn = AddButton("", true, Lang.T("Pen"), Lang.T("Pen"), "Pen", actions.TogglePen);
             highlightBtn = AddButton("", true, Lang.T("Highlighter"), Lang.T("Highlighter"), "Highlighter", actions.ToggleHighlighter);
+            shapeBtn = AddButton("", false, Lang.T("Shape"), Lang.T("ShapeTip"), "Shape", actions.CycleShape, out shapeLabel);
+            // drawn rather than a font glyph: neither icon font has a plain rectangle-and-ellipse
+            StackPanel shapeContent = (StackPanel)shapeBtn.Child;
+            shapeIcon = new Grid { Width = 24, Height = 21, VerticalAlignment = VerticalAlignment.Center };
+            shapeRectIcon = new Rectangle { Stroke = Brushes.White, StrokeThickness = 1.6 };
+            shapeEllipseIcon = new Ellipse { Stroke = Brushes.White, StrokeThickness = 1.6 };
+            shapeIcon.Children.Add(shapeRectIcon);
+            shapeIcon.Children.Add(shapeEllipseIcon);
+            shapeContent.Children.RemoveAt(0);
+            shapeContent.Children.Insert(0, shapeIcon);
+            ShowShapeIcon(ToolState.NoShape);
             eraserBtn = AddButton("", true, Lang.T("Eraser"), null, null, actions.ToggleEraser);
             eraserBtn.ToolTip = Lang.T("Eraser") + bindings.KeySuffix("Eraser") + "\n" + Lang.T("EraserTip");
             boardBtn = AddButton("▭", false, Lang.T("Board"), Lang.T("BoardTip"), "Board", actions.CycleBoard, out boardLabel);
@@ -491,10 +557,14 @@ namespace HighPen
             Border aboutBtn = AddButton("", true, Lang.T("About"), null, null, actions.ShowAbout);
             aboutBtn.ToolTip = Lang.T("AboutTip");
             Tip(ab, Lang.T("Collapse"), "Collapse");
+            foreach (string key in new[] { "WhiteBoard", "BlackBoard", "ZoomLocked", "Rectangle", "Ellipse" })
+                longestLabel = Math.Max(longestLabel, LabelWidth(Lang.T(key)));
+            FitLabels();
 
             // red close button
             Border close = new Border { Height = ButtonHeight, Background = Theme.Idle, Cursor = Cursors.Hand };
-            Grid cg = new Grid { Width = 30, Height = 30, HorizontalAlignment = HorizontalAlignment.Center, VerticalAlignment = VerticalAlignment.Center };
+            Grid cg = new Grid { Width = CloseSize, Height = CloseSize, HorizontalAlignment = HorizontalAlignment.Center, VerticalAlignment = VerticalAlignment.Center };
+            closeCircle = cg;
             cg.Children.Add(new Ellipse { Fill = CloseRed, Stroke = Brushes.White, StrokeThickness = 2 });
             cg.Children.Add(new TextBlock { Text = "", FontFamily = Theme.Icons, Foreground = Brushes.White, FontSize = 14, FontWeight = FontWeights.Bold, HorizontalAlignment = HorizontalAlignment.Center, VerticalAlignment = VerticalAlignment.Center });
             close.Child = cg;
@@ -508,7 +578,7 @@ namespace HighPen
             return new Border { Background = Theme.PanelBg, BorderBrush = Theme.Line, BorderThickness = new Thickness(1), Child = barColumn };
         }
 
-        // A tool button (icon over label) appended to the bar. tip/commandId give the tooltip and its shortcut;
+        // A tool button (icon, then label) appended to the bar. tip/commandId give the tooltip and its shortcut;
         // pass null to set the tooltip yourself.
         Border AddButton(string glyph, bool segoe, string label, string tip, string commandId, Action click)
         {
@@ -519,16 +589,35 @@ namespace HighPen
         // labelText: the label, for buttons whose label changes with their state.
         Border AddButton(string glyph, bool segoe, string label, string tip, string commandId, Action click, out TextBlock labelText)
         {
-            StackPanel sp = new StackPanel { VerticalAlignment = VerticalAlignment.Center };
-            sp.Children.Add(new TextBlock { Text = glyph, Foreground = Brushes.White, FontSize = 20, HorizontalAlignment = HorizontalAlignment.Center, FontFamily = segoe ? Theme.Icons : Theme.Symbols });
-            labelText = new TextBlock { Text = label, Foreground = Brushes.White, FontSize = 10, HorizontalAlignment = HorizontalAlignment.Center };
+            StackPanel sp = new StackPanel { Orientation = Orientation.Horizontal, VerticalAlignment = VerticalAlignment.Center };
+            TextBlock icon = new TextBlock { Text = glyph, Foreground = Brushes.White, FontSize = WideIconSize, Width = WideIconColumn, TextAlignment = TextAlignment.Center, VerticalAlignment = VerticalAlignment.Center, FontFamily = segoe ? Theme.Icons : Theme.Symbols };
+            sp.Children.Add(icon);
+            buttonIcons.Add(icon);
+            labelText = new TextBlock { Text = label, Foreground = Brushes.White, FontSize = LabelSize, Margin = new Thickness(LabelGap, 0, 0, 0), VerticalAlignment = VerticalAlignment.Center, TextWrapping = TextWrapping.NoWrap };
             sp.Children.Add(labelText);
+            buttonContents.Add(sp);
+            longestLabel = Math.Max(longestLabel, LabelWidth(label));
             Border b = new Border { Height = ButtonHeight, Background = Theme.Idle, Cursor = Cursors.Hand, Child = sp };
             buttonLabels.Add(labelText);
             b.MouseLeftButtonUp += delegate { click(); };
             if (tip != null) Tip(b, tip, commandId);
             buttons.Children.Add(b);
             return b;
+        }
+
+        // The labels share one size, the largest up to LabelSize (in half pixels) at which the longest fits the bar.
+        void FitLabels()
+        {
+            double room = BarWidth - 2 - RowPadding - IconColumn - LabelGap - LabelEnd;
+            double size = longestLabel <= room ? LabelSize : Math.Max(MinLabelSize, Math.Floor(LabelSize * room / longestLabel * 2) / 2);
+            foreach (TextBlock label in buttonLabels) label.FontSize = size;
+        }
+
+        static double LabelWidth(string s)
+        {
+            TextBlock t = new TextBlock { Text = s, FontSize = LabelSize };
+            t.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
+            return t.DesiredSize.Width;
         }
 
         void Tip(Border b, string name, string commandId)

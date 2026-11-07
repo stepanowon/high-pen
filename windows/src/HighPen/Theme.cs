@@ -7,7 +7,7 @@ namespace HighPen
 {
     static class AppInfo
     {
-        public const string AppVersion = "1.8.9"; // keep in sync with Version in Setup.cs
+        public const string AppVersion = "1.9.0"; // keep in sync with Version in Setup.cs
         public const string AuthorName = "StephenWon";
         public const string AuthorEmail = "stepanowon@gmail.com";
         public const string RepoUrl = "https://github.com/stepanowon/high-pen";
@@ -60,7 +60,7 @@ namespace HighPen
 
         public static TextBlock SectionTitle(string t)
         {
-            return new TextBlock { Text = t, Foreground = Brushes.White, FontSize = 12, Margin = new Thickness(0, 6, 0, 4) };
+            return new TextBlock { Text = t, Foreground = Brushes.White, Margin = new Thickness(0, 6, 0, 4) };
         }
 
         // A flat button with centred white text (NaN width = as wide as its container allows).

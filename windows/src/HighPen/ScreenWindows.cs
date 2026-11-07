@@ -103,13 +103,13 @@ namespace HighPen
             for (int i = 0; i < removed.Count; i++) Canvas.Children.Insert(i, removed[i]);
         }
 
-        // What the canvas does with input: nothing (speech bubble clicks are handled outside), erase, or ink.
-        public void SetEditing(bool penMode, bool erase, bool text)
+        // What the canvas does with input: nothing (speech bubbles and shapes are handled outside), erase, or ink.
+        public void SetEditing(bool penMode, bool erase, bool text, bool shape)
         {
-            Canvas.EditingMode = text ? InkCanvasEditingMode.None : (erase ? InkCanvasEditingMode.EraseByStroke : InkCanvasEditingMode.Ink);
+            Canvas.EditingMode = text || shape ? InkCanvasEditingMode.None : (erase ? InkCanvasEditingMode.EraseByStroke : InkCanvasEditingMode.Ink);
             // InkCanvas' built-in ink cursor is a barely visible dot, so use a real pointer
             Canvas.UseCustomCursor = true;
-            Canvas.Cursor = text ? Cursors.IBeam : (erase ? Cursors.Cross : Cursors.Pen);
+            Canvas.Cursor = text ? Cursors.IBeam : (erase || shape ? Cursors.Cross : Cursors.Pen);
             Canvas.IsHitTestVisible = penMode;
         }
 
@@ -171,11 +171,12 @@ namespace HighPen
             timer.Tick += delegate { UpdatePosition(); };
         }
 
-        public void SetStyle(Color c, double size)
+        // opacity: percent
+        public void SetStyle(Color c, double size, double opacity)
         {
             spot.Width = size;
             spot.Height = size;
-            spot.Fill = new SolidColorBrush(Color.FromArgb(0x66, c.R, c.G, c.B));
+            spot.Fill = new SolidColorBrush(Color.FromArgb((byte)Math.Round(255 * opacity / 100), c.R, c.G, c.B));
             spot.Stroke = null;
             spot.StrokeThickness = 0;
         }

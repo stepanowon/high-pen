@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 
@@ -35,16 +36,19 @@ namespace HighPen
         Slider breakSlider;
         Panel penSwatches, highlightSwatches;
         Border pressureBtn, clicksBtn;
-        TextBlock pressureText, clicksText, hotkeyWarn;
+        TextBlock pressureText, clicksText, hotkeyWarn, spotOpacityTitle;
         // The groups of settings, in the order they stack in when the panel is upright.
         readonly List<StackPanel> sections = new List<StackPanel>();
         // Beside a bar along an edge they stand in columns, as indexes into sections.
         // Four of these are narrower than the bar in any language, so the bar's width still decides whether it fits.
         static readonly int[][] WideColumns = { new[] { 0, 4, 6 }, new[] { 1 }, new[] { 2, 5 }, new[] { 3, 7 } };
-        const double SectionWidth = 190;
-        // In columns height is what counts: the eight colours fit on one row at this size.
-        const double SwatchSize = 24, WideSwatchSize = 20;
-        readonly List<Panel> allSwatches = new List<Panel>();
+        const double SectionWidth = 160;
+        // The same size as the labels on the bar, for all the text in the panel.
+        const double TextSize = 10;
+        // The eight colours fit on one row of a section.
+        const double SwatchSize = 16, SwatchMargin = 2;
+        // Buttons in a row of three or four fill the section.
+        const double ThirdWidth = (SectionWidth - 3 * 4) / 3, QuarterWidth = (SectionWidth - 4 * 4) / 4;
         Separator versionDivider;
         StackPanel root;
         bool wide;
@@ -58,6 +62,8 @@ namespace HighPen
             BorderBrush = Theme.Line;
             BorderThickness = new Thickness(0, 1, 1, 1);
             VerticalAlignment = VerticalAlignment.Top;
+            // inherited by every text in the panel that does not set its own size
+            TextElement.SetFontSize(this, TextSize);
             // scrolls only when the bar lies along an edge and limits the panel to the room left beside it
             Child = new ScrollViewer { VerticalScrollBarVisibility = ScrollBarVisibility.Auto, Content = Build() };
             ArrangeSections();
@@ -83,7 +89,6 @@ namespace HighPen
             root.Orientation = wide ? Orientation.Horizontal : Orientation.Vertical;
             root.Margin = wide ? new Thickness(10, 6, 10, 6) : new Thickness(10);
             versionDivider.Visibility = wide ? Visibility.Collapsed : Visibility.Visible;
-            foreach (Panel swatches in allSwatches) SizeSwatches(swatches);
             if (!wide)
             {
                 FillColumn(root, sections);
@@ -130,6 +135,11 @@ namespace HighPen
             breakTitle.Text = string.Format(Lang.T("BreakLength"), BreakTimes.Label(minutes));
             for (int i = 0; i < breakBtns.Count; i++) Theme.Highlight(breakBtns[i], BreakTimes.Presets[i] == minutes);
             if ((int)Math.Round(breakSlider.Value) != minutes) breakSlider.Value = minutes;
+        }
+
+        void ShowSpotOpacity()
+        {
+            spotOpacityTitle.Text = string.Format(Lang.T("SpotOpacity"), Math.Round(cfg.SpotOpacity));
         }
 
         public void MarkPenColor(string color) { MarkSwatch(penSwatches, color); }
@@ -184,6 +194,18 @@ namespace HighPen
             p.Children.Add(Swatches(cfg.SpotColor, delegate (string c) { cfg.SpotColor = c; actions.SpotStyleChanged(); }, false));
             p.Children.Add(Theme.SectionTitle(Lang.T("SpotSize")));
             p.Children.Add(MakeSlider(20, 200, cfg.SpotSize, delegate (double v) { cfg.SpotSize = v; actions.SpotStyleChanged(); }));
+            spotOpacityTitle = Theme.SectionTitle("");
+            p.Children.Add(spotOpacityTitle);
+            Slider so = MakeSlider(Settings.SpotOpacityMin, 100, cfg.SpotOpacity, delegate (double v)
+            {
+                cfg.SpotOpacity = v;
+                ShowSpotOpacity();
+                actions.SpotStyleChanged();
+            });
+            so.IsSnapToTickEnabled = true;
+            so.TickFrequency = Settings.SpotOpacityStep;
+            p.Children.Add(so);
+            ShowSpotOpacity();
             p.Children.Add(Switch("ClickShow", "Clicks", actions.ToggleClicks, out clicksBtn, out clicksText));
             ShowClicks(cfg.ShowClicks);
             p = NextSection();
@@ -193,7 +215,7 @@ namespace HighPen
             foreach (double f in Zoomer.Factors)
             {
                 double fv = f;
-                Border zb = Theme.TextButton(f.ToString(System.Globalization.CultureInfo.InvariantCulture) + "x", 58, 26, new Thickness(2));
+                Border zb = Theme.TextButton(f.ToString(System.Globalization.CultureInfo.InvariantCulture) + "x", ThirdWidth, 26, new Thickness(2));
                 zb.MouseLeftButtonUp += delegate { actions.SetZoomFactor(fv); };
                 zoomFactorBtns.Add(zb);
                 zp.Children.Add(zb);
@@ -208,8 +230,7 @@ namespace HighPen
             foreach (int m in BreakTimes.Presets)
             {
                 int mv = m;
-                Border bb = Theme.TextButton(BreakTimes.Label(m), 87, 26, new Thickness(2));
-                ((TextBlock)bb.Child).FontSize = 11;
+                Border bb = Theme.TextButton(string.Format(Lang.T("Minutes"), m), QuarterWidth, 26, new Thickness(2));
                 bb.MouseLeftButtonUp += delegate { actions.SetBreakMinutes(mv); };
                 breakBtns.Add(bb);
                 bp.Children.Add(bb);
@@ -232,8 +253,7 @@ namespace HighPen
             for (int i = 0; i < Lang.Codes.Length; i++)
             {
                 int idx = i;
-                Border lb = Theme.TextButton(Lang.Names[i], 58, 26, new Thickness(2));
-                ((TextBlock)lb.Child).FontSize = 11;
+                Border lb = Theme.TextButton(Lang.Names[i], ThirdWidth, 26, new Thickness(2));
                 Theme.Highlight(lb, i == Lang.Cur);
                 lb.MouseLeftButtonUp += delegate { if (idx != Lang.Cur) actions.SetLanguage(idx); };
                 lp.Children.Add(lb);
@@ -244,7 +264,7 @@ namespace HighPen
             Border hk = Theme.TextButton(Lang.T("Hotkeys"), double.NaN, 26, new Thickness(0, 2, 0, 0));
             hk.MouseLeftButtonUp += delegate { actions.ShowHotkeyEditor(); };
             p.Children.Add(hk);
-            hotkeyWarn = new TextBlock { Foreground = Theme.Warning, FontSize = 11, TextWrapping = TextWrapping.Wrap, Margin = new Thickness(0, 8, 0, 0), Visibility = Visibility.Collapsed };
+            hotkeyWarn = new TextBlock { Foreground = Theme.Warning, TextWrapping = TextWrapping.Wrap, Margin = new Thickness(0, 8, 0, 0), Visibility = Visibility.Collapsed };
             p.Children.Add(hotkeyWarn);
 
             // the Store version opens its Store page instead of checking GitHub
@@ -255,7 +275,7 @@ namespace HighPen
 
             versionDivider = Divider();
             p.Children.Add(versionDivider);
-            p.Children.Add(new TextBlock { Text = "HighPen v" + AppInfo.AppVersion, Foreground = Brushes.Gray, FontSize = 11, HorizontalAlignment = HorizontalAlignment.Center });
+            p.Children.Add(new TextBlock { Text = "HighPen v" + AppInfo.AppVersion, Foreground = Brushes.Gray, HorizontalAlignment = HorizontalAlignment.Center });
             return root;
         }
 
@@ -287,7 +307,7 @@ namespace HighPen
             for (int i = 0; i < Palette.Hex.Length; i++)
             {
                 string h = Palette.Hex[i];
-                Border b = new Border { Width = 24, Height = 24, CornerRadius = new CornerRadius(12), Margin = new Thickness(2), Cursor = Cursors.Hand, Background = new SolidColorBrush(Theme.ParseColor(h)), Tag = h };
+                Border b = new Border { Width = SwatchSize, Height = SwatchSize, CornerRadius = new CornerRadius(SwatchSize / 2), Margin = new Thickness(SwatchMargin), Cursor = Cursors.Hand, Background = new SolidColorBrush(Theme.ParseColor(h)), Tag = h };
                 b.ToolTip = Lang.T(Palette.Names[i]) + (withShortcuts ? bindings.KeySuffix("Color." + Palette.Names[i]) : "");
                 b.MouseLeftButtonUp += delegate
                 {
@@ -297,19 +317,7 @@ namespace HighPen
                 wp.Children.Add(b);
             }
             MarkSwatch(wp, current);
-            allSwatches.Add(wp);
             return wp;
-        }
-
-        void SizeSwatches(Panel swatches)
-        {
-            double size = wide ? WideSwatchSize : SwatchSize;
-            foreach (Border b in swatches.Children)
-            {
-                b.Width = b.Height = size;
-                b.CornerRadius = new CornerRadius(size / 2);
-                b.Margin = new Thickness(wide ? 1.5 : 2);
-            }
         }
 
         static void MarkSwatch(Panel swatches, string color)
@@ -318,13 +326,13 @@ namespace HighPen
             {
                 bool sel = string.Equals((string)b.Tag, color, StringComparison.OrdinalIgnoreCase);
                 b.BorderBrush = sel ? Brushes.White : Brushes.Gray;
-                b.BorderThickness = new Thickness(sel ? 3 : 1);
+                b.BorderThickness = new Thickness(sel ? 2 : 1);
             }
         }
 
         static Slider MakeSlider(double min, double max, double val, Action<double> onChange)
         {
-            Slider s = new Slider { Minimum = min, Maximum = max, Value = val, Width = 170, HorizontalAlignment = HorizontalAlignment.Left };
+            Slider s = new Slider { Minimum = min, Maximum = max, Value = val, Width = SectionWidth - 4, HorizontalAlignment = HorizontalAlignment.Left };
             s.ValueChanged += delegate { onChange(s.Value); };
             return s;
         }
