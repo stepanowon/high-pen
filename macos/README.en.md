@@ -10,7 +10,7 @@ The macOS version of the pen app for online lectures. It runs on macOS 14 (Sonom
 
 ## Download
 
-**[Download HighPen-1.4.3.dmg](https://github.com/stepanowon/high-pen/releases/download/macos-v1.4.3/HighPen-1.4.3.dmg)** (release [macos-v1.4.3](https://github.com/stepanowon/high-pen/releases/tag/macos-v1.4.3))
+**[Download HighPen-1.4.4.dmg](https://github.com/stepanowon/high-pen/releases/download/macos-v1.4.4/HighPen-1.4.4.dmg)** (release [macos-v1.4.4](https://github.com/stepanowon/high-pen/releases/tag/macos-v1.4.4))
 
 1. Open the DMG and drag HighPen onto the Applications folder.
 2. **Before opening it the first time**, run this in Terminal. HighPen then opens without any warning.
@@ -61,8 +61,8 @@ Distributing without the warning requires joining the Apple Developer Program, t
 | Undo | ⌃⌥Z | One stroke, everything removed by one eraser drag, or a clear all (its speech bubbles come back too) |
 | Clear | ⌃⌥C | Clears the current page |
 | Note | ⌃⌥T | Text box at the clicked spot. Enter confirms, Shift+Enter adds a line, Esc cancels. Removed only by Clear |
-| Zoom | ⌃⌥X | Live 1.5x / 2x / 2.5x zoom. The pointer you see in the zoomed view is where you click. The view only moves when the pointer reaches an edge of what is shown (the pointer moves faster by the zoom factor). Over the toolbar the normal pointer comes back. When the toolbar touches a screen edge, hold the pointer at the very edge of the monitor on the toolbar for a moment and the view moves that way. Turning the pen on freezes the view so you can write on the zoomed screen |
-| Zoom lock | ⌃⇧X | While zoomed, locks the zoomed view in place (or unlocks it). Locked, the view stays put as the pointer moves and the Zoom button reads "Locked". You can still click what you see, and the pointer stays inside the part shown. Turning zoom off also unlocks |
+| Zoom | ⌃⌥X | Live 1.5x / 2x / 2.5x zoom. The pointer you see is where you click (see [Zoom](#zoom)) |
+| Zoom lock | ⌃⇧X | While zoomed, locks the zoomed view in place or unlocks it (see [Zoom](#zoom)) |
 | Capture | ⌃⌥F | Saves the screen with ink as a PNG in `~/Pictures/HighPen` and copies it to the clipboard |
 | Break | ⌃⌥W | Shows the time left and when class resumes, large, over the whole selected monitor. The last minute is orange; when time is up a red 00:00 stays until you press it again. Clicks pass through and the toolbar stays on top |
 | Settings | ⌃⌥D | Colors, widths, spot, zoom level, break length (10 min, 15 min, 1 h, 1 h 30 min buttons or a 5–120 minute slider in 5-minute steps; 10 minutes by default), monitor, language (Korean, Japanese, English) |
@@ -77,9 +77,30 @@ Distributing without the warning requires joining the Apple Developer Program, t
 
 In Settings > **Shortcuts**, click an item, then press the new combination. Esc cancels, Delete removes the shortcut, and **Reset all** restores every default. A shortcut must include ⌃, ⌥ or ⌘; F1–F20 can be used alone. You are told when a combination is already used for another item or by another app.
 
-Drag the toolbar by its header to move it; its position and all settings are saved automatically. Bring the pointer to the very top or bottom of the screen (below the menu bar, above the Dock) while dragging and the toolbar lies along that edge as a row: the buttons show only their icons (hover for the name and shortcut) and the settings panel opens toward the middle of the screen in four columns. Drag the header away from the edge to make it upright again. An upright toolbar against the left or right end of the screen stays upright, and so does one on a monitor too narrow for the row. At the right end of the screen the collapse button moves to the right, so it stays in the corner when collapsed. Clicking the Dock icon expands a collapsed toolbar. Hover over a toolbar button or a settings item to see its name and shortcut.
+### Zoom
+
+- The pointer you see in the zoomed view is where a click lands. The real pointer is hidden on the unzoomed screen and the same pointer is drawn enlarged in the zoomed view.
+- The view moves only when the pointer reaches an edge of the part shown. The pointer moves faster by the zoom factor.
+- Over the toolbar and the settings panel the normal pointer comes back. When the toolbar touches a screen edge, hold the pointer at the very edge of the monitor on the toolbar for a moment and the view moves that way.
+- The toolbar, the settings panel and the hints are not zoomed and keep their normal size.
+- Turning the pen on freezes the view so you can write right where you see things. Ink is kept in screen coordinates, so after zoom is turned off it stays on the same content at normal size.
+- **Zoom lock (⌃⇧X):** the view stays put as the pointer moves and the Zoom button reads "Locked". You can still click what you see, and the pointer stays inside the part shown. Turning zoom off also unlocks.
+- Changing the selected monitor, or monitors being connected or removed, turns zoom off.
+
+### Toolbar
+
+- Drag it by its header (HighPen) to move it; its position and shape are saved and come back on the next start.
+- Bring the pointer to the very top or bottom of the screen (below the menu bar, above the Dock) while dragging and the toolbar lies along that edge as a row, with icons only on its buttons. Drag the header away from the edge to make it upright again.
+- An upright toolbar against the left or right end of the screen stays upright when taken to the top or bottom, so it can slide along that side into a corner. It also stays upright on a monitor too narrow for the row.
+- The `<` button in the header (⌃⌥H) collapses and expands it. Collapsed, only the `>` button is left and the toolbar cannot be dragged. At the right end of the screen the collapse button moves to the right, so it stays in the corner when collapsed. Clicking the Dock icon also expands it.
+- The settings panel opens to the right of an upright toolbar (to its left when there is no room). Beside a toolbar along an edge it opens toward the middle of the screen in four columns.
+- Hover over a button or a settings item to see its name and shortcut.
+
+### Several monitors
 
 With several monitors, HighPen remembers the monitor chosen under **Monitor** in Settings (or with ⌃⌥M), even if the monitor order changes. If that monitor is disconnected, HighPen moves to the main monitor, and returns once it is connected again (zoom is turned off if it was on).
+
+### Pen mode and the keyboard
 
 Turning on the pen, highlighter or eraser changes the pointer to that tool. Only the active app can change the pointer on macOS, so HighPen becomes the active app while pen mode (or the shortcut editor) is on, and hands focus back to the app you were using (a slideshow, for example) afterwards. Keyboard input (such as advancing slides) therefore does not reach that app during pen mode. HighPen's shortcuts always work.
 
@@ -93,6 +114,7 @@ The app is signed against its bundle id (`com.stepanowon.HighPen`) so the permis
 
 - Shortcuts use `⌃⌥` (Control+Option) instead of `Ctrl+Alt`. Pen colors moved to `⌃⌥1–8` so they do not clash with other apps.
 - While zoomed, the pointer is not confined to the monitor when it is over the toolbar or in pen mode (macOS has no such feature).
+- The settings panel does not scroll when it is taller than the screen.
 
 ## Layout
 
@@ -101,3 +123,4 @@ The app is signed against its bundle id (`com.stepanowon.HighPen`) so the permis
 | `src/HighPen/` | App sources (AppKit, ScreenCaptureKit, Carbon hotkeys), one file per responsibility: `main.swift` (entry point), `Controller.swift` (wiring), `ToolState.swift` (tool rules), `InkView.swift` / `Stroke.swift` (ink, speech bubbles), `Toolbar.swift`, `SettingsPanel.swift`, `Hints.swift`, `Popups.swift` (toast, about, update window), `Updater.swift` (update check), `Clicks.swift` (show clicks), `HotkeyEditor.swift`, `Hotkeys.swift` / `Hotkey.swift` (shortcuts), `Zoomer.swift`, `BreakTimer.swift` (break timer), `ScreenCapture.swift`, `Spot.swift`, `FocusKeeper.swift`, `Settings.swift`, `Monitors.swift`, `Lang.swift`, `Theme.swift` / `Controls.swift`, `SelfTest.swift` |
 | `src/make-icon.swift` | Draws the app icon at every size (the Windows icon's design on the macOS icon grid) |
 | `build.sh` | Builds arm64 and x86_64 with `swiftc` → `lipo` → `.app` bundle, icon, ad-hoc signing, DMG packaging |
+| `REFACTORING.md` | Code clean-up record, memory pitfalls and known limitations (in Korean) |
