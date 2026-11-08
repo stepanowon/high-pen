@@ -10,7 +10,7 @@ The macOS version of the pen app for online lectures. It runs on macOS 14 (Sonom
 
 ## Download
 
-**[Download HighPen-1.5.0.dmg](https://github.com/stepanowon/high-pen/releases/download/macos-v1.5.0/HighPen-1.5.0.dmg)** (release [macos-v1.5.0](https://github.com/stepanowon/high-pen/releases/tag/macos-v1.5.0))
+**[Download HighPen-1.5.1.dmg](https://github.com/stepanowon/high-pen/releases/download/macos-v1.5.1/HighPen-1.5.1.dmg)** (release [macos-v1.5.1](https://github.com/stepanowon/high-pen/releases/tag/macos-v1.5.1))
 
 1. Open the DMG and drag HighPen onto the Applications folder.
 2. **Before opening it the first time**, run this in Terminal. HighPen then opens without any warning.
