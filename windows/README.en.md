@@ -66,7 +66,7 @@ Windows 10/11 (.NET Framework 4.8 is built in, nothing else to install)
 
 ## Usage
 
-When you start the app, the toolbar appears in the top-left corner of the active monitor. Drag the top row (HighPen) to move it; the position is remembered. Use the `<` button to collapse and expand it.
+When you start the app, the toolbar appears in the top-left corner of the active monitor. Drag the top row (HighPen) to move it; the position is remembered. Use the `<` button to collapse and expand it. You can also attach it vertically to the left or right end of the screen, or horizontally to the top or bottom (see [Toolbar](#toolbar)).
 
 ### Changing the language
 
@@ -263,10 +263,32 @@ Choose the monitor the app works on with **Monitor** in the settings panel (or C
 
 ### Toolbar
 
-- Drag the top row (HighPen) to move the toolbar; the position is saved and used on the next launch. If the saved position is off screen, it returns to the top-left corner.
-- Bring the pointer to the top or bottom of the working area while dragging and the toolbar lies along that edge, horizontally. To keep it low, its buttons then show only their icons; the tooltips give their names and shortcuts. Drag HighPen at its left end away from the edge to make it vertical again. A vertical toolbar touching the left or right end of the working area stays vertical when brought to the top or bottom. On a monitor where the horizontal toolbar would be wider than the working area, it stays vertical.
+You can move the toolbar wherever you like, attach it to the left or right end or the top or bottom of the screen, or collapse it.
+
+#### Moving and placing it
+
+- Drag the top row (HighPen) to move it. The position is saved and used on the next launch; if the saved position is off screen, it returns to the top-left corner.
+- **Left or right end:** a vertical toolbar can sit against the left or right end of the working area. While it touches that end, it stays vertical even when brought to the top or bottom. At the far right, the collapse button and HighPen swap places.
+- **Top or bottom:** bring the pointer to the top or bottom of the working area while dragging and the toolbar lies along that edge, horizontally. To keep it low, its buttons then show only their icons; the tooltips give their names and shortcuts. Drag HighPen at its left end away from the edge to make it vertical again. On a monitor where the horizontal toolbar would be wider than the working area, it stays vertical.
 - The toolbar stays inside the selected monitor. Whether you drag it or it grows (expanding, opening the settings panel), it is kept within that monitor's work area (excluding the taskbar).
-- Use the `<` button on the left of the top row to collapse and expand it. When collapsed, the HighPen title disappears too and only the `>` button remains, so you can click what was behind the toolbar. Press `>` to expand it again in the same place. The toolbar cannot be dragged while collapsed. With the toolbar at the far right of the working area, the collapse button and HighPen swap places, and the button stays where it is when collapsed.
+
+| Left end | Right end |
+|---|---|
+| ![Vertical toolbar at the left end](../screen/en/toolbar-left.png) | ![Vertical toolbar at the right end](../screen/en/toolbar-right.png) |
+| **Top** | **Bottom** |
+| ![Horizontal toolbar along the top](../screen/en/toolbar-top.png) | ![Horizontal toolbar along the bottom](../screen/en/toolbar-bottom.png) |
+
+#### Collapsing it
+
+- Use the `<` button on the left of the top row, or Ctrl+Alt+H, to collapse and expand it. When collapsed, the HighPen title disappears too and only the `>` button remains, so you can click what was behind the toolbar. Press `>` to expand it again in the same place.
+- The toolbar cannot be dragged while collapsed.
+- At the far right, the button stays where it is (at the right end) when collapsed.
+
+| Expanded | Collapsed |
+|---|---|
+| ![Expanded toolbar](../screen/en/toolbar-expanded.png) | ![Collapsed toolbar](../screen/en/toolbar-collapsed.png) |
+
+#### Settings panel and buttons
 
 - The settings panel opens to the right of the toolbar, or to its left when the toolbar is at the right edge of the screen. A horizontal toolbar opens it toward the middle of the screen (below on the top edge, above on the bottom edge) with its settings in four columns, and it scrolls when there is not enough height.
 - Hovering over a button shows its name and shortcut as a tooltip.

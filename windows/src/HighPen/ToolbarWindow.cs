@@ -43,7 +43,7 @@ namespace HighPen
         const double BarWidth = 84, ArrowWidth = 28, CollapsedWidth = ArrowWidth + 2;
         // Upright, each button is one row: a smaller icon, then its label to the right, within the bar's width.
         // Along an edge the icons keep their full size.
-        const double ButtonHeight = 32, IconSize = 17, IconColumn = 24, WideIconSize = 20, WideIconColumn = 30;
+        const double ButtonHeight = 40, IconSize = 17, IconColumn = 24, WideIconSize = 20, WideIconColumn = 30;
         const double RowPadding = 2, LabelGap = 3, LabelEnd = 3;
         // Labels are this size unless the longest one in the language needs them smaller to fit.
         const double LabelSize = 10, MinLabelSize = 8;
