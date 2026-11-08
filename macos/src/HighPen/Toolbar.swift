@@ -28,7 +28,7 @@ final class DragView: NSView {
 @MainActor
 final class Toolbar: NSObject {
     // the bar, and what is left of it collapsed: the arrow
-    static let width: CGFloat = 84, arrowWidth: CGFloat = 28, buttonHeight: CGFloat = 32, headerHeight: CGFloat = 30
+    static let width: CGFloat = 84, arrowWidth: CGFloat = 28, buttonHeight: CGFloat = 40, headerHeight: CGFloat = 30
     // Upright each button is one row: a smaller icon, then its title to the right. The titles are labelSize unless
     // the longest in the language needs them smaller (down to minLabelSize) to fit.
     static let iconSize: CGFloat = 15, wideIconSize: CGFloat = 18, iconColumn: CGFloat = 24, rowPadding: CGFloat = 2, labelGap: CGFloat = 3
