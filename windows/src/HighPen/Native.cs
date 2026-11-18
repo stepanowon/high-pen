@@ -15,7 +15,7 @@ namespace HighPen
         public static readonly IntPtr HWND_TOPMOST = new IntPtr(-1);
         public const uint SWP_NOSIZE = 1, SWP_NOMOVE = 2, SWP_NOACTIVATE = 0x10, SWP_SHOWWINDOW = 0x40;
         public const int WH_MOUSE_LL = 14;
-        public const int WM_LBUTTONDOWN = 0x0201, WM_RBUTTONDOWN = 0x0204;
+        public const int WM_LBUTTONDOWN = 0x0201, WM_RBUTTONDOWN = 0x0204, WM_MOUSEWHEEL = 0x020A, WHEEL_DELTA = 120;
         public const int WM_HOTKEY = 0x0312, WM_MOVING = 0x0216;
         public const uint MOD_NOREPEAT = 0x4000;
         public const int APPMODEL_ERROR_NO_PACKAGE = 15700;

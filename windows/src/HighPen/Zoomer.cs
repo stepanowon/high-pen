@@ -4,7 +4,7 @@ using System.Windows.Threading;
 
 namespace HighPen
 {
-    // Live zoom (1.5x / 2x / 2.5x) of the monitor under the mouse pointer, using the Windows Magnification API.
+    // Live zoom (1.5x / 2x / 2.5x / 3x, also changed with the mouse wheel) of the monitor under the mouse pointer, using the Windows Magnification API.
     // The real pointer stays on the unzoomed content, hidden, and the magnifier draws it enlarged in the image,
     // so a click lands exactly on what the pointer is shown over. The view holds still until the pointer
     // reaches one of its edges and then moves along with the pointer.
@@ -12,7 +12,7 @@ namespace HighPen
     // input in display coordinates, so there the real pointer is shown instead, at the position on the display (see pointerDirect).
     class Zoomer : ITopmost
     {
-        public static readonly double[] Factors = { 1.5, 2, 2.5 };
+        public static readonly double[] Factors = { 1.5, 2, 2.5, 3 };
         float factor = 2f;
         IntPtr host, mag;
         IntPtr[] exclude;
@@ -68,6 +68,14 @@ namespace HighPen
         Native.POINT leftAt;
         bool justLeft;
         readonly DispatcherTimer timer = new DispatcherTimer();
+        // While zoomed the mouse wheel changes the factor instead of scrolling: one notch (+1 up, -1 down) per call,
+        // made from within the hook, so the handler should post the change rather than make it there.
+        // Over a HighPen window or another window above the image (the Start menu) the wheel scrolls as usual.
+        public Action<int> WheelStep;
+        readonly Native.HookProc wheelProc; // kept referenced so the GC does not collect the callback
+        IntPtr wheelHook;
+        // the part of a notch turned so far (touchpads and smooth wheels send less than a notch at a time)
+        int wheelRest;
         public bool Active { get { return host != IntPtr.Zero; } }
 
         // Can be changed while zoomed; the view updates on the spot.
@@ -96,6 +104,21 @@ namespace HighPen
             timer.Interval = TimeSpan.FromMilliseconds(12);
             timer.Tick += delegate { Update(); };
             scanOwnWindow = ScanOwnWindow;
+            wheelProc = OnWheel;
+        }
+
+        IntPtr OnWheel(int code, IntPtr wParam, IntPtr lParam)
+        {
+            if (code >= 0 && wParam.ToInt32() == Native.WM_MOUSEWHEEL && Active && !Direct && !coveredAtPointer && WheelStep != null)
+            {
+                // MSLLHOOKSTRUCT.mouseData: the wheel delta in its high word
+                wheelRest += (short)(System.Runtime.InteropServices.Marshal.ReadInt32(lParam, 8) >> 16);
+                int steps = wheelRest / Native.WHEEL_DELTA;
+                wheelRest -= steps * Native.WHEEL_DELTA;
+                if (steps != 0) WheelStep(Math.Sign(steps));
+                return (IntPtr)1;
+            }
+            return Native.CallNextHookEx(wheelHook, code, wParam, lParam);
         }
 
         public void Start(IntPtr[] excludeFromCapture)
@@ -131,12 +154,15 @@ namespace HighPen
             justLeft = false;
             Update();
             Native.SetWindowPos(host, Native.HWND_TOPMOST, 0, 0, 0, 0, Native.SWP_NOSIZE | Native.SWP_NOMOVE | Native.SWP_NOACTIVATE | Native.SWP_SHOWWINDOW);
+            wheelRest = 0;
+            if (wheelHook == IntPtr.Zero) wheelHook = Native.SetWindowsHookEx(Native.WH_MOUSE_LL, wheelProc, Native.GetModuleHandle(null), 0);
             timer.Start();
         }
 
         public void Stop()
         {
             timer.Stop();
+            if (wheelHook != IntPtr.Zero) { Native.UnhookWindowsHookEx(wheelHook); wheelHook = IntPtr.Zero; }
             if (host != IntPtr.Zero)
             {
                 Native.ClipCursor(IntPtr.Zero);

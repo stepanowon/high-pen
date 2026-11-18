@@ -33,11 +33,11 @@ winget install 9PDG1QN5QSL3 --source msstore
 
 ### インストールせずに実行
 
-[HighPen.exe](https://github.com/stepanowon/high-pen/releases/download/v1.9.1/HighPen.exe) をダウンロードしてそのまま実行します。インストールは不要です。
+[HighPen.exe](https://github.com/stepanowon/high-pen/releases/download/v1.9.2/HighPen.exe) をダウンロードしてそのまま実行します。インストールは不要です。
 
 ### インストーラーでインストール
 
-1. [HighPen-Setup.exe](https://github.com/stepanowon/high-pen/releases/download/v1.9.1/HighPen-Setup.exe) をダウンロードして実行します。
+1. [HighPen-Setup.exe](https://github.com/stepanowon/high-pen/releases/download/v1.9.2/HighPen-Setup.exe) をダウンロードして実行します。
 2. インストールするかどうかと、デスクトップにショートカットを作成するかどうかを選びます。
 3. インストールが終わるとすぐに起動できます。
 
@@ -50,7 +50,7 @@ winget install 9PDG1QN5QSL3 --source msstore
 
 ### ダウンロードしたファイルの確認
 
-実行ファイルは [GitHub リリース](https://github.com/stepanowon/high-pen/releases) でのみ配布しています。コード署名がないため、ダウンロードしたファイルがリリースのものと同じかどうかを [SHA256SUMS.txt](https://github.com/stepanowon/high-pen/releases/download/v1.9.1/SHA256SUMS.txt) の値と比べて確認できます。
+実行ファイルは [GitHub リリース](https://github.com/stepanowon/high-pen/releases) でのみ配布しています。コード署名がないため、ダウンロードしたファイルがリリースのものと同じかどうかを [SHA256SUMS.txt](https://github.com/stepanowon/high-pen/releases/download/v1.9.2/SHA256SUMS.txt) の値と比べて確認できます。
 
 ```powershell
 Get-FileHash .\HighPen-Setup.exe -Algorithm SHA256
@@ -91,7 +91,7 @@ Windows 10/11 (.NET Framework 4.8 は標準搭載のため追加インストー�
 | 元に戻す | Ctrl+Alt+Z | 最後の書き込みまたは消しゴム操作を取り消します。 |
 | 全消去 | Ctrl+Alt+C | 現在のページの書き込みと吹き出しをすべて消します。 |
 | 吹き出し | Ctrl+Alt+T | クリックした位置にテキストメモを貼ります。Enter で確定、Shift+Enter で改行、Esc で取り消し。 |
-| 拡大 | Ctrl+Alt+X | マウスポインターのあるモニターを 拡大します（倍率は設定で 1.5 倍・2 倍・2.5 倍から選択）。 |
+| 拡大 | Ctrl+Alt+X | マウスポインターのあるモニターを 拡大します（倍率は設定で 1.5 倍・2 倍・2.5 倍・3 倍から選択、拡大中はマウスホイールでも変更）。 |
 | 拡大の固定 | Ctrl+Shift+X | 拡大中に拡大画面をその場で固定、または固定を解除します。固定中はマウスを動かしても拡大画面が動かず、拡大ボタンに「拡大固定」と表示されます。 |
 | キャプチャ | Ctrl+Alt+F | 使用モニターの画面を書き込み・ボード・吹き出しごと PNG で保存し、クリップボードにコピーします。ツールバーとスポットは写りません。 |
 | 休憩 | Ctrl+Alt+W | 休憩タイマーを開始・終了します。使用モニター全体に残り時間が大きく表示されます。 |
@@ -115,7 +115,7 @@ Windows 10/11 (.NET Framework 4.8 は標準搭載のため追加インストー�
 | 言語 | | 한국어、日本語、English から選ぶとすぐに切り替わります。既定は English です ([言語の切り替え](#言語の切り替え) を参照)。 |
 | ショートカット設定 | | すべてのショートカットを好きな組み合わせに変更したり、なしにしたりできます ([ショートカットの変更](#ショートカットの変更) を参照)。 |
 | 更新の確認 | | 押すとすぐに新しいバージョンが出ているか確認します。起動時にも自動で確認します ([自動更新](#自動更新) を参照)。Microsoft Store 版では押すと Store の HighPen のページが開き、更新があればそこで更新します。 |
-| バージョン | | パネル下部に現在のバージョン (`HighPen v1.9.1`) が表示されます。 |
+| バージョン | | パネル下部に現在のバージョン (`HighPen v1.9.2`) が表示されます。 |
 
 設定は自動保存され、`%APPDATA%\HighPen\settings.txt` にあります。
 
@@ -219,7 +219,7 @@ Windows 10/11 (.NET Framework 4.8 は標準搭載のため追加インストー�
 
 ### 画面拡大
 
-マウスポインターのあるモニターをリアルタイムで拡大します。倍率（1.5 倍・2 倍・2.5 倍）は設定パネルで選べ、拡大中に変更してもすぐに反映されます。
+マウスポインターのあるモニターをリアルタイムで拡大します。倍率（1.5 倍・2 倍・2.5 倍・3 倍）は設定パネルで選べ、拡大中に変更してもすぐに反映されます。拡大中にマウスホイールを上に回すと 1 段階拡大し、下に回すと 1 段階縮小します（1.5 倍〜3 倍）。このときホイールで画面はスクロールしません。HighPen のウィンドウやスタートメニューなど、拡大画面の上にあるウィンドウの上では通常どおりスクロールします。
 
 ![画面拡大](../screen/ja/zoom-1.9.1.png)
 

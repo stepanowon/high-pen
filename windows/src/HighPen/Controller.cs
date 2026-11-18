@@ -93,6 +93,7 @@ namespace HighPen
 
             zoomer.ViewChanged = OnZoomView;
             zoomer.Factor = cfg.ZoomFactor;
+            zoomer.WheelStep = delegate (int step) { Toolbar.Dispatcher.BeginInvoke(new Action(delegate { StepZoomFactor(step); })); };
             spotWin.ToShown = zoomer.ToShown;
 
             topmost.Add(zoomer);
@@ -435,6 +436,15 @@ namespace HighPen
             zoomer.Factor = f;
             Toolbar.SettingsPanel.MarkZoomFactor(f);
             Toolbar.UpdateZoomTip();
+        }
+
+        // The mouse wheel while zoomed: one factor up (step > 0) or down, stopping at the smallest and the largest.
+        void StepZoomFactor(int step)
+        {
+            if (!zoomer.Active) return;
+            int i = Array.IndexOf(Zoomer.Factors, cfg.ZoomFactor) + step;
+            if (i < 0 || i >= Zoomer.Factors.Length) return;
+            SetZoomFactor(Zoomer.Factors[i]);
         }
 
         // A break already running keeps its length.

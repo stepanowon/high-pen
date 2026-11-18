@@ -33,11 +33,11 @@ winget install 9PDG1QN5QSL3 --source msstore
 
 ### 설치 없이 실행
 
-[HighPen.exe](https://github.com/stepanowon/high-pen/releases/download/v1.9.1/HighPen.exe)를 다운로드해서 바로 실행합니다. 설치 과정이 필요 없습니다.
+[HighPen.exe](https://github.com/stepanowon/high-pen/releases/download/v1.9.2/HighPen.exe)를 다운로드해서 바로 실행합니다. 설치 과정이 필요 없습니다.
 
 ### 설치 파일로 설치
 
-1. [HighPen-Setup.exe](https://github.com/stepanowon/high-pen/releases/download/v1.9.1/HighPen-Setup.exe)를 다운로드해서 실행합니다.
+1. [HighPen-Setup.exe](https://github.com/stepanowon/high-pen/releases/download/v1.9.2/HighPen-Setup.exe)를 다운로드해서 실행합니다.
 2. 설치 여부와 바탕화면 바로가기 생성 여부를 선택합니다.
 3. 설치가 끝나면 바로 실행할 수 있습니다.
 
@@ -50,7 +50,7 @@ winget install 9PDG1QN5QSL3 --source msstore
 
 ### 받은 파일 확인
 
-실행 파일은 [GitHub 릴리스](https://github.com/stepanowon/high-pen/releases)에서만 배포합니다. 코드 서명이 없으므로, 받은 파일이 릴리스에 올린 파일과 같은지 [SHA256SUMS.txt](https://github.com/stepanowon/high-pen/releases/download/v1.9.1/SHA256SUMS.txt)의 값과 비교해 확인할 수 있습니다.
+실행 파일은 [GitHub 릴리스](https://github.com/stepanowon/high-pen/releases)에서만 배포합니다. 코드 서명이 없으므로, 받은 파일이 릴리스에 올린 파일과 같은지 [SHA256SUMS.txt](https://github.com/stepanowon/high-pen/releases/download/v1.9.2/SHA256SUMS.txt)의 값과 비교해 확인할 수 있습니다.
 
 ```powershell
 Get-FileHash .\HighPen-Setup.exe -Algorithm SHA256
@@ -91,7 +91,7 @@ Windows 10/11 (.NET Framework 4.8 포함, 별도 설치 불필요)
 | 되돌리기 | Ctrl+Alt+Z | 마지막 필기나 지우개 작업을 취소합니다. |
 | 지우기 | Ctrl+Alt+C | 현재 페이지의 필기와 말풍선을 모두 지웁니다. |
 | 말풍선 | Ctrl+Alt+T | 클릭한 위치에 텍스트 메모를 붙입니다. Enter 확정, Shift+Enter 줄바꿈, Esc 취소. |
-| 확대 | Ctrl+Alt+X | 마우스 포인터가 있는 모니터를 확대합니다. 배율은 설정에서 1.5배, 2배, 2.5배 중 선택합니다. |
+| 확대 | Ctrl+Alt+X | 마우스 포인터가 있는 모니터를 확대합니다. 배율은 설정에서 1.5배, 2배, 2.5배, 3배 중 선택하며, 확대 중에는 마우스 휠로 바꿀 수 있습니다. |
 | 확대 고정 | Ctrl+Shift+X | 확대 중에 확대 화면을 그 자리에 고정하거나 고정을 풉니다. 고정하면 마우스를 움직여도 확대 화면이 움직이지 않고, 확대 버튼에 "확대 고정"이 표시됩니다. |
 | 캡처 | Ctrl+Alt+F | 작동 모니터의 화면을 필기·칠판·말풍선과 함께 PNG로 저장하고 클립보드에 복사합니다. 설정바와 스팟은 찍히지 않습니다. |
 | 쉬는 시간 | Ctrl+Alt+W | 쉬는 시간 타이머를 시작하고 끝냅니다. 작동 모니터 전체에 남은 시간이 크게 표시됩니다. |
@@ -115,7 +115,7 @@ Windows 10/11 (.NET Framework 4.8 포함, 별도 설치 불필요)
 | 언어 | | 한국어, 日本語, English 중에서 고르면 바로 바뀝니다. 기본값은 English입니다([언어 바꾸기](#언어-바꾸기) 참고). |
 | 단축키 설정 | | 모든 단축키를 원하는 조합으로 바꾸거나 없앨 수 있습니다([단축키 바꾸기](#단축키-바꾸기) 참고). |
 | 업데이트 확인 | | 누르면 새 버전이 나왔는지 바로 확인합니다. 시작할 때도 자동으로 확인합니다([자동 업데이트](#자동-업데이트) 참고). Microsoft Store 버전에서는 누르면 Store의 HighPen 페이지가 열리고, 받을 업데이트가 있으면 거기서 업데이트합니다. |
-| 버전 | | 패널 맨 아래에 현재 버전(`HighPen v1.9.1`)이 표시됩니다. |
+| 버전 | | 패널 맨 아래에 현재 버전(`HighPen v1.9.2`)이 표시됩니다. |
 
 설정은 자동 저장되며 `%APPDATA%\HighPen\settings.txt`에 있습니다.
 
@@ -219,7 +219,7 @@ Windows 10/11 (.NET Framework 4.8 포함, 별도 설치 불필요)
 
 ### 화면 확대
 
-마우스 포인터가 있는 모니터를 실시간으로 확대합니다. 배율(1.5배·2배·2.5배)은 설정 패널에서 고를 수 있으며, 확대 중에 바꾸면 바로 적용됩니다.
+마우스 포인터가 있는 모니터를 실시간으로 확대합니다. 배율(1.5배·2배·2.5배·3배)은 설정 패널에서 고를 수 있으며, 확대 중에 바꾸면 바로 적용됩니다. 확대 중에 마우스 휠을 위로 돌리면 한 단계 더 확대되고, 아래로 돌리면 한 단계 줄어듭니다(1.5배~3배). 이때 휠은 화면을 스크롤하지 않으며, HighPen 창이나 시작 메뉴처럼 확대 화면 위에 떠 있는 창 위에서는 평소처럼 스크롤됩니다.
 
 ![화면 확대](../screen/ko/zoom-1.9.1.png)
 
