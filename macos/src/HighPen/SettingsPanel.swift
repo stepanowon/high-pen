@@ -24,6 +24,7 @@ final class SettingsPanel {
     private var breakTitle = NSTextField(), breakBtns: [NSButton] = [], breakSlider = NSSlider()
     private var pressureBox: NSButton?, clicksBox: NSButton?
     private var spotOpacityTitle = NSTextField()
+    private var zoomSegments: NSSegmentedControl?
     // beside a bar lying along an edge: in columns. Changing it rearranges the groups without making them again
     // (making controls leaves AppKit bookkeeping behind each time).
     // The groups never leave their container, only their constraints change, and only when the panel is shown:
@@ -40,6 +41,7 @@ final class SettingsPanel {
 
     func showPenColor(_ i: Int) { penSwatches?.selectedSegment = i }
     func showHighlightColor(_ i: Int) { highlightSwatches?.selectedSegment = i }
+    func showZoomIndex(_ i: Int) { zoomSegments?.selectedSegment = i }
     // The checkboxes, after their shortcut changed them.
     func showSwitches() {
         pressureBox?.state = Cfg.pressure ? .on : .off
@@ -145,10 +147,13 @@ final class SettingsPanel {
 
         section()
         title("ZoomFactor")
-        add(segments(Cfg.zoomFactors.map { String(format: "%gx", $0) }, Cfg.zoomIndex, fill: true) { [unowned self] i in
+        let zs = segments(Cfg.zoomFactors.map { String(format: "%gx", $0) }, Cfg.zoomIndex, fill: true) { [unowned self] i in
             Cfg.zoomIndex = i
             self.delegate?.zoomChanged()
-        })
+        }
+        hints.attach(zs, Lang.t("ZoomWheel"))
+        zoomSegments = zs
+        add(zs)
 
         section()
         breakTitle = label("", size: SettingsPanel.textSize)

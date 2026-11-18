@@ -102,6 +102,7 @@ final class Controller: NSObject, NSApplicationDelegate, SettingsPanelDelegate {
         }
         zoomer.onChange = { [unowned self] in self.applyZoomTransform() }
         zoomer.onStop = { [unowned self] in self.syncToolbar() }
+        zoomer.onWheel = { [unowned self] in self.stepZoomFactor($0) }
         spot.toShown = { [unowned self] in self.zoomer.shown($0) }
         clicks.toShown = spot.toShown
         clicks.allowed = { [unowned self] in !self.tools.penMode } // while drawing every pen stroke would be a click
@@ -267,9 +268,27 @@ final class Controller: NSObject, NSApplicationDelegate, SettingsPanelDelegate {
         if zoomer.active { zoomer.stop(); syncToolbar(); return }
         guard CGPreflightScreenCaptureAccess() else { askPermission(); return }
         Task { @MainActor in
-            do { try await zoomer.start(screen(Cfg.monitor), factor: Cfg.zoomFactors[Cfg.zoomIndex]) }
+            do { try await zoomer.start(screen(Cfg.monitor), factor: Cfg.zoomFactors[Cfg.zoomIndex]); noteWheelPermission() }
             catch { askPermission() }
             syncToolbar()
+        }
+    }
+
+    // The mouse wheel while zoomed: one factor up (step > 0) or down, stopping at the smallest and the largest.
+    func stepZoomFactor(_ step: Int) {
+        let i = Cfg.zoomIndex + step
+        guard zoomer.active, Cfg.zoomFactors.indices.contains(i) else { return }
+        Cfg.zoomIndex = i
+        settings.showZoomIndex(i)
+        zoomChanged()
+    }
+
+    // The first zoom without the Accessibility permission says once that the wheel needs it; clicking asks for it.
+    func noteWheelPermission() {
+        guard zoomer.active, !AXIsProcessTrusted(), !Cfg.wheelAsked else { return }
+        Cfg.wheelAsked = true
+        toast.show(Lang.t("WheelPermission"), seconds: 10) {
+            _ = AXIsProcessTrustedWithOptions([kAXTrustedCheckOptionPrompt.takeUnretainedValue(): true] as CFDictionary)
         }
     }
 
