@@ -35,6 +35,14 @@ final class Zoomer: NSObject, SCStreamOutput, SCStreamDelegate {
     // The system stopped the stream (display gone, permission withdrawn).
     var onStop: () -> Void = {}
     var active: Bool { stream != nil }
+    // While the pointer is drawn the mouse wheel changes the factor instead of scrolling: +1 a notch up, -1 down.
+    // Over HighPen's windows, and in pen mode, it scrolls as usual. Needs the Accessibility permission (an event tap
+    // that takes events away from other apps); without it the wheel scrolls as before.
+    var onWheel: (Int) -> Void = { _ in }
+    private var wheelTap: CFMachPort?, wheelSource: CFRunLoopSource?
+    // the part of a step turned so far: a trackpad scrolls smoothly, wheelPoints per step
+    private var wheelRest: CGFloat = 0
+    private static let wheelPoints: CGFloat = 40
 
     // True: the real pointer is visible and its position is the position on the display.
     // False: it is hidden, on the content, and drawn over the image.
@@ -94,6 +102,54 @@ final class Zoomer: NSObject, SCStreamOutput, SCStreamDelegate {
         pointerWindow.setFrame(frame, display: false)
         update(force: true)
         timer = repeatingTimer(1.0 / 60) { [weak self] in self?.update(force: false) }
+        startWheel()
+    }
+
+    private func startWheel() {
+        wheelRest = 0
+        guard wheelTap == nil, AXIsProcessTrusted() else { return }
+        let me = Unmanaged.passUnretained(self).toOpaque()
+        guard let tap = CGEvent.tapCreate(tap: .cgSessionEventTap, place: .headInsertEventTap, options: .defaultTap,
+                                          eventsOfInterest: CGEventMask(1 << CGEventType.scrollWheel.rawValue),
+                                          callback: { _, type, e, me in
+                                              let z = Unmanaged<Zoomer>.fromOpaque(me!).takeUnretainedValue()
+                                              return MainActor.assumeIsolated { z.wheel(type, e) }
+                                          }, userInfo: me) else { return }
+        wheelTap = tap
+        wheelSource = CFMachPortCreateRunLoopSource(nil, tap, 0)
+        CFRunLoopAddSource(CFRunLoopGetMain(), wheelSource, .commonModes)
+    }
+
+    private func stopWheel() {
+        guard let t = wheelTap else { return }
+        CGEvent.tapEnable(tap: t, enable: false)
+        CFRunLoopRemoveSource(CFRunLoopGetMain(), wheelSource, .commonModes)
+        CFMachPortInvalidate(t)
+        wheelTap = nil
+        wheelSource = nil
+    }
+
+    // nil: the event is taken (it does not scroll the app under the pointer).
+    private func wheel(_ type: CGEventType, _ e: CGEvent) -> Unmanaged<CGEvent>? {
+        let pass = Unmanaged.passUnretained(e)
+        if type == .tapDisabledByTimeout || type == .tapDisabledByUserInput {
+            if let t = wheelTap { CGEvent.tapEnable(tap: t, enable: true) }
+            return pass
+        }
+        guard type == .scrollWheel, active, !pointerDirect else { return pass }
+        if e.getIntegerValueField(.scrollWheelEventMomentumPhase) != 0 { return nil } // the glide after a swipe
+        // a notch is one step however fast the wheel turns; smooth scrolling adds up
+        var d = e.getIntegerValueField(.scrollWheelEventIsContinuous) != 0
+            ? CGFloat(e.getDoubleValueField(.scrollWheelEventPointDeltaAxis1)) / Zoomer.wheelPoints
+            : CGFloat(e.getIntegerValueField(.scrollWheelEventDeltaAxis1).signum())
+        if d == 0 { return pass } // sideways, or the start and end of a swipe
+        // up is up on the device, whatever the scrolling direction setting
+        if NSEvent(cgEvent: e)?.isDirectionInvertedFromDevice == true { d = -d }
+        wheelRest += d
+        let steps = Int(wheelRest)
+        wheelRest -= CGFloat(steps)
+        if steps != 0 { onWheel(steps > 0 ? 1 : -1) }
+        return nil
     }
 
     func stop() {
@@ -101,6 +157,7 @@ final class Zoomer: NSObject, SCStreamOutput, SCStreamDelegate {
         guard let s = stream else { return }
         if !pointerDirect { showPointer(direct: true, at: nil) } // left on the content it was over
         restoreClicks()
+        stopWheel()
         stream = nil
         timer?.invalidate()
         timer = nil

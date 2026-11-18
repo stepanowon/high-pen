@@ -10,7 +10,7 @@ The macOS version of the pen app for online lectures. It runs on macOS 14 (Sonom
 
 ## Download
 
-**[Download HighPen-1.5.1.dmg](https://github.com/stepanowon/high-pen/releases/download/macos-v1.5.1/HighPen-1.5.1.dmg)** (release [macos-v1.5.1](https://github.com/stepanowon/high-pen/releases/tag/macos-v1.5.1))
+**[Download HighPen-1.5.2.dmg](https://github.com/stepanowon/high-pen/releases/download/macos-v1.5.2/HighPen-1.5.2.dmg)** (release [macos-v1.5.2](https://github.com/stepanowon/high-pen/releases/tag/macos-v1.5.2))
 
 1. Open the DMG and drag HighPen onto the Applications folder.
 2. **Before opening it the first time**, run this in Terminal. HighPen then opens without any warning.
@@ -62,7 +62,7 @@ Distributing without the warning requires joining the Apple Developer Program, t
 | Undo | ⌃⌥Z | One stroke, everything removed by one eraser drag, or a clear all (its speech bubbles come back too) |
 | Clear | ⌃⌥C | Clears the current page |
 | Note | ⌃⌥T | Text box at the clicked spot. Enter confirms, Shift+Enter adds a line, Esc cancels. Removed only by Clear |
-| Zoom | ⌃⌥X | Live 1.5x / 2x / 2.5x zoom. The pointer you see is where you click (see [Zoom](#zoom)) |
+| Zoom | ⌃⌥X | Live 1.5x / 2x / 2.5x / 3x zoom; the mouse wheel changes the level while zoomed. The pointer you see is where you click (see [Zoom](#zoom)) |
 | Zoom lock | ⌃⇧X | While zoomed, locks the zoomed view in place or unlocks it (see [Zoom](#zoom)) |
 | Capture | ⌃⌥F | Saves the screen with ink as a PNG in `~/Pictures/HighPen` and copies it to the clipboard |
 | Break | ⌃⌥W | Shows the time left and when class resumes, large, over the whole selected monitor. The last minute is orange; when time is up a red 00:00 stays until you press it again. Clicks pass through and the toolbar stays on top |
@@ -86,6 +86,7 @@ In Settings > **Shortcuts**, click an item, then press the new combination. Esc 
 - The toolbar, the settings panel and the hints are not zoomed and keep their normal size.
 - Turning the pen on freezes the view so you can write right where you see things. Ink is kept in screen coordinates, so after zoom is turned off it stays on the same content at normal size.
 - **Zoom lock (⌃⇧X):** the view stays put as the pointer moves and the Zoom button reads "Locked". You can still click what you see, and the pointer stays inside the part shown. Turning zoom off also unlocks.
+- **Wheel zoom:** while zoomed, roll the mouse wheel up to zoom in a step and down to zoom out (stopping at 1.5x and 3x). The new level is saved. The wheel does not scroll the screen then; over the toolbar and settings panel, and in pen mode, it scrolls as usual. On a trackpad, a slightly longer two-finger swipe changes one step. This needs the **Accessibility** permission (turn on HighPen in System Settings > Privacy & Security > Accessibility). Without it a note is shown once on the first zoom, and the wheel scrolls as usual.
 - Changing the selected monitor, or monitors being connected or removed, turns zoom off.
 
 ### Toolbar

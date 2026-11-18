@@ -8,7 +8,7 @@ enum Cfg {
     static let colorNames = ["Red", "Orange", "Yellow", "Green", "Blue", "Purple", "Black", "White"] // Lang keys
     static let black = 6, white = 7
     static let colors = 0...palette.count - 1
-    static let zoomFactors: [CGFloat] = [1.5, 2, 2.5]
+    static let zoomFactors: [CGFloat] = [1.5, 2, 2.5, 3]
 
     static func int(_ k: String, _ def: Int, _ r: ClosedRange<Int>) -> Int {
         d.object(forKey: k) == nil ? def : min(max(d.integer(forKey: k), r.lowerBound), r.upperBound)
@@ -30,7 +30,7 @@ enum Cfg {
     static var showClicks: Bool { get { flag("ShowClicks", false) } set { d.set(newValue, forKey: "ShowClicks") } }
     static var spotOn: Bool { get { flag("SpotOn", true) } set { d.set(newValue, forKey: "SpotOn") } }
     static var breakMinutes: Int { get { BreakTimes.clamp(int("BreakMinutes", 10, 0...1000)) } set { d.set(newValue, forKey: "BreakMinutes") } }
-    static var zoomIndex: Int { get { int("ZoomIndex", 1, 0...2) } set { d.set(newValue, forKey: "ZoomIndex") } }
+    static var zoomIndex: Int { get { int("ZoomIndex", 1, 0...zoomFactors.count - 1) } set { d.set(newValue, forKey: "ZoomIndex") } }
     // The chosen monitor is remembered by display UUID, so it survives monitors being reordered. While it is
     // disconnected HighPen uses the main monitor, and returns to it once it is connected again.
     static var monitor: Int {
@@ -48,6 +48,8 @@ enum Cfg {
     static var barY: Double { get { num("BarY", 20, 0...100_000) } set { d.set(newValue, forKey: "BarY") } }
     // the edge the toolbar lies along (BarEdge)
     static var barEdge: Int { get { int("BarEdge", 0, 0...2) } set { d.set(newValue, forKey: "BarEdge") } }
+    // the note about the Accessibility permission the zoom wheel needs was shown (once)
+    static var wheelAsked: Bool { get { flag("WheelAsked", false) } set { d.set(newValue, forKey: "WheelAsked") } }
     static var language: String? { get { d.string(forKey: "Language") } set { d.set(newValue, forKey: "Language") } }
     // Shortcuts changed from their defaults, by action id (Hotkey.saved, or "" = no shortcut).
     static var hotkeys: [String: String] { get { d.dictionary(forKey: "Hotkeys") as? [String: String] ?? [:] } set { d.set(newValue, forKey: "Hotkeys") } }
