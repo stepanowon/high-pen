@@ -124,6 +124,8 @@ macOS 앱은 `macos/`에 있고 DMG로만 배포한다(Apple 공증 없음). 태
 | 1.9.0 제출 | 완료 | 2026-11-08 이 PC에 Store 버전 1.9.0.0(`StephenWon.HighPen_1.9.0.0`)이 설치되어 실행 중인 것을 확인 |
 | 1.9.1 MSIX | 완료 | `dist/HighPen.msix` (1.9.1.0) `0c8e7716…` 빌드. MSIX 안의 `HighPen.exe`가 `dist/HighPen.exe`와 같음(`5f0c4580…`) 확인. `HighPen-Setup.exe` `01f43c69…`도 같은 exe를 포함함을 확인. `SHA256SUMS.txt` 작성 |
 | 1.9.1 제출 | 완료 | 2026-11-15 이 PC에 Store 버전 1.9.1.0(`StephenWon.HighPen_1.9.1.0`)이 설치되어 있음을 확인. 현재 Store 버전 |
+| 1.9.2 MSIX | 완료 | `dist/HighPen.msix` (1.9.2.0) `2f7908cb…` 빌드. MSIX 안의 `HighPen.exe`가 `dist/HighPen.exe`와 같음(`8cd7d213…`) 확인. `HighPen-Setup.exe` `da9b04e5…`는 같은 exe로 빌드. `SHA256SUMS.txt` 작성. 확대 배율 3배 추가, 확대 중 마우스 휠로 배율 변경 |
+| 1.9.2 제출 | 대기 | 1.9.2.0 패키지를 Partner Center에 제출해야 함. GitHub 릴리스는 사용자 요청으로 Store 제출 전에 만듦 |
 
 ## Store 정보
 

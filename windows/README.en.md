@@ -33,11 +33,11 @@ winget install 9PDG1QN5QSL3 --source msstore
 
 ### Run without installing
 
-Download [HighPen.exe](https://github.com/stepanowon/high-pen/releases/download/v1.9.1/HighPen.exe) and run it directly. No installation needed.
+Download [HighPen.exe](https://github.com/stepanowon/high-pen/releases/download/v1.9.2/HighPen.exe) and run it directly. No installation needed.
 
 ### Install with the installer
 
-1. Download [HighPen-Setup.exe](https://github.com/stepanowon/high-pen/releases/download/v1.9.1/HighPen-Setup.exe) and run it.
+1. Download [HighPen-Setup.exe](https://github.com/stepanowon/high-pen/releases/download/v1.9.2/HighPen-Setup.exe) and run it.
 2. Confirm the installation and choose whether to create a desktop shortcut.
 3. When the installation finishes, you can start the app right away.
 
@@ -50,7 +50,7 @@ Download [HighPen.exe](https://github.com/stepanowon/high-pen/releases/download/
 
 ### Verify the download
 
-The executables are distributed only through [GitHub Releases](https://github.com/stepanowon/high-pen/releases). They are not code-signed, so you can check that a downloaded file is the one published in the release by comparing it with [SHA256SUMS.txt](https://github.com/stepanowon/high-pen/releases/download/v1.9.1/SHA256SUMS.txt).
+The executables are distributed only through [GitHub Releases](https://github.com/stepanowon/high-pen/releases). They are not code-signed, so you can check that a downloaded file is the one published in the release by comparing it with [SHA256SUMS.txt](https://github.com/stepanowon/high-pen/releases/download/v1.9.2/SHA256SUMS.txt).
 
 ```powershell
 Get-FileHash .\HighPen-Setup.exe -Algorithm SHA256
@@ -91,7 +91,7 @@ Shortcuts are global, so they work while you are using other programs. A combina
 | Undo | Ctrl+Alt+Z | Cancels the last pen stroke or eraser action. |
 | Clear | Ctrl+Alt+C | Clears all ink and notes on the current page. |
 | Note | Ctrl+Alt+T | Places a text note where you click. Enter confirms, Shift+Enter adds a line break, Esc cancels. |
-| Zoom | Ctrl+Alt+X | Zooms the monitor under the mouse pointer (1.5x, 2x or 2.5x, chosen in Settings). |
+| Zoom | Ctrl+Alt+X | Zooms the monitor under the mouse pointer (1.5x, 2x, 2.5x or 3x, chosen in Settings or with the mouse wheel while zoomed). |
 | Lock zoom | Ctrl+Shift+X | While zoomed, locks the zoomed view in place or unlocks it. While locked, moving the mouse does not move the view, and the zoom button reads "Locked". |
 | Capture | Ctrl+Alt+F | Saves the active monitor, with ink, board and notes, as a PNG and copies it to the clipboard. The toolbar and spot are left out. |
 | Break | Ctrl+Alt+W | Starts and stops the break timer. The time left is shown in large digits over the whole active monitor. |
@@ -115,7 +115,7 @@ Shortcuts are global, so they work while you are using other programs. A combina
 | Language | | Choose 한국어, 日本語 or English; the change applies immediately. The default is English (see [Changing the language](#changing-the-language)). |
 | Shortcuts | | Change any shortcut to the combination you want, or remove it (see [Changing shortcuts](#changing-shortcuts)). |
 | Check for updates | | Looks for a new version right away. HighPen also checks automatically at every start-up (see [Automatic updates](#automatic-updates)). In the Microsoft Store version it opens HighPen's Store page, where you can update when an update is available. |
-| Version | | The current version (`HighPen v1.9.1`) is shown at the bottom of the panel. |
+| Version | | The current version (`HighPen v1.9.2`) is shown at the bottom of the panel. |
 
 Settings are saved automatically to `%APPDATA%\HighPen\settings.txt`.
 
@@ -219,7 +219,7 @@ Attaches a text note to the screen. Use it to leave terms or explanations in cle
 
 ### Zoom
 
-Zooms the monitor under the mouse pointer in real time. Pick 1.5x, 2x or 2.5x in the settings panel; changing it while zoomed applies immediately.
+Zooms the monitor under the mouse pointer in real time. Pick 1.5x, 2x, 2.5x or 3x in the settings panel; changing it while zoomed applies immediately. While zoomed, turning the mouse wheel up zooms in one step and turning it down zooms out one step (1.5x to 3x). The wheel does not scroll the screen then, except over HighPen's own windows or a window above the zoomed image, such as the Start menu.
 
 ![Zoom](../screen/en/zoom-1.9.1.png)
 

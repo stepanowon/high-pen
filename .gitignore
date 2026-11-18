@@ -4,3 +4,4 @@ windows/dist/*.msix
 windows/dist/SHA256SUMS.txt
 macos/dist/
 .DS_Store
+.playwright-mcp/

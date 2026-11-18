@@ -215,7 +215,7 @@ namespace HighPen
             foreach (double f in Zoomer.Factors)
             {
                 double fv = f;
-                Border zb = Theme.TextButton(f.ToString(System.Globalization.CultureInfo.InvariantCulture) + "x", ThirdWidth, 26, new Thickness(2));
+                Border zb = Theme.TextButton(f.ToString(System.Globalization.CultureInfo.InvariantCulture) + "x", QuarterWidth, 26, new Thickness(2));
                 zb.MouseLeftButtonUp += delegate { actions.SetZoomFactor(fv); };
                 zoomFactorBtns.Add(zb);
                 zp.Children.Add(zb);
